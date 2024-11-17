@@ -1,23 +1,57 @@
 include_directories(
 	${SKYLICHT_ENGINE_SOURCE_DIR}/Samples/BoidSystemVAT/Source
-	${SKYLICHT_ENGINE_SOURCE_DIR}/Samples/BoidSystem/Source/Boids
-	${SKYLICHT_ENGINE_SOURCE_DIR}/Samples/SampleFW
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Main
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Irrlicht/Include
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/System
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Engine
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Components
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Collision
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Physics
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Client
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Lightmapper
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Audio
+	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty
 	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty/freetype2/include
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Bullet3/src
 )
+
+if (BUILD_SKYLICHT_AUDIO)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Audio)
+endif()
+
+if (BUILD_SKYLICHT_LIGHMAPPER)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Lightmapper)
+endif()
+
+if (BUILD_SKYLICHT_COMPONENTS)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Components)
+endif()
+
+if (BUILD_SKYLICHT_COLLISION)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Collision)
+endif()
 
 if (BUILD_IMGUI)
 	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Imgui)
+endif()
+
+if (BUILD_SKYLICHT_PHYSIC)
+	include_directories(
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Bullet3/src
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Physics
+	)
+endif()
+
+if (BUILD_SPINE_RUNTIMES)
+	include_directories(
+		${SKYLICHT_ENGINE_PROJECT_DIR}/SpineCpp/spine-cpp/include
+		${SKYLICHT_ENGINE_PROJECT_DIR}/SpineCpp/spine-runtimes
+	)
+endif()
+
+if (BUILD_SKYLICHT_UI)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/UserInterface)
+endif()
+
+if (BUILD_SKYLICHT_NETWORK)
+	include_directories(
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Crypto
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Network
+	)
 endif()
 
 set(template_path ${SKYLICHT_ENGINE_PROJECT_DIR}/Main)
@@ -25,11 +59,10 @@ set(template_path ${SKYLICHT_ENGINE_PROJECT_DIR}/Main)
 file(GLOB_RECURSE application_source 
 	./Source/**.cpp 
 	./Source/**.c 
-	./Source/**.h
-	../SampleFW/**.cpp
-	../SampleFW/**.h
-	../BoidSystem/Source/Boids/**.cpp
-	../BoidSystem/Source/Boids/**.h)
+	./Source/**.h)
+
+# Custom additional sources
+include(CMakeProject.cmake)
 
 setup_project_group("${application_source}" ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -46,24 +79,24 @@ if (BUILD_ANDROID)
 endif()
 
 if (BUILD_WINDOWS_STORE)
-	file(MAKE_DIRECTORY ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem)
-	file(MAKE_DIRECTORY ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem/Assets)
+	file(MAKE_DIRECTORY ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT)
+	file(MAKE_DIRECTORY ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT/Assets)
 	
 	file(GLOB uwp_assets 
 		${template_path}/Platforms/UWP/Assets/**.*
 		${SKYLICHT_ENGINE_BIN_DIR}/**.zip)
 	
 	foreach(asset_file ${uwp_assets})
-		file(COPY "${asset_file}" DESTINATION ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem/Assets)
+		file(COPY "${asset_file}" DESTINATION ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT/Assets)
 	endforeach()
 
 	file(COPY ${template_path}/Platforms/UWP/Package.appxmanifest
 		DESTINATION 
-		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem)
+		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT)
 		
 	file(COPY ${template_path}/Platforms/UWP/TemporaryKey.pfx
 		DESTINATION 
-		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem)
+		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT)
 
 	file(GLOB_RECURSE platform_uwp_source 
 		${template_path}/Platforms/UWP/**.cpp 
@@ -71,7 +104,7 @@ if (BUILD_WINDOWS_STORE)
 		${template_path}/Platforms/UWP/**.h)
 	
 	# copy resource to generate prj folder
-	file(GLOB_RECURSE platform_uwp_asset ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem/Assets/**.*)
+	file(GLOB_RECURSE platform_uwp_asset ${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT/Assets/**.*)
 	add_source_group("${platform_uwp_asset}" "Assets")
 	
 	list (APPEND application_source ${platform_uwp_source})
@@ -142,7 +175,19 @@ if (BUILD_SDL AND MSVC)
 	endif()	
 	link_directories(${sdl_lib_path})
 endif()	
-	
+
+
+if (BUILD_OPENSSL AND MSVC)
+	if (CMAKE_CL_64)
+		set(openssl_lib_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x64")
+		set(openssl_dll_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x64/*.dll")
+	else()
+		set(openssl_lib_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x86")
+		set(openssl_dll_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x86/*.dll")
+	endif()	
+	link_directories(${openssl_lib_path})
+endif()
+
 if (MINGW OR CYGWIN)
 	# .rc build
 	set(CMAKE_RC_COMPILER_INIT windres)
@@ -171,8 +216,8 @@ elseif (BUILD_WINDOWS_STORE)
 	add_executable(SampleBoidSystemVAT
 		${application_source}
 		${platform_uwp_asset}
-		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem/TemporaryKey.pfx
-		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystem/Package.appxmanifest
+		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT/TemporaryKey.pfx
+		${SKYLICHT_ENGINE_SOURCE_DIR}/PrjUWP/Samples/BoidSystemVAT/Package.appxmanifest
 	)
 elseif (MSVC OR CYGWIN OR MINGW)
 	add_executable(SampleBoidSystemVAT WIN32
@@ -224,6 +269,8 @@ elseif (BUILD_MACOS)
 		BUILD_WITH_INSTALL_RPATH 1
 		INSTALL_RPATH "@executable_path/../Frameworks"
 	)
+	
+	set_target_properties(SampleBoidSystemVAT PROPERTIES XCODE_ATTRIBUTE_INSTALL_PATH $(LOCAL_APPS_DIR))
 elseif (BUILD_IOS)
 	set(MACOSX_BUNDLE_EXECUTABLE_NAME SampleBoidSystemVAT)
 
@@ -268,12 +315,15 @@ elseif (BUILD_IOS)
 	set_target_properties(SampleBoidSystemVAT PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CODE_SIGN_IDENTITY})
 	set_target_properties(SampleBoidSystemVAT PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY ${DEVICE_FAMILY})
 	set_target_properties(SampleBoidSystemVAT PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${template_path}/Platforms/IOS/plist.in")
-	
+	set_target_properties(SampleBoidSystemVAT PROPERTIES XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon)
+	set_target_properties(SampleBoidSystemVAT PROPERTIES XCODE_ATTRIBUTE_INSTALL_PATH $(LOCAL_APPS_DIR))
+
 	# add assets icon
 	target_sources(SampleBoidSystemVAT PRIVATE "${template_path}/Platforms/IOS/Assets.xcassets")
 	
 	list (APPEND platform_ios_resources "${template_path}/Platforms/IOS/Assets.xcassets")
-	set_target_properties(SampleBoidSystemVAT PROPERTIES RESOURCE "${resources_files} ${platform_ios_resources}")
+	list (APPEND platform_ios_resources "${resources_files}")
+	set_target_properties(SampleBoidSystemVAT PROPERTIES RESOURCE "${platform_ios_resources}")
 
 	# link framework
 	target_link_libraries(SampleBoidSystemVAT "-framework Foundation")
@@ -299,6 +349,16 @@ endif()
 # Imgui
 if (BUILD_IMGUI)
 	target_link_libraries(SampleBoidSystemVAT Imgui)
+endif()
+
+# Spine runtimes
+if (BUILD_SPINE_RUNTIMES)
+	target_link_libraries(SampleBoidSystemVAT SpineRuntimes)
+endif()
+
+# OpenSSL
+if (BUILD_OPENSSL AND MSVC)
+	target_link_libraries(SampleBoidSystemVAT crypto.lib decrepit.lib ssl.lib Crypt32.lib)
 endif()
 
 # Emscripten

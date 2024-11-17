@@ -40,6 +40,14 @@ float3 linearRGB(float3 color)
 {
 	return pow(color, invGamma);
 }
+float3 shAmbient(float3 n)
+{
+	float3 ambientLighting = uSHConst[0].xyz +
+		uSHConst[1].xyz * n.y +
+		uSHConst[2].xyz * n.z +
+		uSHConst[3].xyz * n.x;
+	return ambientLighting * 0.9;
+}
 static const float PI = 3.1415926;
 float3 fresnelSchlick(float3 V, float3 H, float3 F0)
 {
@@ -94,11 +102,8 @@ float4 main(PS_INPUT input) : SV_TARGET
 	float roughness = rmaMap.r;
 	float metalness = rmaMap.g;
 	float ao = rmaMap.b;
-	float3 ambientLighting = uSHConst[0].xyz +
-		uSHConst[1].xyz * n.y +
-		uSHConst[2].xyz * n.z +
-		uSHConst[3].xyz * n.x;
-	ambientLighting = sRGB(ambientLighting * 0.9);
+	float3 ambientLighting = shAmbient(n);
+	ambientLighting = sRGB(ambientLighting);
 	float3 albedo = sRGB(albedoMap.rgb);
 	float3 F0 = float3(0.04, 0.04, 0.04);
 	F0 = lerp(F0, albedo, metalness);
@@ -113,8 +118,8 @@ float4 main(PS_INPUT input) : SV_TARGET
 	float3 prefilteredColor = sRGB(uTexReflect.SampleLevel(uTexReflectSampler, reflection, roughness * 7).xyz);
 	float2 envBRDF = uTexBRDF.Sample(uTexBRDFSampler, float2(VdotN, roughness)).rg;
 	float3 indirectSpecular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y);
-	float grey = (0.4 + (1.0 - roughness) * 2.6);
-	float3 indirectLight = (kd * indirectDiffuse + indirectSpecular * grey);
+	float brightness = (0.8 + (1.0 - roughness) * 2.2);
+	float3 indirectLight = (kd * indirectDiffuse + indirectSpecular * brightness);
 	lightContribution += sRGB(emissiveMap);
 	return float4((lightContribution + indirectLight) * ao, albedoMap.a);
 }

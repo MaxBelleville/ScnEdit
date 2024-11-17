@@ -36,6 +36,7 @@ cbuffer cbPerFrame
 };
 
 #include "../../PostProcessing/HLSL/LibToneMapping.hlsl"
+#include "../../SHAmbient/HLSL/SHAmbient.hlsl"
 
 #if defined(SHADOW)
 #include "../../Shadow/HLSL/LibShadow.hlsl"
@@ -65,6 +66,7 @@ float4 main(PS_INPUT input) : SV_TARGET
 	// shadow
 	float depth = length(input.depth);
 
+#if defined(CASCADED_SHADOW)
 	float4 shadowCoord[3];
 	shadowCoord[0] = mul(float4(input.worldPos, 1.0), uShadowMatrix[0]);
 	shadowCoord[1] = mul(float4(input.worldPos, 1.0), uShadowMatrix[1]);
@@ -75,16 +77,18 @@ float4 main(PS_INPUT input) : SV_TARGET
 	shadowDistance[1] = uShadowDistance.y;
 	shadowDistance[2] = uShadowDistance.z;
 	visibility = shadow(shadowCoord, shadowDistance, depth);
-#endif
+#else
+	float4 shadowCoord = mul(float4(input.worldPos, 1.0), uShadowMatrix[0]);
+	visibility = shadow(shadowCoord, depth);
+#endif	// CASCADED_SHADOW
+
+#endif // SHADOW
 
 	// SH4 Ambient
-	float3 ambientLighting = uSHConst[0].xyz +
-		uSHConst[1].xyz * input.worldNormal.y +
-		uSHConst[2].xyz * input.worldNormal.z +
-		uSHConst[3].xyz * input.worldNormal.x;
-
+	float3 ambientLighting = shAmbient(input.worldNormal);
+	
 	// Tone Mapping
-	ambientLighting = sRGB(ambientLighting * 0.9); // fix for SH4
+	ambientLighting = sRGB(ambientLighting * 0.9);
 	
 	float NdotL = max((dot(input.worldNormal, uLightDirection.xyz) + uWrapFactor.x) / (1.0 + uWrapFactor.x), 0.0);
 	float3 rampMap = uTexRamp.Sample(uTexRampSampler, float2(NdotL, NdotL)).rgb;

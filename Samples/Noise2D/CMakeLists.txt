@@ -4,17 +4,54 @@ include_directories(
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Irrlicht/Include
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/System
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Engine
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Components
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Collision
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Physics
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Client
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Lightmapper
-	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Audio
+	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty
 	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty/freetype2/include
 )
 
+if (BUILD_SKYLICHT_AUDIO)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Audio)
+endif()
+
+if (BUILD_SKYLICHT_LIGHMAPPER)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Lightmapper)
+endif()
+
+if (BUILD_SKYLICHT_COMPONENTS)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Components)
+endif()
+
+if (BUILD_SKYLICHT_COLLISION)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Collision)
+endif()
+
 if (BUILD_IMGUI)
 	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Imgui)
+endif()
+
+if (BUILD_SKYLICHT_PHYSIC)
+	include_directories(
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Bullet3/src
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Physics
+	)
+endif()
+
+if (BUILD_SPINE_RUNTIMES)
+	include_directories(
+		${SKYLICHT_ENGINE_PROJECT_DIR}/SpineCpp/spine-cpp/include
+		${SKYLICHT_ENGINE_PROJECT_DIR}/SpineCpp/spine-runtimes
+	)
+endif()
+
+if (BUILD_SKYLICHT_UI)
+	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/UserInterface)
+endif()
+
+if (BUILD_SKYLICHT_NETWORK)
+	include_directories(
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Crypto
+		${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Network
+	)
 endif()
 
 set(template_path ${SKYLICHT_ENGINE_PROJECT_DIR}/Main)
@@ -23,6 +60,9 @@ file(GLOB_RECURSE application_source
 	./Source/**.cpp 
 	./Source/**.c 
 	./Source/**.h)
+
+# Custom additional sources
+include(CMakeProject.cmake)
 
 setup_project_group("${application_source}" ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -98,7 +138,7 @@ if (BUILD_MACOS)
 
 	list (APPEND application_source ${platform_mac_source})
 endif()
-	
+
 if (BUILD_IOS)
 	# Angle API
 	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Angle/include)
@@ -116,7 +156,7 @@ if (BUILD_IOS)
 
 	list (APPEND application_source ${platform_ios_source})
 endif()
-	
+
 if (BUILD_DEBUG_VLD)
 	if (CMAKE_CL_64)
 		set(vld_dll_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/Vld/bin/Win64/*.*")
@@ -124,7 +164,7 @@ if (BUILD_DEBUG_VLD)
 		set(vld_dll_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/Vld/bin/Win32/*.*")
 	endif()
 endif()
-
+	
 if (BUILD_SDL AND MSVC)
 	if (CMAKE_CL_64)
 		set(sdl_lib_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/SDL/lib/x64")
@@ -134,6 +174,18 @@ if (BUILD_SDL AND MSVC)
 		set(sdl_dll_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/SDL/lib/x86/*.dll")
 	endif()	
 	link_directories(${sdl_lib_path})
+endif()	
+
+
+if (BUILD_OPENSSL AND MSVC)
+	if (CMAKE_CL_64)
+		set(openssl_lib_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x64")
+		set(openssl_dll_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x64/*.dll")
+	else()
+		set(openssl_lib_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x86")
+		set(openssl_dll_path "${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdPartySDK/boringssl/x86/*.dll")
+	endif()	
+	link_directories(${openssl_lib_path})
 endif()
 
 if (MINGW OR CYGWIN)
@@ -154,7 +206,7 @@ elseif(BUILD_SDL)
 		${template_path}/Platforms/SDL2/MainSDL.cpp
 	)
 elseif(BUILD_LINUX)
-	add_executable(SampleNoise2D
+	add_executable(SampleNoise2D 
 		${application_source}
 		${template_path}/Platforms/Linux/MainLinux.cpp
 	)
@@ -217,11 +269,13 @@ elseif (BUILD_MACOS)
 		BUILD_WITH_INSTALL_RPATH 1
 		INSTALL_RPATH "@executable_path/../Frameworks"
 	)
+	
+	set_target_properties(SampleNoise2D PROPERTIES XCODE_ATTRIBUTE_INSTALL_PATH $(LOCAL_APPS_DIR))
 elseif (BUILD_IOS)
 	set(MACOSX_BUNDLE_EXECUTABLE_NAME SampleNoise2D)
 
 	set(APP_NAME "SampleNoise2D")
-	set(APP_BUNDLE_IDENTIFIER "com.skylicht.samplenoise2d")
+	set(APP_BUNDLE_IDENTIFIER "com.team_name.project_name")
 	set(CODE_SIGN_IDENTITY "iPhone Developer")
 
 	set(PRODUCT_NAME ${APP_NAME})
@@ -261,12 +315,15 @@ elseif (BUILD_IOS)
 	set_target_properties(SampleNoise2D PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CODE_SIGN_IDENTITY})
 	set_target_properties(SampleNoise2D PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY ${DEVICE_FAMILY})
 	set_target_properties(SampleNoise2D PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${template_path}/Platforms/IOS/plist.in")
-	
+	set_target_properties(SampleNoise2D PROPERTIES XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon)
+	set_target_properties(SampleNoise2D PROPERTIES XCODE_ATTRIBUTE_INSTALL_PATH $(LOCAL_APPS_DIR))
+
 	# add assets icon
 	target_sources(SampleNoise2D PRIVATE "${template_path}/Platforms/IOS/Assets.xcassets")
-
+	
 	list (APPEND platform_ios_resources "${template_path}/Platforms/IOS/Assets.xcassets")
-	set_target_properties(SampleNoise2D PROPERTIES RESOURCE "${resources_files} ${platform_ios_resources}")
+	list (APPEND platform_ios_resources "${resources_files}")
+	set_target_properties(SampleNoise2D PROPERTIES RESOURCE "${platform_ios_resources}")
 
 	# link framework
 	target_link_libraries(SampleNoise2D "-framework Foundation")
@@ -294,6 +351,16 @@ if (BUILD_IMGUI)
 	target_link_libraries(SampleNoise2D Imgui)
 endif()
 
+# Spine runtimes
+if (BUILD_SPINE_RUNTIMES)
+	target_link_libraries(SampleNoise2D SpineRuntimes)
+endif()
+
+# OpenSSL
+if (BUILD_OPENSSL AND MSVC)
+	target_link_libraries(SampleNoise2D crypto.lib decrepit.lib ssl.lib Crypt32.lib)
+endif()
+
 # Emscripten
 if (BUILD_EMSCRIPTEN)
 	message(STATUS "Setting build in data: ${CMAKE_CURRENT_BINARY_DIR}")
@@ -313,6 +380,14 @@ if (BUILD_DEBUG_VLD)
 	file(GLOB_RECURSE vld_bin_files ${vld_dll_path})
 	foreach(vld_bin ${vld_bin_files})
 		add_custom_command(TARGET SampleNoise2D POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${vld_bin} $<TARGET_FILE_DIR:SampleNoise2D>)
+	endforeach()
+endif()
+
+#SDL
+if (BUILD_SDL AND MSVC)
+	file(GLOB_RECURSE sdl_bin_files ${sdl_dll_path})
+	foreach(sdl_bin ${sdl_bin_files})
+		add_custom_command(TARGET SampleNoise2D POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${sdl_bin} $<TARGET_FILE_DIR:SampleNoise2D>)
 	endforeach()
 endif()
 

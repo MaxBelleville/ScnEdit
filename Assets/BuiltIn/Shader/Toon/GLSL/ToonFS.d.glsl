@@ -3,6 +3,7 @@ precision highp float;
 #else
 precision mediump float;
 #endif
+
 precision highp sampler2D;
 precision highp sampler2DArray;
 
@@ -37,6 +38,7 @@ in vec4 vColor;
 out vec4 FragColor;
 
 #include "../../PostProcessing/GLSL/LibToneMapping.glsl"
+#include "../../SHAmbient/GLSL/SHAmbient.glsl"
 
 #if defined(SHADOW)
 #include "../../Shadow/GLSL/LibShadow.glsl"
@@ -69,7 +71,8 @@ void main(void)
 	
 #if defined(SHADOW)
 	float depth = length(vDepth);
-
+	
+#if defined(CASCADED_SHADOW)
 	vec4 shadowCoord[3];
 	shadowCoord[0] = uShadowMatrix[0] * vec4(vWorldPosition, 1.0);
 	shadowCoord[1] = uShadowMatrix[1] * vec4(vWorldPosition, 1.0);
@@ -81,14 +84,16 @@ void main(void)
 	shadowDistance[2] = uShadowDistance.z;
 
 	visibility = shadow(shadowCoord, shadowDistance, depth);
-#endif
+#else
+	vec4 shadowCoord = uShadowMatrix[0] * vec4(vWorldPosition, 1.0)
+	visibility = shadow(shadowCoord, depth);
+#endif // CASCADED_SHADOW
+
+#endif // SHADOW
 
 	// SH Ambient
-	vec3 ambientLighting = uSHConst[0].xyz +
-		uSHConst[1].xyz * vWorldNormal.y +
-		uSHConst[2].xyz * vWorldNormal.z +
-		uSHConst[3].xyz * vWorldNormal.x;
-	ambientLighting = sRGB(ambientLighting * 0.9);	// fix for SH4
+	vec3 ambientLighting = shAmbient(vWorldNormal);
+	ambientLighting = sRGB(ambientLighting);
 	
 	// Shadows intensity through alpha
 	vec3 ramp = mix(color, shadowColor, shadowIntensity * (1.0 - visibility));

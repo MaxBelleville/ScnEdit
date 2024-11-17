@@ -60,6 +60,7 @@ cbuffer cbPerFrame
 };
 
 #include "../../../PostProcessing/HLSL/LibToneMapping.hlsl"
+#include "../../../SHAmbient/HLSL/SHAmbient.hlsl"
 
 static const float PI = 3.1415926;
 
@@ -145,13 +146,10 @@ float4 main(PS_INPUT input) : SV_TARGET
 	float ao = rmaMap.b;
 
 	// SH4 Ambient
-	float3 ambientLighting = uSHConst[0].xyz +
-		uSHConst[1].xyz * n.y +
-		uSHConst[2].xyz * n.z +
-		uSHConst[3].xyz * n.x;
+	float3 ambientLighting = shAmbient(n);
 
 	// Tone Mapping
-	ambientLighting = sRGB(ambientLighting * 0.9); // fix for SH4
+	ambientLighting = sRGB(ambientLighting);
 
 	float3 albedo = sRGB(albedoMap.rgb);
 	
@@ -185,8 +183,8 @@ float4 main(PS_INPUT input) : SV_TARGET
 	float2 envBRDF = uTexBRDF.Sample(uTexBRDFSampler, float2(VdotN, roughness)).rg;
 	float3 indirectSpecular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y);
 
-	float grey = (0.4 + (1.0 - roughness) * 2.6);
-	float3 indirectLight = (kd * indirectDiffuse + indirectSpecular * grey);
+	float brightness = (0.8 + (1.0 - roughness) * 2.2);
+	float3 indirectLight = (kd * indirectDiffuse + indirectSpecular * brightness);
 
 #ifdef EMISSIVE
 	lightContribution += sRGB(emissiveMap);

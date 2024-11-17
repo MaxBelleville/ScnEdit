@@ -24,6 +24,14 @@ vec3 linearRGB(vec3 color)
 {
 	return pow(color, vec3(invGamma));
 }
+vec3 shAmbient(vec3 n)
+{
+	vec3 ambientLighting = uSHConst[0].xyz +
+		uSHConst[1].xyz * n.y +
+		uSHConst[2].xyz * n.z +
+		uSHConst[3].xyz * n.x;
+	return ambientLighting * 0.9;
+}
 const float PI = 3.1415926;
 vec3 fresnelSchlick(vec3 V, vec3 H, vec3 F0)
 {
@@ -72,11 +80,8 @@ void main(void)
 	float roughness = rmaMap.r;
 	float metalness = rmaMap.g;
 	float ao = rmaMap.b;
-	vec3 ambientLighting = uSHConst[0].xyz +
-		uSHConst[1].xyz * n.y +
-		uSHConst[2].xyz * n.z +
-		uSHConst[3].xyz * n.x;
-	ambientLighting = sRGB(ambientLighting * 0.9);
+	vec3 ambientLighting = shAmbient(n);
+	ambientLighting = sRGB(ambientLighting);
 	vec3 albedo = sRGB(albedoMap.rgb);
 	vec3 F0 = vec3(0.04, 0.04, 0.04);
 	F0 = mix(F0, albedo, metalness);
@@ -88,10 +93,10 @@ void main(void)
 	kd *= (1.0 - metalness);
 	vec3 indirectDiffuse = ambientLighting * lambert;
 	vec3 reflection = -normalize(reflect(vWorldViewDir, n));
-	vec3 prefilteredColor = sRGB(textureLod(uTexReflect, reflection, roughness * 7).xyz);
+	vec3 prefilteredColor = sRGB(textureLod(uTexReflect, reflection, roughness * 7.0).xyz);
 	vec2 envBRDF = texture(uTexBRDF, vec2(VdotN, roughness)).rg;
 	vec3 indirectSpecular = prefilteredColor * (F0 * envBRDF.x + envBRDF.y);
-	float grey = (0.4 + (1.0 - roughness) * 2.6);
-	vec3 indirectLight = (kd * indirectDiffuse + indirectSpecular * grey);
+	float brightness = (0.8 + (1.0 - roughness) * 2.2);
+	vec3 indirectLight = (kd * indirectDiffuse + indirectSpecular * brightness);
 	FragColor = vec4((lightContribution + indirectLight) * ao, albedoMap.a);
 }

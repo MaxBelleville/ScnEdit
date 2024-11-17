@@ -6,7 +6,7 @@
 
 #include "CSphereComponent.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleNoise3D* app = new SampleNoise3D();
 	getApplication()->registerAppEvent("SampleNoise3D", app);

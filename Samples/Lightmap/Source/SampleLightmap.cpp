@@ -6,7 +6,7 @@
 #include "ViewManager/CViewManager.h"
 #include "CViewInit.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleLightmap* app = new SampleLightmap();
 	getApplication()->registerAppEvent("SampleLightmap", app);

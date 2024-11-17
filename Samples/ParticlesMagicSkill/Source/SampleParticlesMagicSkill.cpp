@@ -10,7 +10,7 @@
 
 #include "Projective/CProjective.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleParticlesMagicSkill* app = new SampleParticlesMagicSkill();
 	getApplication()->registerAppEvent("SampleParticlesMagicSkill", app);

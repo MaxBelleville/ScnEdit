@@ -4,7 +4,7 @@
 
 #include "GridPlane/CGridPlane.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleLightmapUV* app = new SampleLightmapUV();
 	getApplication()->registerAppEvent("SampleLightmapUV", app);

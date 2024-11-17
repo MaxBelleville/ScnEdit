@@ -41,7 +41,7 @@ namespace Skylicht
 		unsigned long m_pauseTime;
 
         std::function<void()> OnExitApplication;
-        
+
 	protected:
 		int m_width;
 		int m_height;
@@ -65,8 +65,9 @@ namespace Skylicht
 		}
 
 		void setParams(const std::vector<std::string>& argv);
-
+	
 		const std::vector<std::string>& getParams();
+
 
 		void initApplication(IrrlichtDevice* device);
 

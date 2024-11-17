@@ -79,6 +79,7 @@ namespace Skylicht
 		AllocConsole();
 		freopen("con", "w", stdout);
 		freopen("con", "w", stderr);
+		
 #endif
 #endif
 	}

@@ -6,7 +6,7 @@
 
 #include "CViewInit.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleInstancing* app = new SampleInstancing();
 	getApplication()->registerAppEvent("SampleInstancing", app);

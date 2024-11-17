@@ -8,7 +8,7 @@
 #include "Lightmapper/CLightmapper.h"
 #include "CRotateComponent.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleShader* app = new SampleShader();
 	getApplication()->registerAppEvent("SampleShader", app);

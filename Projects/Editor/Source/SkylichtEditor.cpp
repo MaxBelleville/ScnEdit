@@ -31,7 +31,7 @@
 #include "PhysicsEngine/CPhysicsEngine.h"
 #endif
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SkylichtEditor* app = new SkylichtEditor();
 	getApplication()->registerAppEvent("SkylichtEditor", app);

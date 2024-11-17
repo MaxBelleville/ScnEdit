@@ -9,7 +9,7 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
-void installApplication(const std::vector<std::string>& argv);
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param);
 
 CApplication *g_mainApp = NULL;
 irr::IrrlichtDevice *g_device = NULL;
@@ -35,7 +35,7 @@ int main(int, char**)
 
 	g_mainApp->initApplication(g_device);
 
-	installApplication(g_mainApp->getParams());
+	prepareApplication(g_mainApp->getParams(), &p);
 
 	g_mainApp->onInit();
 

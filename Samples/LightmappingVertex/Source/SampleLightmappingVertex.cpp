@@ -7,7 +7,7 @@
 #include "CViewInit.h"
 #include "CViewBakeLightmap.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleLightmappingVertex *app = new SampleLightmappingVertex();
 	getApplication()->registerAppEvent("SampleLightmappingVertex", app);

@@ -8,7 +8,7 @@
 #include "GridPlane/CGridPlane.h"
 #include "ParticleSystem/CParticleComponent.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleParticles *app = new SampleParticles();
 	getApplication()->registerAppEvent("SampleParticles", app);

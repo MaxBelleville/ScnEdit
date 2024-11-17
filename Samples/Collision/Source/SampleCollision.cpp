@@ -8,7 +8,7 @@
 #include "CViewInit.h"
 #include "CImguiManager.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleCollision* app = new SampleCollision();
 	getApplication()->registerAppEvent("SampleCollision", app);

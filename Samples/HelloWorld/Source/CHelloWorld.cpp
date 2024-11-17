@@ -2,7 +2,7 @@
 #include "SkylichtEngine.h"
 #include "CHelloWorld.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	CHelloWorld *demo = new CHelloWorld();
 	getApplication()->registerAppEvent("CHelloWorld", demo);

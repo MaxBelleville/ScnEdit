@@ -9,7 +9,7 @@
 #include "CProfileData.h"
 #include "UserInterface/CUIEventManager.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleGUI* app = new SampleGUI();
 	getApplication()->registerAppEvent("SampleGUI", app);

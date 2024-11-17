@@ -8,7 +8,7 @@
 #include "CSphereComponent.h"
 #include "Lightmapper/CLightmapper.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleMaterials *app = new SampleMaterials();
 	getApplication()->registerAppEvent("SampleMaterials", app);

@@ -28,13 +28,16 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #if !defined(WINDOWS_STORE) && (defined(WIN32) || defined(CYGWIN) || defined(MINGW))
 #include <Windows.h>
-
+#include <Uxtheme.h>
+#include <dwmapi.h>
+#pragma comment(lib, "Dwmapi.lib")
 #include "Resource.h"
 #include "CApplication.h"
 #include "CWindowConfig.h"
 #include "BuildConfig/CBuildConfig.h"
 #include "Utils/CStringImp.h"
 #include "Control/CTouchManager.h"
+
 
 
 #define MAX_LOADSTRING 100
@@ -51,14 +54,12 @@ DWORD hWndStyle;
 ATOM MyRegisterClass(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-
 CApplication* g_application;
 bool g_restartApplication = false;
 bool g_update = true;
 float g_displayScale = 1.0f;
 
-void installApplication(const std::vector<std::string>& argv);
-
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param = NULL);
 #if defined(CYGWIN) || defined(MINGW)
 int CALLBACK WinMain(
 	HINSTANCE   hInstance,
@@ -76,7 +77,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 
-	int useDX11 = MessageBox(hWnd, L"Use directX11 driver?", L"Question", MB_YESNO | MB_ICONQUESTION);
+	//int useDX11 = MessageBox(hWnd, L"Use directX11 driver?", L"Question", MB_YESNO | MB_ICONQUESTION);
 	MSG msg;
 
 	// Initialize global strings
@@ -146,12 +147,34 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 #endif
 
-	if (params.size() >= 2)
-	{
-		winSize.Width = atoi(params[0].c_str());
-		winSize.Height = atoi(params[1].c_str());
-	}
+	// init application
+	g_application = new CApplication();
+	g_application->setParams(params);
 
+#if defined(SKYLICHT_EDITOR)
+	g_application->enableWriteLog(true);
+#endif
+
+
+	// create irrlicht device
+	SIrrlichtCreationParameters p;
+
+	p.DriverType = video::EDT_DIRECT3D11;
+
+	p.WindowSize = winSize;
+	p.Bits = (u8)32;
+	p.ZBufferBits = (u8)32;
+	p.Fullscreen = false;
+	p.Stencilbuffer = false;
+	p.Vsync = false;
+	p.EventReceiver = g_application;
+	p.AntiAlias = 0;
+	p.WindowId = reinterpret_cast<void*>(hWnd);
+
+	p.AntiAlias = 1;
+	prepareApplication(g_application->getParams(), &p);
+
+	winSize = p.WindowSize;
 	RECT clientSize;
 	clientSize.top = 0;
 	clientSize.left = 0;
@@ -178,48 +201,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		windowTop = y;
 	}
 #endif
+	if (p.Borderless && !p.Fullscreen) {
 
+		hWndStyle = WS_POPUP | WS_VISIBLE;
+		BOOL composition_enabled = FALSE;
+		SetWindowLong(hWnd, GWL_STYLE, static_cast<LONG>(hWndStyle));
+		bool success = DwmIsCompositionEnabled(&composition_enabled) == S_OK;
+		static const MARGINS shadow_state{ 0, 0, 0, 0 };
+		DWM_WINDOW_CORNER_PREFERENCE no_round_corners{ DWMWCP_DONOTROUND };
+		if (composition_enabled && success) {
+			DwmExtendFrameIntoClientArea(hWnd, &shadow_state);
+			DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &no_round_corners, sizeof(no_round_corners));
+		}
+
+		SetWindowPos(hWnd, nullptr, 0, 0, windowLeft, windowTop, SWP_FRAMECHANGED | SWP_NOMOVE);
+		ShowWindow(hWnd, SW_SHOW); //display window
+	}
+	if (!p.Resizeable && !p.Fullscreen && !p.Borderless) {
+		hWndStyle &= ~WS_MAXIMIZEBOX;
+		hWndStyle &= ~WS_THICKFRAME;
+		SetWindowLong(hWnd, GWL_STYLE, static_cast<LONG>(hWndStyle));
+		SetWindowPos(hWnd, nullptr, 0, 0, windowLeft, windowTop, SWP_FRAMECHANGED | SWP_NOMOVE);
+		ShowWindow(hWnd, SW_SHOW); //display window
+	}
 	MoveWindow(hWnd, windowLeft, windowTop, realWidth, realHeight, TRUE);
-
-	// init application
-	g_application = new CApplication();
-	g_application->setParams(params);
-
-#if defined(SKYLICHT_EDITOR)
-	g_application->enableWriteLog(true);
-#endif
-
-	// create irrlicht device
-	SIrrlichtCreationParameters p;
-	if (useDX11 == IDNO)
-	{
-#ifdef _IRR_COMPILE_WITH_OPENGL_
-		p.DriverType = video::EDT_OPENGL;
-#else
-		p.DriverType = video::EDT_OPENGLES;
-#endif
-	}
-	else
-	{
-		p.DriverType = video::EDT_DIRECT3D11;
-	}
-
-	p.WindowSize = winSize;
-	p.Bits = (u8)32;
-	p.ZBufferBits = (u8)32;
-	p.Fullscreen = false;
-	p.Stencilbuffer = false;
-	p.Vsync = false;
-	p.EventReceiver = g_application;
-	p.AntiAlias = 0;
-	p.WindowId = reinterpret_cast<void*>(hWnd);
-
-	if (params.size() >= 3 && strcmp(params[2].c_str(), "true") == 0)
-		p.Fullscreen = true;
-
-	if (useDX11 == IDYES)
-		p.AntiAlias = 1;
-
 	// create device
 	IrrlichtDevice* device = irr::createDeviceEx(p);
 
@@ -230,8 +235,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	g_application->initApplication(device);
 
 	g_application->setLimitFPS(60);
-
-	installApplication(g_application->getParams());
 
 	g_application->onInit();
 
@@ -272,7 +275,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			g_application->initApplication(device);
 			g_restartApplication = false;
 
-			installApplication(g_application->getParams());
+			prepareApplication(g_application->getParams());
 
 			g_application->onInit();
 		}

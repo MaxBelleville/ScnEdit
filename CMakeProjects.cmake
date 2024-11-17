@@ -23,6 +23,7 @@ if (BUILD_EXAMPLES AND BUILD_SKYLICHT_LIGHMAPPER)
 	endif()
 	
 	subdirs(Samples/HelloWorld)
+	subdirs (Samples/SCNEdit)
 	subdirs(Samples/Instancing)
 	
 	if (BUILD_SKYLICHT_AUDIO)

@@ -9,7 +9,7 @@
 
 #include "PhysicsEngine/CPhysicsEngine.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleLoadScene* app = new SampleLoadScene();
 	getApplication()->registerAppEvent("SampleLoadScene", app);

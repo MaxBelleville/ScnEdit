@@ -4,7 +4,7 @@
 
 #include "GridPlane/CGridPlane.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleNoise2D* app = new SampleNoise2D();
 	getApplication()->registerAppEvent("SampleNoise2D", app);

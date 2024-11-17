@@ -7,7 +7,7 @@
 
 #include "CViewInit.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleAudio *app = new SampleAudio();
 	getApplication()->registerAppEvent("SampleAudio", app);

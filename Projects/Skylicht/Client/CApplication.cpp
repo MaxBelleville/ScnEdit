@@ -133,10 +133,12 @@ namespace Skylicht
 		m_argv = argv;
 	}
 
+
 	const std::vector<std::string>& CApplication::getParams()
 	{
 		return m_argv;
 	}
+
 
 	void CApplication::initApplication(IrrlichtDevice* device)
 	{

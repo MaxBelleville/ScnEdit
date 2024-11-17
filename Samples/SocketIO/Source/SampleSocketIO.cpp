@@ -8,7 +8,7 @@
 
 #include "json/json.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleSocketIO* app = new SampleSocketIO();
 	getApplication()->registerAppEvent("SampleSocketIO", app);

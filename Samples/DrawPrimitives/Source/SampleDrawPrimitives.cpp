@@ -7,7 +7,7 @@
 
 #include "GridPlane/CGridPlane.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleDrawPrimitives *app = new SampleDrawPrimitives();
 	getApplication()->registerAppEvent("SampleDrawPrimitives", app);

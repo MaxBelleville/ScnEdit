@@ -7,7 +7,7 @@
 
 #include "CViewInit.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleSpine2D* app = new SampleSpine2D();
 	getApplication()->registerAppEvent("SampleSpine2D", app);

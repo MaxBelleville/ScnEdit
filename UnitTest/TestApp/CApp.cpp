@@ -12,7 +12,7 @@
 
 bool g_finalPass = false;
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	CApp *mainTest = new CApp();
 	getApplication()->registerAppEvent("CApp", mainTest);

@@ -27,6 +27,8 @@ namespace irr
 			Bits(32),
 			ZBufferBits(32),
 			Fullscreen(false),
+			Borderless(false),
+			Resizeable(false),
 			Stencilbuffer(false),
 			Vsync(false),
 			AntiAlias(0),
@@ -63,6 +65,8 @@ namespace irr
 			Bits = other.Bits;
 			ZBufferBits = other.ZBufferBits;
 			Fullscreen = other.Fullscreen;
+			Borderless = other.Borderless;
+			Resizeable = other.Resizeable;
 			Stencilbuffer = other.Stencilbuffer;
 			Vsync = other.Vsync;
 			AntiAlias = other.AntiAlias;
@@ -116,6 +120,13 @@ namespace irr
 		//! Should be set to true if the device should run in fullscreen.
 		/** Otherwise the device runs in windowed mode. Default: false. */
 		bool Fullscreen;
+
+		//! Should be set to true if the device should run in borderless.
+		/** Otherwise the device runs in windowed mode. Default: false. */
+		bool Borderless;
+
+		//! Should be set to true if the device should be scaleable. Default: false.
+		bool Resizeable;
 
 		//! Specifies if the stencil buffer should be enabled.
 		/** Set this to true, if you want the engine be able to draw

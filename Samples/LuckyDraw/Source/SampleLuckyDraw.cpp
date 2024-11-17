@@ -9,7 +9,7 @@
 
 #include "UserInterface/CUIEventManager.h"
 
-void installApplication(const std::vector<std::string>& argv)
+void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param)
 {
 	SampleLuckyDraw* app = new SampleLuckyDraw();
 	getApplication()->registerAppEvent("SampleLuckyDraw", app);

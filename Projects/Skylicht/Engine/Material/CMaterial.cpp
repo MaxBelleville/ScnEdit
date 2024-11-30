@@ -55,6 +55,7 @@ namespace Skylicht
 		initMaterial();
 	}
 
+
 	CMaterial::~CMaterial()
 	{
 		for (int i = 0; i < MATERIAL_MAX_TEXTURES; i++)
@@ -78,6 +79,8 @@ namespace Skylicht
 
 		return mat;
 	}
+
+
 
 	void CMaterial::copyTo(CMaterial* mat)
 	{

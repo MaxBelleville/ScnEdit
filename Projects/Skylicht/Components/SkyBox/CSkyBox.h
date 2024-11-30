@@ -54,6 +54,8 @@ namespace Skylicht
 
 		void setTexture6(const char* texture);
 
+		void setTextures(const char* textures[6]);
+
 		void setColorIntensity(const SColor& c, float intensity = 1.0f);
 
 		DECLARE_GETTYPENAME(CSkyBox)

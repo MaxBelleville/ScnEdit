@@ -160,7 +160,7 @@ namespace Skylicht
 	void CDeferredLightmapRP::initDefferredMaterial()
 	{
 		m_directionalLightPass.MaterialType = m_lightDirection;
-
+		
 		m_directionalLightPass.setTexture(0, m_albedo);
 		m_directionalLightPass.setTexture(1, m_position);
 		m_directionalLightPass.setTexture(2, m_normal);

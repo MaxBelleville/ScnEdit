@@ -144,6 +144,7 @@ namespace Skylicht
 	public:
 		CMaterial(const char* name, const char* shaderPath);
 
+
 		virtual ~CMaterial();
 
 		inline CShader* getShader()
@@ -188,7 +189,6 @@ namespace Skylicht
 
 		CMaterial* clone();
 		void copyTo(CMaterial* mat);
-
 		void deleteAllParams();
 		void deleteExtraParams();
 
@@ -230,6 +230,8 @@ namespace Skylicht
 		{
 			m_backfaceCulling = b;
 		}
+
+
 
 		inline bool isBackfaceCulling()
 		{

@@ -129,6 +129,19 @@ namespace Skylicht
 		m_skyboxData->updateTexture();
 	}
 
+	void CSkyBox::setTextures(const char* textures[6]) {
+		m_texture = textures[0];
+		std::string path = textures[0];
+		CTextureManager* textureMgr = CTextureManager::getInstance();
+		m_skyboxData->Back = textureMgr->getTexture(textures[0]);
+		m_skyboxData->Bottom = textureMgr->getTexture(textures[1]);
+		m_skyboxData->Front = textureMgr->getTexture(textures[2]);
+		m_skyboxData->Right = textureMgr->getTexture(textures[3]);
+		m_skyboxData->Left = textureMgr->getTexture(textures[4]);
+		m_skyboxData->Top = textureMgr->getTexture(textures[5]);
+		m_skyboxData->updateTexture();
+	}
+
 	void CSkyBox::setColorIntensity(const SColor& c, float intensity)
 	{
 		for (int i = 0; i < 6; i++)

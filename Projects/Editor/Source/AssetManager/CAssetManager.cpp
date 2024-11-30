@@ -53,7 +53,11 @@ namespace Skylicht
 		CAssetManager::CAssetManager() :
 			m_haveAssetFolder(false)
 		{
-			m_workingFolder = getIrrlichtDevice()->getFileSystem()->getWorkingDirectory().c_str();
+			wchar_t* m_BaseDirectory = new wchar_t[256];
+			char* pMBBuffer = (char*)malloc(256);
+			GetCurrentDirectory(256, m_BaseDirectory);
+			wcstombs(pMBBuffer, m_BaseDirectory, 256);
+			m_workingFolder = pMBBuffer;
 
 			m_assetFolder = m_workingFolder;
 			m_assetFolder = CPath::normalizePath(m_assetFolder);

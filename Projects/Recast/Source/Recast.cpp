@@ -55,6 +55,17 @@ float rcSqrt(float x)
 	return sqrtf(x);
 }
 
+rcContext::rcContext(bool state) :
+	m_logEnabled(state), 
+	m_timerEnabled(state)
+{
+
+}
+
+rcContext::~rcContext() 
+{
+}
+
 void rcContext::log(const rcLogCategory category, const char* format, ...)
 {
 	if (!m_logEnabled)
@@ -81,6 +92,31 @@ void rcContext::log(const rcLogCategory category, const char* format, ...)
 void rcContext::doResetLog()
 {
 	// Defined out of line to fix the weak v-tables warning
+}
+
+void rcContext::doLog(const rcLogCategory category, const char* msg, const int len)
+{
+
+}
+
+void rcContext::doResetTimers()
+{
+
+}
+
+void rcContext::doStartTimer(const rcTimerLabel label)
+{
+
+}
+
+void rcContext::doStopTimer(const rcTimerLabel label)
+{
+
+}
+
+int rcContext::doGetAccumulatedTime(const rcTimerLabel label) const
+{
+	return -1;
 }
 
 rcHeightfield* rcAllocHeightfield()

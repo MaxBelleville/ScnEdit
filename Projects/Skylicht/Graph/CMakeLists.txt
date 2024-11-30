@@ -2,6 +2,7 @@ include_directories(
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/System
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Irrlicht/Include	
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Engine
+	${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Graph
 	${SKYLICHT_ENGINE_PROJECT_DIR}/Recast/Include
 )
 
@@ -15,6 +16,10 @@ setup_project_group("${skylicht_graph_source}" ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(Graph ${ENGINE_SHARED_OR_STATIC_LIB} ${skylicht_graph_source})
 
 if (BUILD_SHARED_LIBS)
+if (BUILD_LINUX OR BUILD_MACOS)
+add_compile_options(-fPIC)
+endif()
+
 set_target_properties(Graph PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS true)
 endif()
 

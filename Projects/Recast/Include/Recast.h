@@ -116,8 +116,8 @@ class rcContext
 public:
 	/// Constructor.
 	///  @param[in]		state	TRUE if the logging and performance timers should be enabled.  [Default: true]
-	inline rcContext(bool state = true) : m_logEnabled(state), m_timerEnabled(state) {}
-	virtual ~rcContext() {}
+	rcContext(bool state = true);
+	virtual ~rcContext();
 
 	/// Enables or disables logging.
 	///  @param[in]		state	TRUE if logging should be enabled.
@@ -166,23 +166,23 @@ protected:
 	/// @param[in]		category	The category of the message.
 	/// @param[in]		msg			The formatted message.
 	/// @param[in]		len			The length of the formatted message.
-	virtual void doLog(const rcLogCategory category, const char* msg, const int len) { rcIgnoreUnused(category); rcIgnoreUnused(msg); rcIgnoreUnused(len); }
+	virtual void doLog(const rcLogCategory category, const char* msg, const int len);
 
 	/// Clears all timers. (Resets all to unused.)
-	virtual void doResetTimers() {}
+	virtual void doResetTimers();
 
 	/// Starts the specified performance timer.
 	/// @param[in]		label	The category of timer.
-	virtual void doStartTimer(const rcTimerLabel label) { rcIgnoreUnused(label); }
+	virtual void doStartTimer(const rcTimerLabel label);
 
 	/// Stops the specified performance timer.
 	/// @param[in]		label	The category of the timer.
-	virtual void doStopTimer(const rcTimerLabel label) { rcIgnoreUnused(label); }
+	virtual void doStopTimer(const rcTimerLabel label);
 
 	/// Returns the total accumulated time of the specified performance timer.
 	/// @param[in]		label	The category of the timer.
 	/// @return The accumulated time of the timer, or -1 if timers are disabled or the timer has never been started.
-	virtual int doGetAccumulatedTime(const rcTimerLabel label) const { rcIgnoreUnused(label); return -1; }
+	virtual int doGetAccumulatedTime(const rcTimerLabel label) const;
 	
 	/// True if logging is enabled.
 	bool m_logEnabled;

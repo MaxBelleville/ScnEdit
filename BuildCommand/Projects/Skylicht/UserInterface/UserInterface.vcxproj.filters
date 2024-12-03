@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CAlphaMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CColorMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CFrameMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CPositionMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CRotationMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CScaleMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CVisibleMotion.cpp">
+      <Filter>Motion</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIBase.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIButton.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUICheckbox.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIContainer.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIDraggable.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIEventManager.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIGridView.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIListView.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIProgressBar.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUISlider.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUISwitch.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUITextBox.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CAlphaMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CColorMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CFrameMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CPositionMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CRotationMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CScaleMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\Motion\CVisibleMotion.h">
+      <Filter>Motion</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIBase.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIButton.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUICheckbox.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIContainer.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIDraggable.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIEventManager.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIGridView.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIListView.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUIProgressBar.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUISlider.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUISwitch.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\UserInterface\CUITextBox.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\UserInterface\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9119C534-6ACE-30FC-BD46-345FB1DE394C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Motion">
+      <UniqueIdentifier>{152BAB1D-40A6-3FAB-8ED5-A1C76E85E067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D56E17FC-EE4C-3060-A119-B1C2BCD04571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UserInterface">
+      <UniqueIdentifier>{ABE8679A-953F-3A8B-8526-6E014ADAF518}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

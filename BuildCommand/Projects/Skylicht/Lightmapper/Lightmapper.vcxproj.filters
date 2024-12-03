@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakeDirectionalRP\CDirectionalLightBakeRP.cpp">
+      <Filter>BakeDirectionalRP</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakeDirectionalRP\CShadowMapBakeRP.cpp">
+      <Filter>BakeDirectionalRP</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakePointLightRP\CPointLightBakeRP.cpp">
+      <Filter>BakePointLightRP</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakePointLightRP\CPointLightShadowBakeRP.cpp">
+      <Filter>BakePointLightRP</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CBakeUtils.cpp">
+      <Filter>Lightmapper</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CBaker.cpp">
+      <Filter>Lightmapper</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CGPUBaker.cpp">
+      <Filter>Lightmapper</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CLightmapper.cpp">
+      <Filter>Lightmapper</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CMTBaker.cpp">
+      <Filter>Lightmapper</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CSH9.cpp">
+      <Filter>Lightmapper</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Rasterisation\CRasterisation.cpp">
+      <Filter>Rasterisation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Rasterisation\SutherlandHodgman.cpp">
+      <Filter>Rasterisation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\UnwrapUV\CUnwrapUV.cpp">
+      <Filter>UnwrapUV</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\UnwrapUV\xatlas.cpp">
+      <Filter>UnwrapUV</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakeDirectionalRP\CDirectionalLightBakeRP.h">
+      <Filter>BakeDirectionalRP</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakeDirectionalRP\CShadowMapBakeRP.h">
+      <Filter>BakeDirectionalRP</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakePointLightRP\CPointLightBakeRP.h">
+      <Filter>BakePointLightRP</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\BakePointLightRP\CPointLightShadowBakeRP.h">
+      <Filter>BakePointLightRP</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CBakeUtils.h">
+      <Filter>Lightmapper</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CBaker.h">
+      <Filter>Lightmapper</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CGPUBaker.h">
+      <Filter>Lightmapper</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CLightmapper.h">
+      <Filter>Lightmapper</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CMTBaker.h">
+      <Filter>Lightmapper</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Lightmapper\CSH9.h">
+      <Filter>Lightmapper</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Rasterisation\CRasterisation.h">
+      <Filter>Rasterisation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\Rasterisation\SutherlandHodgman.h">
+      <Filter>Rasterisation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\UnwrapUV\CUnwrapUV.h">
+      <Filter>UnwrapUV</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\UnwrapUV\xatlas.h">
+      <Filter>UnwrapUV</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Lightmapper\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="BakeDirectionalRP">
+      <UniqueIdentifier>{2CC57014-DEFB-32AD-9761-A9A068545CB2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BakePointLightRP">
+      <UniqueIdentifier>{7065A7DC-4EB8-3D39-96AB-FF8D2FCD4936}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9119C534-6ACE-30FC-BD46-345FB1DE394C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lightmapper">
+      <UniqueIdentifier>{B4311450-2319-3AA2-AA1C-3EEA02CEAA47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rasterisation">
+      <UniqueIdentifier>{A28581E9-3C1A-3730-AE02-C9981C1177A9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D56E17FC-EE4C-3060-A119-B1C2BCD04571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UnwrapUV">
+      <UniqueIdentifier>{376E6153-11F7-3762-B1C2-A85656CF376F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

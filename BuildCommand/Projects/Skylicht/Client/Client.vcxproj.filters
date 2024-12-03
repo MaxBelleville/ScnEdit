@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\BuildConfig\CBuildConfig.cpp">
+      <Filter>BuildConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CBaseApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CWindowConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CrashHandler\CCrashHandler.cpp">
+      <Filter>CrashHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\AppInclude.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\BuildConfig\CBuildConfig.h">
+      <Filter>BuildConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CBaseApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CWindowConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CrashHandler\CCrashHandler.h">
+      <Filter>CrashHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\IApplicationEventReceiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Client\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="BuildConfig">
+      <UniqueIdentifier>{B2324CEE-EC4E-3AA2-A19A-42A19F60AD60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CrashHandler">
+      <UniqueIdentifier>{77566259-56E8-32EC-B882-88E63BD9DAA6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9119C534-6ACE-30FC-BD46-345FB1DE394C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D56E17FC-EE4C-3060-A119-B1C2BCD04571}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

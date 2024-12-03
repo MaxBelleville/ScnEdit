@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\CHttpRequest.cpp">
+      <Filter>HttpRequest</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\CHttpStream.cpp">
+      <Filter>HttpRequest</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\CMD5.cpp">
+      <Filter>HttpRequest</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\IHttpRequest.cpp">
+      <Filter>HttpRequest</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\SocketIO\CSocketIO.cpp">
+      <Filter>SocketIO</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\SocketIO\easywsclient.cpp">
+      <Filter>SocketIO</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\CHttpRequest.h">
+      <Filter>HttpRequest</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\CHttpStream.h">
+      <Filter>HttpRequest</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\CMD5.h">
+      <Filter>HttpRequest</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\IHttpRequest.h">
+      <Filter>HttpRequest</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\HttpRequest\IHttpStream.h">
+      <Filter>HttpRequest</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\SocketIO\CSocketIO.h">
+      <Filter>SocketIO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\SocketIO\easywsclient.hpp">
+      <Filter>SocketIO</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Network\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9119C534-6ACE-30FC-BD46-345FB1DE394C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HttpRequest">
+      <UniqueIdentifier>{3C83481E-3643-3577-AE3E-9A94DB270A2F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SocketIO">
+      <UniqueIdentifier>{5D3B7363-FBF8-33B4-90EF-352E52C2AACD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D56E17FC-EE4C-3060-A119-B1C2BCD04571}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

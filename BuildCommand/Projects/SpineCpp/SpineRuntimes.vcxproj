@@ -1,0 +1,494 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{324C2E1D-D7D2-36F1-8F83-97DFB2B0F46C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>SpineRuntimes</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Bin\Windows\Libs\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SpineRuntimes.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SpineRuntimes</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Bin\Windows\Libs\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SpineRuntimes.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SpineRuntimes</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Bin\Windows\Libs\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SpineRuntimes.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SpineRuntimes</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Bin\Windows\Libs\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SpineRuntimes.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SpineRuntimes</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat3/skylicht-engine/Projects/SpineCpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/maxbe/Documents/Swat3/skylicht-engine -BC:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand --check-stamp-file C:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand/Projects/SpineCpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\flags.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\SpineCpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat3/skylicht-engine/Projects/SpineCpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/maxbe/Documents/Swat3/skylicht-engine -BC:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand --check-stamp-file C:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand/Projects/SpineCpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\flags.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\SpineCpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat3/skylicht-engine/Projects/SpineCpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/maxbe/Documents/Swat3/skylicht-engine -BC:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand --check-stamp-file C:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand/Projects/SpineCpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\flags.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\SpineCpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat3/skylicht-engine/Projects/SpineCpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/maxbe/Documents/Swat3/skylicht-engine -BC:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand --check-stamp-file C:/Users/maxbe/Documents/Swat3/skylicht-engine/BuildCommand/Projects/SpineCpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\flags.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\SpineCpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Animation.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\AnimationState.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\AnimationStateData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Atlas.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\AtlasAttachmentLoader.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Attachment.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\AttachmentLoader.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\AttachmentTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Bone.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\BoneData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\BoundingBoxAttachment.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\ClippingAttachment.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\ColorTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\ConstraintData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\CurveTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\DeformTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\DrawOrderTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Event.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\EventData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\EventTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Extension.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\IkConstraint.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\IkConstraintData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\IkConstraintTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\InheritTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Json.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\LinkedMesh.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Log.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\MathUtil.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\MeshAttachment.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PathAttachment.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PathConstraint.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PathConstraintData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PathConstraintMixTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PathConstraintPositionTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PathConstraintSpacingTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PhysicsConstraint.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PhysicsConstraintData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PhysicsConstraintTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\PointAttachment.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\RTTI.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\RegionAttachment.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\RotateTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\ScaleTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Sequence.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SequenceTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\ShearTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Skeleton.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SkeletonBinary.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SkeletonBounds.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SkeletonClipping.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SkeletonData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SkeletonJson.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SkeletonRenderer.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Skin.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Slot.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SlotData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\SpineObject.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\TextureLoader.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Timeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\TransformConstraint.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\TransformConstraintData.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\TransformConstraintTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\TranslateTimeline.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Triangulator.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\Updatable.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\src\spine\VertexAttachment.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Animation.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\AnimationState.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\AnimationStateData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Atlas.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\AtlasAttachmentLoader.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Attachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\AttachmentLoader.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\AttachmentTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\AttachmentType.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\BlendMode.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\BlockAllocator.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Bone.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\BoneData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\BoundingBoxAttachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\ClippingAttachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Color.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\ColorTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\ConstraintData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\ContainerUtil.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\CurveTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Debug.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\DeformTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\DrawOrderTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Event.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\EventData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\EventTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Extension.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\HasRendererObject.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\HashMap.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\IkConstraint.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\IkConstraintData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\IkConstraintTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Inherit.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\InheritTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Json.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\LinkedMesh.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Log.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\MathUtil.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\MeshAttachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\MixBlend.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\MixDirection.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PathAttachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PathConstraint.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PathConstraintData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PathConstraintMixTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PathConstraintPositionTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PathConstraintSpacingTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Physics.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PhysicsConstraint.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PhysicsConstraintData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PhysicsConstraintTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PointAttachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Pool.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\PositionMode.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Property.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\RTTI.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\RegionAttachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\RotateMode.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\RotateTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\ScaleTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Sequence.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SequenceTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\ShearTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Skeleton.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SkeletonBinary.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SkeletonBounds.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SkeletonClipping.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SkeletonData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SkeletonJson.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SkeletonRenderer.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Skin.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Slot.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SlotData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SpacingMode.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SpineObject.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\SpineString.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\TextureLoader.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\TextureRegion.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Timeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\TransformConstraint.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\TransformConstraintData.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\TransformConstraintTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\TranslateTimeline.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Triangulator.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Updatable.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Vector.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Version.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\VertexAttachment.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\Vertices.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\dll.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-cpp\include\spine\spine.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\CSkeletonDrawable.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\CSpineResource.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\CTextureLoader.cpp" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\pch.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\CSkeletonDrawable.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\CSpineResource.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\CTextureLoader.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\SpineCpp\spine-runtimes\pch.h" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\ZERO_CHECK.vcxproj">
+      <Project>{DE5C9C11-A235-3ECF-A961-E230646D5121}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\Skylicht\Audio\Audio.vcxproj">
+      <Project>{97D3EC08-EAA4-346C-AD59-71766C24A177}</Project>
+      <Name>Audio</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\Skylicht\Engine\Engine.vcxproj">
+      <Project>{ADA3018F-8C49-3E22-8AD9-3EE560889D5E}</Project>
+      <Name>Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\Irrlicht\Irrlicht.vcxproj">
+      <Project>{1F4FFC4C-A878-3B44-BEA5-CEEB6D58BFF1}</Project>
+      <Name>Irrlicht</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\Skylicht\System\System.vcxproj">
+      <Project>{458AD3B5-B523-31E6-8C32-5A4ABDA2E683}</Project>
+      <Name>System</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\BuildCommand\Projects\ThirdParty\ThirdParty.vcxproj">
+      <Project>{9B773501-FACC-3E08-AEDF-AE94FB2FC271}</Project>
+      <Name>ThirdParty</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

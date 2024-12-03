@@ -1,0 +1,1479 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimation.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimationController.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimationManager.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimationTrack.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CGradientBandInterpolation.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\IK\CIKSolver.cpp">
+      <Filter>Animation\IK</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\Skeleton\CAnimationTimeline.cpp">
+      <Filter>Animation\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\Skeleton\CAnimationTransformData.cpp">
+      <Filter>Animation\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\Skeleton\CSkeleton.cpp">
+      <Filter>Animation\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\AudioStream\CZipAudioFileStream.cpp">
+      <Filter>AudioStream</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\AudioStream\CZipAudioStreamFactory.cpp">
+      <Filter>AudioStream</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\C3rdCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CCameraBrain.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CEditorCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CFpsMoveCamera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CComponentCategory.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CComponentSystem.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CDependentComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CNullComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ConsoleLog\CConsoleLog.cpp">
+      <Filter>ConsoleLog</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CAccelerometer.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CJoystick.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CTouchIdentify.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CTouchManager.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CCullingBBoxData.cpp">
+      <Filter>Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CCullingData.cpp">
+      <Filter>Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CCullingSystem.cpp">
+      <Filter>Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CGroupVisible.cpp">
+      <Filter>Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CVisibleData.cpp">
+      <Filter>Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CVisibleSystem.cpp">
+      <Filter>Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Debug\CDebugRenderer.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Debug\CSceneDebug.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Emscripten\CGetFileURL.cpp">
+      <Filter>Emscripten</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntity.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityChildsData.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityDataTypeManager.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityGroup.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityHandleData.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityHandler.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityManager.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityPrefab.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\EventManager\CEventManager.cpp">
+      <Filter>EventManager</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Exporter\Skylicht\CSkylichtAnimExporter.cpp">
+      <Filter>Exporter\Skylicht</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Exporter\Skylicht\CSkylichtMeshExporter.cpp">
+      <Filter>Exporter\Skylicht</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\GameObject\CContainerObject.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\GameObject\CGameObject.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\GameObject\CZone.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\Atlas\CAtlas.cpp">
+      <Filter>Graphics2D\Atlas</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CCanvas.cpp">
+      <Filter>Graphics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CGUIExporter.cpp">
+      <Filter>Graphics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CGUIImporter.cpp">
+      <Filter>Graphics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CGraphics2D.cpp">
+      <Filter>Graphics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUIAlignData.cpp">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUILayoutData.cpp">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUIRenderData.cpp">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUITransformData.cpp">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIElement.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIFitSprite.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIImage.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUILayout.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIMask.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIRect.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUISprite.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIText.cpp">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUISystem\CGUILayoutSystem.cpp">
+      <Filter>Graphics2D\GUISystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUISystem\CGUIOpacitySystem.cpp">
+      <Filter>Graphics2D\GUISystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\Glyph\CGlyphFreetype.cpp">
+      <Filter>Graphics2D\Glyph</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CFontManager.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CFontSource.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CFrameSource.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CGlyphFont.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteAtlas.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteFont.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteFrame.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteManager.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\IFont.cpp">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\CBaseMeshImporter.cpp">
+      <Filter>Importer</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Collada\CColladaAnimLoader.cpp">
+      <Filter>Importer\Collada</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Collada\CColladaLoader.cpp">
+      <Filter>Importer\Collada</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Collada\CColladaLoaderFunc.cpp">
+      <Filter>Importer\Collada</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\CFBXAnimLoader.cpp">
+      <Filter>Importer\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\CFBXLoaderFunc.cpp">
+      <Filter>Importer\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\CFBXMeshLoader.cpp">
+      <Filter>Importer\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\ufbx.cpp">
+      <Filter>Importer\FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Skylicht\CSkylichtAnimLoader.cpp">
+      <Filter>Importer\Skylicht</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Skylicht\CSkylichtMeshLoader.cpp">
+      <Filter>Importer\Skylicht</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Utils\CMeshUtils.cpp">
+      <Filter>Importer\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\WavefrontOBJ\COBJMeshFileLoader.cpp">
+      <Filter>Importer\WavefrontOBJ</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\IndirectLighting\CIndirectLighting.cpp">
+      <Filter>IndirectLighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\IndirectLighting\CIndirectLightingData.cpp">
+      <Filter>IndirectLighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\IndirectLighting\CIndirectLightingSystem.cpp">
+      <Filter>IndirectLighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LOD\CLOD.cpp">
+      <Filter>LOD</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LOD\CLODData.cpp">
+      <Filter>LOD</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LOD\CLODSystem.cpp">
+      <Filter>LOD</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbe.cpp">
+      <Filter>LightProbes</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbeData.cpp">
+      <Filter>LightProbes</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbeRender.cpp">
+      <Filter>LightProbes</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbes.cpp">
+      <Filter>LightProbes</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CProbeSerializable.cpp">
+      <Filter>LightProbes</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CDirectionalLight.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CLight.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CLightCullingData.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CLightCullingSystem.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CPointLight.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CSpotLight.cpp">
+      <Filter>Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lightmap\CLightmap.cpp">
+      <Filter>Lightmap</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lightmap\CLightmapData.cpp">
+      <Filter>Lightmap</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LineDraw\CLineDrawData.cpp">
+      <Filter>LineDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\CMaterial.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\CMaterialManager.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CBaseShaderCallback.cpp">
+      <Filter>Material\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CShader.cpp">
+      <Filter>Material\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CShaderManager.cpp">
+      <Filter>Material\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CShaderParams.cpp">
+      <Filter>Material\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\CSkinTBNSGInstancing.cpp">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\CStandardSGInstancing.cpp">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\CTBNSGInstancing.cpp">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\IShaderInstancing.cpp">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderCamera.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderDeferred.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderLighting.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderMaterial.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderParticle.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderSH.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderShadow.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderTransformTexture.cpp">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\MeshManager\CMeshManager.cpp">
+      <Filter>MeshManager</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQuery.cpp">
+      <Filter>OcclusionQuery</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQueryData.cpp">
+      <Filter>OcclusionQuery</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQueryRenderer.cpp">
+      <Filter>OcclusionQuery</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQuerySceneNode.cpp">
+      <Filter>OcclusionQuery</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\PolygonDraw\CPolygonDrawData.cpp">
+      <Filter>PolygonDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Projective\CProjective.cpp">
+      <Filter>Projective</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbe.cpp">
+      <Filter>ReflectionProbe</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbeData.cpp">
+      <Filter>ReflectionProbe</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbeRender.cpp">
+      <Filter>ReflectionProbe</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbeSystem.cpp">
+      <Filter>ReflectionProbe</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CGroupMesh.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CJointAnimationSystem.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CJointData.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMesh.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshRenderSystem.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshRenderer.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshRendererInstancing.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshSystem.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CRenderMesh.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CRenderMeshData.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CRenderMeshInstancing.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSkinnedMesh.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSkinnedMeshRenderer.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSkinnedMeshSystem.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSoftwareBlendShapeSystem.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSoftwareSkinningSystem.cpp">
+      <Filter>RenderMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CBaseRP.cpp">
+      <Filter>RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CDeferredLightmapRP.cpp">
+      <Filter>RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CDeferredRP.cpp">
+      <Filter>RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CForwardRP.cpp">
+      <Filter>RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CPostProcessorRP.cpp">
+      <Filter>RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CShadowMapRP.cpp">
+      <Filter>RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Scene\CScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Scene\CSceneExporter.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Scene\CSceneImporter.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CArraySerializable.cpp">
+      <Filter>Serializable</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CAssetResource.cpp">
+      <Filter>Serializable</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CObjectSerializable.cpp">
+      <Filter>Serializable</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CSerializableLoader.cpp">
+      <Filter>Serializable</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CValueProperty.cpp">
+      <Filter>Serializable</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CBoundShadowMaps.cpp">
+      <Filter>Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CCascadedShadowMaps.cpp">
+      <Filter>Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CShadowMaps.cpp">
+      <Filter>Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CShadowRTTManager.cpp">
+      <Filter>Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Skylicht.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\TextureManager\CTextureManager.cpp">
+      <Filter>TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CGroupTransform.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransform.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformComponentData.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformComponentSystem.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformEuler.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformMatrix.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldInverseTransformData.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldInverseTransformSystem.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldTransformData.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldTransformSystem.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTween.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenColor.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenFloat.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenManager.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenMatrix4.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenQuaternion.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenVector2df.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenVector3df.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\easing.cpp">
+      <Filter>Tween</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CActivator.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CColor.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CDateTimeUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CMemoryStream.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CPath.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CRandomID.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CVector.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\XMLSpreadsheet\CXMLSpreadsheet.cpp">
+      <Filter>Utils\XMLSpreadsheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\XMLSpreadsheet\CXMLTableData.cpp">
+      <Filter>Utils\XMLSpreadsheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\VertexAnimation\CSoftwareSkinningUtils.cpp">
+      <Filter>VertexAnimation</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimation.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimationClip.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimationController.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimationManager.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CAnimationTrack.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\CGradientBandInterpolation.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\IK\CIKSolver.h">
+      <Filter>Animation\IK</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\Skeleton\CAnimationTimeline.h">
+      <Filter>Animation\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\Skeleton\CAnimationTransformData.h">
+      <Filter>Animation\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Animation\Skeleton\CSkeleton.h">
+      <Filter>Animation\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\AudioStream\CZipAudioFileStream.h">
+      <Filter>AudioStream</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\AudioStream\CZipAudioStreamFactory.h">
+      <Filter>AudioStream</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\C3rdCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CCameraBrain.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CEditorCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Camera\CFpsMoveCamera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CComponentCategory.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CComponentSystem.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CDependentComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\CNullComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Components\ILateUpdate.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ConsoleLog\CConsoleLog.h">
+      <Filter>ConsoleLog</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CAccelerometer.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CJoystick.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CTouchIdentify.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Control\CTouchManager.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CCullingBBoxData.h">
+      <Filter>Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CCullingData.h">
+      <Filter>Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CCullingSystem.h">
+      <Filter>Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CGroupVisible.h">
+      <Filter>Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CVisibleData.h">
+      <Filter>Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Culling\CVisibleSystem.h">
+      <Filter>Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Debug\CDebugRenderer.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Debug\CSceneDebug.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Emscripten\CGetFileURL.h">
+      <Filter>Emscripten</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CArrayUtils.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityChildsData.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityDataTypeManager.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityGroup.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityHandleData.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityHandler.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityManager.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\CEntityPrefab.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\IEntityData.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\IEntitySystem.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Entity\IRenderSystem.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\EventManager\CEventManager.h">
+      <Filter>EventManager</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Exporter\ExportResources.h">
+      <Filter>Exporter</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Exporter\IAnimationExporter.h">
+      <Filter>Exporter</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Exporter\IMeshExporter.h">
+      <Filter>Exporter</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Exporter\Skylicht\CSkylichtAnimExporter.h">
+      <Filter>Exporter\Skylicht</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Exporter\Skylicht\CSkylichtMeshExporter.h">
+      <Filter>Exporter\Skylicht</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\GameObject\CContainerObject.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\GameObject\CGameObject.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\GameObject\CZone.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\Atlas\CAtlas.h">
+      <Filter>Graphics2D\Atlas</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CCanvas.h">
+      <Filter>Graphics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CGUIExporter.h">
+      <Filter>Graphics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CGUIImporter.h">
+      <Filter>Graphics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\CGraphics2D.h">
+      <Filter>Graphics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUIAlignData.h">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUILayoutData.h">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUIRenderData.h">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\EntityData\CGUITransformData.h">
+      <Filter>Graphics2D\EntityData</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIElement.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIFitSprite.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIImage.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUILayout.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIMask.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIRect.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUISprite.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUI\CGUIText.h">
+      <Filter>Graphics2D\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUISystem\CGUILayoutSystem.h">
+      <Filter>Graphics2D\GUISystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\GUISystem\CGUIOpacitySystem.h">
+      <Filter>Graphics2D\GUISystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\Glyph\CGlyphFreetype.h">
+      <Filter>Graphics2D\Glyph</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CFontManager.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CFontSource.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CFrameSource.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CGlyphFont.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteAtlas.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteFont.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteFrame.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\CSpriteManager.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Graphics2D\SpriteFrame\IFont.h">
+      <Filter>Graphics2D\SpriteFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\CBaseMeshImporter.h">
+      <Filter>Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Collada\CColladaAnimLoader.h">
+      <Filter>Importer\Collada</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Collada\CColladaLoader.h">
+      <Filter>Importer\Collada</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Collada\CColladaLoaderFunc.h">
+      <Filter>Importer\Collada</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\CFBXAnimLoader.h">
+      <Filter>Importer\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\CFBXLoaderFunc.h">
+      <Filter>Importer\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\CFBXMeshLoader.h">
+      <Filter>Importer\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\FBX\ufbx.h">
+      <Filter>Importer\FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\IAnimationImporter.h">
+      <Filter>Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\IMeshImporter.h">
+      <Filter>Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Skylicht\CSkylichtAnimLoader.h">
+      <Filter>Importer\Skylicht</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Skylicht\CSkylichtMeshLoader.h">
+      <Filter>Importer\Skylicht</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\Utils\CMeshUtils.h">
+      <Filter>Importer\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Importer\WavefrontOBJ\COBJMeshFileLoader.h">
+      <Filter>Importer\WavefrontOBJ</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\IndirectLighting\CIndirectLighting.h">
+      <Filter>IndirectLighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\IndirectLighting\CIndirectLightingData.h">
+      <Filter>IndirectLighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\IndirectLighting\CIndirectLightingSystem.h">
+      <Filter>IndirectLighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Instancing\SInstancingVertexBuffer.h">
+      <Filter>Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Instancing\SMeshInstancing.h">
+      <Filter>Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Instancing\SMeshInstancingGroup.h">
+      <Filter>Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Instancing\SShaderMesh.h">
+      <Filter>Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LOD\CLOD.h">
+      <Filter>LOD</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LOD\CLODData.h">
+      <Filter>LOD</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LOD\CLODSystem.h">
+      <Filter>LOD</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbe.h">
+      <Filter>LightProbes</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbeData.h">
+      <Filter>LightProbes</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbeRender.h">
+      <Filter>LightProbes</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CLightProbes.h">
+      <Filter>LightProbes</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LightProbes\CProbeSerializable.h">
+      <Filter>LightProbes</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CDirectionalLight.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CLight.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CLightCullingData.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CLightCullingSystem.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CPointLight.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lighting\CSpotLight.h">
+      <Filter>Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lightmap\CLightmap.h">
+      <Filter>Lightmap</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Lightmap\CLightmapData.h">
+      <Filter>Lightmap</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\LineDraw\CLineDrawData.h">
+      <Filter>LineDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\CMaterial.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\CMaterialManager.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CBaseShaderCallback.h">
+      <Filter>Material\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CShader.h">
+      <Filter>Material\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CShaderManager.h">
+      <Filter>Material\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\CShaderParams.h">
+      <Filter>Material\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\CSkinTBNSGInstancing.h">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\CStandardSGInstancing.h">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\CTBNSGInstancing.h">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\Instancing\IShaderInstancing.h">
+      <Filter>Material\Shader\Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderCamera.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderDeferred.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderLighting.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderMaterial.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderParticle.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderSH.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderShadow.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Material\Shader\ShaderCallback\CShaderTransformTexture.h">
+      <Filter>Material\Shader\ShaderCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\MeshManager\CMeshManager.h">
+      <Filter>MeshManager</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQuery.h">
+      <Filter>OcclusionQuery</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQueryData.h">
+      <Filter>OcclusionQuery</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQueryRenderer.h">
+      <Filter>OcclusionQuery</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\OcclusionQuery\COcclusionQuerySceneNode.h">
+      <Filter>OcclusionQuery</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\PolygonDraw\CPolygonDrawData.h">
+      <Filter>PolygonDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Projective\CProjective.h">
+      <Filter>Projective</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbe.h">
+      <Filter>ReflectionProbe</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbeData.h">
+      <Filter>ReflectionProbe</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbeRender.h">
+      <Filter>ReflectionProbe</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\ReflectionProbe\CReflectionProbeSystem.h">
+      <Filter>ReflectionProbe</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CGroupMesh.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CJointAnimationSystem.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CJointData.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMesh.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshRenderSystem.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshRenderer.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshRendererInstancing.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CMeshSystem.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CRenderMesh.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CRenderMeshData.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CRenderMeshInstancing.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSkinnedMesh.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSkinnedMeshRenderer.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSkinnedMeshSystem.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSoftwareBlendShapeSystem.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderMesh\CSoftwareSkinningSystem.h">
+      <Filter>RenderMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CBaseRP.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CDeferredLightmapRP.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CDeferredRP.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CForwardRP.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CPostProcessorRP.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\CShadowMapRP.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\IPostProcessor.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\RenderPipeline\IRenderPipeline.h">
+      <Filter>RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Scene\CScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Scene\CSceneExporter.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Scene\CSceneImporter.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CArraySerializable.h">
+      <Filter>Serializable</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CAssetResource.h">
+      <Filter>Serializable</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CObjectSerializable.h">
+      <Filter>Serializable</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CSerializableLoader.h">
+      <Filter>Serializable</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CValueProperty.h">
+      <Filter>Serializable</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Serializable\CValuePropertyTemplate.h">
+      <Filter>Serializable</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CBoundShadowMaps.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CCascadedShadowMaps.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CShadowMaps.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\CShadowRTTManager.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Shadow\SFrustumSplit.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Skylicht.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\SkylichtConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\SkylichtHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\TextureManager\CTextureManager.h">
+      <Filter>TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CGroupTransform.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransform.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformComponentData.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformComponentSystem.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformEuler.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CTransformMatrix.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldInverseTransformData.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldInverseTransformSystem.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldTransformData.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Transform\CWorldTransformSystem.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTween.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenColor.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenFloat.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenManager.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenMatrix4.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenQuaternion.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenVector2df.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\CTweenVector3df.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Tween\easing.h">
+      <Filter>Tween</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CActivator.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CColor.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CDateTimeUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CMemoryStream.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CPath.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CRandomID.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CSingleton.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CStringImp.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\CVector.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\XMLSpreadsheet\CXMLSpreadsheet.h">
+      <Filter>Utils\XMLSpreadsheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\Utils\XMLSpreadsheet\CXMLTableData.h">
+      <Filter>Utils\XMLSpreadsheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\VertexAnimation\CSoftwareSkinningUtils.h">
+      <Filter>VertexAnimation</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat3\skylicht-engine\Projects\Skylicht\Engine\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{6AC9D309-FDF0-3E7F-9443-70E8465C1055}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Animation\IK">
+      <UniqueIdentifier>{798739D0-8F50-34C0-9C4D-4797D86FBE0C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Animation\Skeleton">
+      <UniqueIdentifier>{38AE1490-3239-3C63-9C8B-6E4EEA7DAC2C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AudioStream">
+      <UniqueIdentifier>{6C872EF9-DC1A-37F7-A65A-13AE9420A3BC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{E5FE36BA-5E31-3A06-92A1-8FD5EB2C43D4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{2DD4D03B-066E-31B0-AFAC-C344D5E594CF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ConsoleLog">
+      <UniqueIdentifier>{D26DBC9F-4424-317B-B0F2-700AD23FB5BE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control">
+      <UniqueIdentifier>{B129E8AC-3C6F-3334-BD51-BF60890CD549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Culling">
+      <UniqueIdentifier>{637DEDED-3987-3CB0-BE63-8F16A1844D60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{D527FAED-5133-3B38-9D8D-20F4B8E26564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emscripten">
+      <UniqueIdentifier>{EBFD648A-0EDE-31B2-9931-2943EBF568E9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{0D555C44-F89B-3DFD-8B30-E20A284763AE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EventManager">
+      <UniqueIdentifier>{0C8527E9-1C75-3DC2-B358-613C243CCAC6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exporter">
+      <UniqueIdentifier>{87EDDFE0-B447-33D6-9D53-5CD7A8E5F0CB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exporter\Skylicht">
+      <UniqueIdentifier>{003D45B7-98E6-3091-AB39-80FD25B5E62A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{89F1A8EB-9A44-343A-A4A6-D05E4A81C43B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics2D">
+      <UniqueIdentifier>{73B099FE-BBCF-3D8F-AF0E-6ED69A77DEA6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics2D\Atlas">
+      <UniqueIdentifier>{9C4FDC8B-3832-3165-9A56-0E005F668C0B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics2D\EntityData">
+      <UniqueIdentifier>{2F53459E-F4E0-3ECD-84D4-D46BD4DFA795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics2D\GUI">
+      <UniqueIdentifier>{51EEA42F-A808-3C60-9CAA-C2E70A343B7D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics2D\GUISystem">
+      <UniqueIdentifier>{6696FD4E-E7D1-304F-A6EC-7663AEF9D993}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics2D\Glyph">
+      <UniqueIdentifier>{91A6E6DE-8767-3C4A-B385-C19E33B00906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics2D\SpriteFrame">
+      <UniqueIdentifier>{387A0BD4-2B28-3130-A06E-4C14CAEB6923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9119C534-6ACE-30FC-BD46-345FB1DE394C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importer">
+      <UniqueIdentifier>{82AA8C28-15B2-320D-BDC4-77D4022C0BB1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importer\Collada">
+      <UniqueIdentifier>{4CF5ED24-1FD8-3113-898A-DA8E25AEC156}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importer\FBX">
+      <UniqueIdentifier>{E4DE7C5C-1230-3099-959F-7AFE5A899491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importer\Skylicht">
+      <UniqueIdentifier>{10E6EDAD-8EB8-3CD8-B8C1-541B81195EC8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importer\Utils">
+      <UniqueIdentifier>{882A2DED-5CE5-3BE6-B320-6C4B3031D729}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Importer\WavefrontOBJ">
+      <UniqueIdentifier>{731BE67A-2E60-3463-8CBA-4EDD6CA37602}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IndirectLighting">
+      <UniqueIdentifier>{10DCBC23-D853-3691-B95A-54787DE3CE1C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Instancing">
+      <UniqueIdentifier>{9535BA4A-999E-335C-A9A1-D52FBD0FAB1D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LOD">
+      <UniqueIdentifier>{74EF35F0-6B5E-384A-8CB4-83C49C24324A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LightProbes">
+      <UniqueIdentifier>{3FAAD57C-263E-3B95-900A-6BCA5BDDB53E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lighting">
+      <UniqueIdentifier>{74AE3E38-E9CE-374C-8259-694B8EB578A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lightmap">
+      <UniqueIdentifier>{6689B5E2-9B2E-3D8C-B54C-62448A44DB6F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LineDraw">
+      <UniqueIdentifier>{40FD062E-3E06-3293-A953-C873BCB5D18F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material">
+      <UniqueIdentifier>{13A54555-301D-32AF-AEC6-0D4B7E3ED686}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Shader">
+      <UniqueIdentifier>{4C1148A9-0072-3316-B52A-F8221AEB3BD1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Shader\Instancing">
+      <UniqueIdentifier>{5093AFC5-282B-3261-B503-CEBFCDFBB80C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material\Shader\ShaderCallback">
+      <UniqueIdentifier>{EF25B7B3-8A89-3877-B146-6BBF4132748F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MeshManager">
+      <UniqueIdentifier>{CC37C148-4BD5-38B0-A4D2-28C96F208870}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OcclusionQuery">
+      <UniqueIdentifier>{7DAB9262-88E4-3919-8043-D5E9659D5A5B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PolygonDraw">
+      <UniqueIdentifier>{057211C7-EC9A-3E0E-984C-0B5737214B52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Projective">
+      <UniqueIdentifier>{FF9814BF-EFD1-3A72-9B5A-03CAD46B517B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ReflectionProbe">
+      <UniqueIdentifier>{6B66B2B8-B49D-3065-89E0-AF513A87BBE2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderMesh">
+      <UniqueIdentifier>{212DC82D-BF23-3C62-9DCF-2256691BB28B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderPipeline">
+      <UniqueIdentifier>{94941308-87D3-302F-A200-54850F093A0F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{62A1F16A-6A60-30B2-BF21-063811115329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serializable">
+      <UniqueIdentifier>{A1D4FC1B-13C1-3C69-B015-86C3EA7EEB70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shadow">
+      <UniqueIdentifier>{2D263A4B-2FEA-36FC-9980-1FE5417BAA57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D56E17FC-EE4C-3060-A119-B1C2BCD04571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextureManager">
+      <UniqueIdentifier>{268C7E7F-C7EE-33F7-91D0-13D3C0AC29A2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Transform">
+      <UniqueIdentifier>{BD560CB4-DC2E-3DD2-88B3-8C2D3719E5EC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tween">
+      <UniqueIdentifier>{77904974-2CE8-3AD4-B70C-049660DD3A49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{A4B2B63E-46A8-37FA-BA2B-E43104164C25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\XMLSpreadsheet">
+      <UniqueIdentifier>{17012AD4-7310-363C-A833-946E1C2AE106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VertexAnimation">
+      <UniqueIdentifier>{FDC82FBA-DE16-3B52-8D08-C295ACA568C1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

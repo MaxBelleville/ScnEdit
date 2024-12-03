@@ -1,0 +1,46 @@
+<!-- -240;-492;1440;900;0 -->
+<canvas x='0' y='0' w='1440' h='900'>
+    <dock-panel x='0' y='26' w='1440' h='849'>
+        <horizontal x='0' y='0' w='1440' h='849' count='2' weak-row='0' weak-col='0'>
+            <col width='1006'>
+                <vertical x='0' y='0' w='1006' h='849' count='2' weak-row='0' weak-col='0'>
+                    <row height='592'>
+                        <horizontal x='0' y='0' w='1006' h='592' count='2' weak-row='0' weak-col='1'>
+                            <col width='288'>
+                                <docktab x='0' y='0' w='288' h='592' current='Hierarchy'>
+                                    <window name='Hierarchy' x='0' y='28' w='288' h='564'/>
+                                    <window name='GUI Hierarchy' x='0' y='28' w='288' h='564'/>
+                                </docktab>
+                            </col>
+                            <col width='716'>
+                                <docktab x='290' y='0' w='716' h='592' current='Scene'>
+                                    <window name='Scene' x='0' y='28' w='716' h='564'/>
+                                    <window name='GUI Design' x='0' y='28' w='716' h='564'/>
+                                </docktab>
+                            </col>
+                        </horizontal>
+                    </row>
+                    <row height='255'>
+                        <horizontal x='0' y='594' w='1006' h='255' count='2' weak-row='0' weak-col='0'>
+                            <col width='500'>
+                                <docktab x='0' y='0' w='500' h='255' current='Assets'>
+                                    <window name='Assets' x='0' y='28' w='500' h='227'/>
+                                </docktab>
+                            </col>
+                            <col width='504'>
+                                <docktab x='502' y='0' w='504' h='255' current='Console'>
+                                    <window name='Console' x='0' y='28' w='504' h='227'/>
+                                </docktab>
+                            </col>
+                        </horizontal>
+                    </row>
+                </vertical>
+            </col>
+            <col width='432'>
+                <docktab x='1008' y='0' w='432' h='849' current='Property'>
+                    <window name='Property' x='0' y='28' w='432' h='821'/>
+                </docktab>
+            </col>
+        </horizontal>
+    </dock-panel>
+</canvas>

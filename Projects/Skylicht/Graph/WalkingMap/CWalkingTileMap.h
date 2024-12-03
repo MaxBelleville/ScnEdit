@@ -40,7 +40,6 @@ namespace Skylicht
 			int Z;
 			core::vector3df Position;
 			core::aabbox3df BBox;
-			CObstacleAvoidance Obstacle;
 			core::array<core::triangle3df> Tris;
 			core::array<STile*> Neighbours;
 			bool Visit;
@@ -92,7 +91,7 @@ namespace Skylicht
 
 		typedef std::map<STileXYZ, STile*, CompareTile> TileValueMap;
 
-		class CWalkingMap
+		class CWalkingTileMap
 		{
 		protected:
 			core::array<STile*> m_tiles;
@@ -102,18 +101,22 @@ namespace Skylicht
 			float m_tileWidth;
 			float m_tileHeight;
 
+			core::aabbox3df m_bbox;
+
 		public:
-			CWalkingMap();
+			CWalkingTileMap();
 
-			virtual ~CWalkingMap();
+			virtual ~CWalkingTileMap();
 
-			void generate(float tileWidth, float tileHeight, CMesh* recastMesh, CObstacleAvoidance* obstacle);
+			void generate(float tileWidth, float tileHeight, CMesh* navMesh, CObstacleAvoidance* obstacle);
 
 			void release();
 
 			void resetVisit();
 
 			STile* getTile(int x, int y, int z);
+
+			STile* getTileByPosition(const core::vector3df& pos);
 
 			inline float getTileWidth()
 			{

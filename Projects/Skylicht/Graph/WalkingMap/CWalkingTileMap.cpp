@@ -23,25 +23,25 @@ https://github.com/skylicht-lab/skylicht-engine
 */
 
 #include "pch.h"
-#include "CWalkingMap.h"
+#include "CWalkingTileMap.h"
 
 namespace Skylicht
 {
 	namespace Graph
 	{
-		CWalkingMap::CWalkingMap() :
+		CWalkingTileMap::CWalkingTileMap() :
 			m_tileWidth(0.0f),
 			m_tileHeight(0.0f)
 		{
 
 		}
 
-		CWalkingMap::~CWalkingMap()
+		CWalkingTileMap::~CWalkingTileMap()
 		{
 			release();
 		}
 
-		void CWalkingMap::generate(float tileWidth, float tileHeight, const core::aabbox3df& bbox)
+		void CWalkingTileMap::generate(float tileWidth, float tileHeight, const core::aabbox3df& bbox)
 		{
 			release();
 
@@ -55,6 +55,9 @@ namespace Skylicht
 			int nZ = (int)ceilf(size.Z / tileWidth);
 
 			core::vector3df boxSize(tileWidth, tileHeight, tileWidth);
+
+			m_bbox.MinEdge = bbox.MinEdge;
+			m_bbox.MaxEdge = bbox.MinEdge + core::vector3df(nX * tileWidth, nY * tileHeight, nZ * tileWidth);
 
 			for (int y = 0; y <= nY; y++)
 			{
@@ -74,12 +77,12 @@ namespace Skylicht
 			}
 		}
 
-		void CWalkingMap::generate(float tileWidth, float tileHeight, CMesh* recastMesh, CObstacleAvoidance* obstacle)
+		void CWalkingTileMap::generate(float tileWidth, float tileHeight, CMesh* navMesh, CObstacleAvoidance* obstacle)
 		{
-			generate(tileWidth, tileHeight, recastMesh->getBoundingBox());
+			generate(tileWidth, tileHeight, navMesh->getBoundingBox());
 
 			// check used tile
-			IMeshBuffer* mb = recastMesh->getMeshBuffer(0);
+			IMeshBuffer* mb = navMesh->getMeshBuffer(0);
 			IVertexBuffer* vb = mb->getVertexBuffer();
 			IIndexBuffer* ib = mb->getIndexBuffer();
 
@@ -109,7 +112,8 @@ namespace Skylicht
 				}
 			}
 
-			// core::vector3df edges[8];
+			core::vector3df edges[8];
+			core::line3df lines[4];
 			core::line3df centerLine;
 
 			for (int i = (int)m_tiles.size() - 1; i >= 0; i--)
@@ -122,15 +126,12 @@ namespace Skylicht
 				else
 				{
 					const core::aabbox3df& bbox = m_tiles[i]->BBox;
-
-					/*
 					bbox.getEdges(edges);
 
 					lines[0].setLine(edges[1], edges[0]);
 					lines[1].setLine(edges[3], edges[2]);
 					lines[2].setLine(edges[5], edges[4]);
 					lines[3].setLine(edges[7], edges[6]);
-					*/
 
 					core::vector3df center = bbox.getCenter();
 					core::vector3df centerTop = center;
@@ -139,24 +140,31 @@ namespace Skylicht
 					centerBottom.Y = bbox.MinEdge.Y;
 					centerLine.setLine(centerTop, centerBottom);
 
-					// lines[4].setLine(centerTop, centerBottom);
+					bool hit = false;
 
-					bool allHit = true;
+					core::vector3df p;
+					int nHit = 0;
 
-					/*
-					for (int j = 0; j < 5; j++)
+					for (int j = 0; j < 4; j++)
 					{
-						if (!hitTris(lines[j], m_tiles[i]->Tris, m_tiles[i]->Position))
+						if (hitTris(lines[j], m_tiles[i]->Tris, m_tiles[i]->Position))
 						{
-							allHit = false;
-							break;
+							p += m_tiles[i]->Position;
+							nHit++;
+							hit = true;
 						}
 					}
-					*/
 
-					allHit = hitTris(centerLine, m_tiles[i]->Tris, m_tiles[i]->Position);
+					if (hitTris(centerLine, m_tiles[i]->Tris, m_tiles[i]->Position))
+					{
+						hit = true;
+					}
+					else if (hit)
+					{
+						m_tiles[i]->Position = p / (float)nHit;
+					}
 
-					if (!allHit)
+					if (!hit)
 					{
 						delete m_tiles[i];
 						m_tiles.erase(i);
@@ -171,8 +179,6 @@ namespace Skylicht
 
 				STileXYZ tile(t->X, t->Y, t->Z);
 				m_hashTiles[tile] = t;
-
-				obstacle->copySegments(&t->Obstacle, t->BBox);
 			}
 
 			// link Neighbour
@@ -195,8 +201,7 @@ namespace Skylicht
 								t->Z + z);
 							if (nei)
 							{
-								if (!t->Obstacle.isLineHit(t->Position, nei->Position, tileHeight) &&
-									!nei->Obstacle.isLineHit(t->Position, nei->Position, tileHeight))
+								if (!obstacle->isLineHit(t->Position, nei->Position, tileHeight))
 								{
 									t->Neighbours.push_back(nei);
 								}
@@ -205,9 +210,26 @@ namespace Skylicht
 					}
 				}
 			}
+
+			// remove tile have no Neighbours
+			for (int i = (int)m_tiles.size() - 1; i >= 0; i--)
+			{
+				if (m_tiles[i]->Neighbours.size() == 0)
+				{
+					// delete hash
+					STileXYZ tile(m_tiles[i]->X, m_tiles[i]->Y, m_tiles[i]->Z);
+					auto it = m_hashTiles.find(tile);
+					if (it == m_hashTiles.end())
+						m_hashTiles.erase(it);
+
+					// free data
+					delete m_tiles[i];
+					m_tiles.erase(i);
+				}
+			}
 		}
 
-		STile* CWalkingMap::getTile(int x, int y, int z)
+		STile* CWalkingTileMap::getTile(int x, int y, int z)
 		{
 			STileXYZ tile(x, y, z);
 			auto it = m_hashTiles.find(tile);
@@ -216,7 +238,23 @@ namespace Skylicht
 			return it->second;
 		}
 
-		bool CWalkingMap::hitTris(const core::line3df& line, core::array<core::triangle3df>& tris, core::vector3df& outPoint)
+		STile* CWalkingTileMap::getTileByPosition(const core::vector3df& pos)
+		{
+			if (!m_bbox.isPointInside(pos))
+				return NULL;
+
+			float dx = pos.X - m_bbox.MinEdge.X;
+			float dy = pos.Y - m_bbox.MinEdge.Y;
+			float dz = pos.Z - m_bbox.MinEdge.Z;
+
+			int x = (int)floorf(dx / m_tileWidth);
+			int y = (int)floorf(dy / m_tileHeight);
+			int z = (int)floorf(dz / m_tileWidth);
+
+			return getTile(x, y, z);
+		}
+
+		bool CWalkingTileMap::hitTris(const core::line3df& line, core::array<core::triangle3df>& tris, core::vector3df& outPoint)
 		{
 			bool hit = false;
 			for (int i = 0, n = tris.size(); i < n; i++)
@@ -231,7 +269,7 @@ namespace Skylicht
 			return hit;
 		}
 
-		void CWalkingMap::release()
+		void CWalkingTileMap::release()
 		{
 			for (u32 i = 0, n = m_tiles.size(); i < n; i++)
 			{
@@ -241,7 +279,7 @@ namespace Skylicht
 			m_hashTiles.clear();
 		}
 
-		void CWalkingMap::resetVisit()
+		void CWalkingTileMap::resetVisit()
 		{
 			for (u32 i = 0, n = m_tiles.size(); i < n; i++)
 			{

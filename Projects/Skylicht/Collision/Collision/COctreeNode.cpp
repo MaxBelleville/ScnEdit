@@ -38,6 +38,9 @@ namespace Skylicht
 	COctreeNode::~COctreeNode()
 	{
 		for (u32 i = 0; i != 8; ++i)
-			delete Childs[i];
+		{
+			if (Childs[i])
+				delete Childs[i];
+		}
 	}
 }

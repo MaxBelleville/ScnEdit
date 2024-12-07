@@ -34,16 +34,10 @@ namespace Skylicht
 			float Radius;
 		};
 
-		struct SObstacleSegment
-		{
-			core::vector3df Begin;
-			core::vector3df End;
-		};
-
 		class CObstacleAvoidance
 		{
 		protected:
-			core::array<SObstacleSegment> m_segments;
+			core::array<core::line3df> m_segments;
 
 		public:
 			CObstacleAvoidance();
@@ -52,13 +46,13 @@ namespace Skylicht
 
 			void addSegment(const core::vector3df& begin, const core::vector3df& end);
 
-			void addSegments(const core::array<SObstacleSegment>& segments);
+			void addSegments(const core::array<core::line3df>& segments);
 
 			void clear();
 
 			void copySegments(CObstacleAvoidance* toTarget, const core::aabbox3df& box);
 
-			inline core::array<SObstacleSegment>& getSegments()
+			inline core::array<core::line3df>& getSegments()
 			{
 				return m_segments;
 			}
@@ -68,12 +62,12 @@ namespace Skylicht
 				return m_segments.empty();
 			}
 
-			inline bool isLineHit(const core::line3df& line, float h = 1.0f)
+			inline bool isLineHit(const core::line3df& line, float h, float& outT)
 			{
-				return isLineHit(line.start, line.end, h);
+				return isLineHit(line.start, line.end, h, outT);
 			}
 
-			bool isLineHit(const core::vector3df& a, const core::vector3df& b, float h = 1.0f);
+			bool isLineHit(const core::vector3df& a, const core::vector3df& b, float h, float& outT);
 
 			core::vector3df collide(const core::vector3df& position, const core::vector3df& vel, float stepHeight = 0.3f, int recursionDepth = 0);
 		};

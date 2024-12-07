@@ -22,6 +22,58 @@ namespace Skylicht
 			}
 		}
 
+		CDistancePriorityQueue::CDistancePriorityQueue()
+		{
+
+		}
+
+		CDistancePriorityQueue::~CDistancePriorityQueue()
+		{
+
+		}
+
+		void CDistancePriorityQueue::push(const SDistanceTile& d)
+		{
+			SDistanceTile* a = m_queue.pointer();
+
+			// find position
+			int pos = -1;
+			for (u32 i = 0, n = m_queue.size(); i < n; i++)
+			{
+				if (m_queue[i].Distance < d.Distance)
+				{
+					pos = i;
+					break;
+				}
+			}
+
+			if (pos == -1)
+				pos = m_queue.size();
+
+			// insert empty at last
+			m_queue.push_back(SDistanceTile());
+
+			// swap
+			for (int i = m_queue.size() - 1; i > pos; i--)
+			{
+				SDistanceTile t = m_queue[i];
+				m_queue[i] = m_queue[i - 1];
+				m_queue[i - 1] = t;
+			}
+
+			m_queue[pos] = d;
+		}
+
+		void CDistancePriorityQueue::pop()
+		{
+			m_queue.set_used(m_queue.size() - 1);
+		}
+
+		const SDistanceTile& CDistancePriorityQueue::top()
+		{
+			return m_queue.getLast();
+		}
+
 
 		CGraphQuery::CGraphQuery() :
 			m_root(NULL),
@@ -97,7 +149,7 @@ namespace Skylicht
 
 			core::aabbox3d<f32> childOctreeBox;
 			core::array<core::triangle3df> keepTriangles;
-			core::array<Graph::SObstacleSegment> keepSegments;
+			core::array<core::line3df> keepSegments;
 
 			// calculate children
 			if (!node->Box.isEmpty() && node->Triangles.size() > m_minimalPolysPerNode)
@@ -161,17 +213,17 @@ namespace Skylicht
 					keepTriangles.clear();
 
 					// step 3: collect obstacle segment
-					core::array<SObstacleSegment>& segs = node->Obstacle.getSegments();
+					core::array<core::line3df>& segs = node->Obstacle.getSegments();
 					for (u32 i = 0, n = segs.size(); i < n; i++)
 					{
-						SObstacleSegment& s = segs[i];
+						core::line3df& s = segs[i];
 
-						if (childNode->OctreeBox.isPointInside(s.Begin) && childNode->OctreeBox.isPointInside(s.End))
+						if (childNode->OctreeBox.isPointInside(s.start) && childNode->OctreeBox.isPointInside(s.end))
 						{
-							childNode->Obstacle.addSegment(s.Begin, s.End);
+							childNode->Obstacle.addSegment(s.start, s.end);
 
-							childNode->Box.addInternalPoint(s.Begin);
-							childNode->Box.addInternalPoint(s.End);
+							childNode->Box.addInternalPoint(s.start);
+							childNode->Box.addInternalPoint(s.end);
 						}
 						else
 						{
@@ -275,11 +327,17 @@ namespace Skylicht
 
 		void CGraphQuery::getTriangles(const core::aabbox3df& box, core::array<core::triangle3df*>& result)
 		{
+			if (m_root == NULL)
+				return;
+
 			getTrianglesFromOctree(result, m_root, box);
 		}
 
 		void CGraphQuery::getObstacles(const core::aabbox3df& box, CObstacleAvoidance& obstacle)
 		{
+			if (m_root == NULL)
+				return;
+
 			getObstacleFromOctree(obstacle, m_root, box);
 		}
 
@@ -359,13 +417,13 @@ namespace Skylicht
 			COctreeNode* node,
 			const core::aabbox3df& box)
 		{
-			core::array<SObstacleSegment>& segs = node->Obstacle.getSegments();
+			core::array<core::line3df>& segs = node->Obstacle.getSegments();
 			for (u32 i = 0, n = segs.size(); i < n; i++)
 			{
-				SObstacleSegment& s = segs[i];
-				if (box.isPointInside(s.Begin) || box.isPointInside(s.End))
+				core::line3df& s = segs[i];
+				if (box.intersectsWithLine(s))
 				{
-					obstacle.addSegment(s.Begin, s.End);
+					obstacle.addSegment(s.start, s.end);
 				}
 			}
 
@@ -374,6 +432,84 @@ namespace Skylicht
 				if (node->Childs[i] && node->Childs[i]->Box.intersectsWithBox(box))
 					getObstacleFromOctree(obstacle, node->Childs[i], box);
 			}
+		}
+
+		bool CGraphQuery::findPath(CWalkingTileMap* map, STile* from, STile* to, core::array<STile*>& result)
+		{
+			result.clear();
+			u32 numTile = map->getNumTile();
+
+			CDistancePriorityQueue queue;
+
+			std::vector<STile*> prev(numTile, NULL);
+			std::vector<float> dist(numTile, -1.0);
+
+			float length = (to->Position - from->Position).getLengthSQ();
+			queue.push({ length, from });
+
+			dist[from->Id] = 0.0f;
+
+			map->resetVisit();
+
+			while (!queue.empty())
+			{
+				const SDistanceTile& t = queue.top();
+
+				STile* tile = t.Tile;
+				queue.pop();
+
+				if (tile->Visit)
+					continue;
+
+				tile->Visit = true;
+				if (tile == to)
+					break;
+
+				float walkDistance = dist[tile->Id];
+
+				for (u32 i = 0, n = tile->Neighbours.size(); i < n; i++)
+				{
+					STile* nei = tile->Neighbours[i];
+
+					float neiDist = (nei->Position - tile->Position).getLength();
+					float currentDist = walkDistance + neiDist;
+
+					if (dist[nei->Id] < 0 || dist[nei->Id] > currentDist)
+					{
+						// if not yet calc dist of nei
+						// or have another link shorter
+						dist[nei->Id] = currentDist;
+
+						float length = currentDist + (to->Position - nei->Position).getLength();
+						queue.push({ length, nei });
+
+						prev[nei->Id] = tile;
+					}
+				}
+			}
+
+			map->resetVisit();
+
+			if (prev[to->Id] == NULL)
+				return false;
+
+			STile* u = to;
+			result.push_back(u);
+			while (u != from) {
+				result.push_back(prev[u->Id]);
+				u = prev[u->Id];
+			}
+
+			// reverse result
+			u32 count = result.size();
+			for (u32 i = 0, n = count / 2; i < n; i++)
+			{
+				STile* temp = result[count - i - 1];
+				result[count - i - 1] = result[i];
+				result[i] = temp;
+			}
+
+			return true;
 		}
 	}
 }

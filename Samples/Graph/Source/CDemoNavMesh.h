@@ -16,7 +16,10 @@ protected:
 	CGameObject* m_agent;
 
 	core::vector3df m_clickPosition;
-	Graph::STile* m_pickTile;
+
+	Graph::STile* m_fromTile;
+	Graph::STile* m_toTile;
+	core::array<Graph::STile*> m_path;
 
 	Graph::CRecastMesh* m_recastMesh;
 	Graph::CRecastBuilder* m_builder;
@@ -50,8 +53,6 @@ public:
 	virtual void onGUI();
 
 	virtual void onViewRayClick(const core::line3df& ray, int button, bool holdShift);
-
-	virtual void onLeftClickPosition(bool holdShift, const core::vector3df& pos);
 
 	void buildNavMesh();
 

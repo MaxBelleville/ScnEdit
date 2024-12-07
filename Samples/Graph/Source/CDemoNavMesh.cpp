@@ -18,7 +18,8 @@ CDemoNavMesh::CDemoNavMesh(CZone* zone) :
 	m_recastMesh(NULL),
 	m_tileWidth(2.0f),
 	m_tileHeight(2.0f),
-	m_pickTile(NULL),
+	m_fromTile(NULL),
+	m_toTile(NULL),
 	m_drawDebugRecastMesh(false),
 	m_drawDebugNavMesh(true),
 	m_drawDebugObstacle(true),
@@ -70,6 +71,10 @@ void CDemoNavMesh::init()
 			m_recastMesh->addMeshPrefab(mapPrefab, core::IdentityMatrix);
 	}
 
+	m_fromTile = NULL;
+	m_toTile = NULL;
+	m_path.clear();
+
 	m_walkingTileMap->release();
 	m_outputNavMesh->removeAllMeshBuffer();
 	m_obstacle->clear();
@@ -79,6 +84,10 @@ void CDemoNavMesh::init()
 
 	if (m_map)
 		m_map->setVisible(true);
+
+	CMoveAgent* moveAgent = m_agent->getComponent<CMoveAgent>();
+	moveAgent->setGraphQuery(m_query);
+	moveAgent->clearPath();
 
 	m_clickPosition.set(0.0f, 0.0f, 0.0f);
 }
@@ -101,6 +110,7 @@ void CDemoNavMesh::update()
 	}
 
 	SColor red(255, 100, 0, 0);
+	SColor blue(255, 0, 0, 100);
 	SColor grey(255, 20, 20, 20);
 	SColor white(255, 100, 100, 100);
 	SColor green(255, 0, 10, 0);
@@ -158,10 +168,10 @@ void CDemoNavMesh::update()
 	// draw bound obstacle
 	if (m_drawDebugObstacle)
 	{
-		core::array<Graph::SObstacleSegment>& segments = m_obstacle->getSegments();
+		core::array<core::line3df>& segments = m_obstacle->getSegments();
 		for (u32 i = 0, n = segments.size(); i < n; i++)
 		{
-			debug->addLine(segments[i].Begin, segments[i].End, red);
+			debug->addLine(segments[i], red);
 		}
 	}
 
@@ -200,27 +210,43 @@ void CDemoNavMesh::update()
 			Graph::STile* tile = tiles[i];
 			debug->addLine(tile->Position, tile->Position + halfHeight, yellow);
 
-			for (u32 j = 0, n = tile->Neighbours.size(); j < n; j++)
+			/*
+			if (tile == m_fromTile)
 			{
-				Graph::STile* nei = tile->Neighbours[j];
-				if (nei->Visit == false)
+				for (u32 j = 0, n = tile->Neighbours.size(); j < n; j++)
+				{
+					Graph::STile* nei = tile->Neighbours[j];
 					debug->addLine(tile->Position, nei->Position, green);
+				}
 			}
+			*/
 
 			tile->Visit = true;
 		}
 		m_walkingTileMap->resetVisit();
 	}
 
-	if (m_pickTile)
+	// draw path
+	if (m_fromTile)
+		debug->addBoudingBox(m_fromTile->BBox, greenL);
+	if (m_toTile)
+		debug->addBoudingBox(m_toTile->BBox, greenL);
+
+	for (int i = 0, n = (int)m_path.size() - 1; i < n; i++)
 	{
-		debug->addBoudingBox(m_pickTile->BBox, greenL);
-		debug->addLine(m_clickPosition, m_pickTile->Position, red);
+		Graph::STile* tile1 = m_path[i];
+		Graph::STile* tile2 = m_path[i + 1];
+		debug->addLine(tile1->Position, tile2->Position, blue);
 	}
 }
 
 void CDemoNavMesh::onGUI()
 {
+	ImGui::Text("Demo NavMesh");
+	ImGui::Text("After build NavMesh");
+	ImGui::Text("- Left mouse to set Agent position");
+	ImGui::Text("- Right mouse to move Agent");
+
 	if (ImGui::CollapsingHeader("Draw Debug"))
 	{
 		ImGui::Checkbox("Recast mesh", &m_drawDebugRecastMesh);
@@ -255,8 +281,8 @@ void CDemoNavMesh::onGUI()
 
 	if (ImGui::CollapsingHeader("Config Tile"))
 	{
-		ImGui::SliderFloat("TileWidth", &m_tileWidth, 0.5f, 4.0f);
-		ImGui::SliderFloat("TileHeight", &m_tileHeight, 0.5f, 4.0f);
+		ImGui::SliderFloat("TileWidth", &m_tileWidth, 1.0f, 4.0f);
+		ImGui::SliderFloat("TileHeight", &m_tileHeight, 1.0f, 4.0f);
 	}
 
 	if (ImGui::Button("Build Walking TileMap"))
@@ -277,20 +303,34 @@ void CDemoNavMesh::onViewRayClick(const core::line3df& ray, int button, bool hol
 	if (m_query->getCollisionPoint(ray, rayDistance, outIntersection, outTriangle) == true)
 	{
 		m_clickPosition = outIntersection;
-		m_pickTile = m_walkingTileMap->getTileByPosition(m_clickPosition);
+
+		CMoveAgent* moveAgent = m_agent->getComponent<CMoveAgent>();
 
 		if (button == 0)
 		{
-			CMoveAgent* moveAgent = m_agent->getComponent<CMoveAgent>();
+			m_fromTile = m_walkingTileMap->getTileByPosition(m_clickPosition);
+
+			// left click
 			moveAgent->setPosition(m_clickPosition);
 			moveAgent->setTargetPosition(m_clickPosition);
 		}
+		else
+		{
+			m_fromTile = m_walkingTileMap->getTileByPosition(moveAgent->getPosition());
+			m_toTile = m_walkingTileMap->getTileByPosition(m_clickPosition);
+
+			// right click
+			moveAgent->setTargetPosition(m_clickPosition);
+		}
+
+		if (m_fromTile && m_toTile)
+		{
+			if (m_query->findPath(m_walkingTileMap, m_fromTile, m_toTile, m_path))
+			{
+				moveAgent->setPath(m_path, m_clickPosition);
+			}
+		}
 	}
-}
-
-void CDemoNavMesh::onLeftClickPosition(bool holdShift, const core::vector3df& pos)
-{
-
 }
 
 void CDemoNavMesh::buildNavMesh()
@@ -301,5 +341,12 @@ void CDemoNavMesh::buildNavMesh()
 
 void CDemoNavMesh::buildWalkingMap()
 {
+	m_fromTile = NULL;
+	m_toTile = NULL;
+	m_path.clear();
+
+	CMoveAgent* moveAgent = m_agent->getComponent<CMoveAgent>();
+	moveAgent->clearPath();
+
 	m_walkingTileMap->generate(m_tileWidth, m_tileHeight, m_outputNavMesh, m_obstacle);
 }

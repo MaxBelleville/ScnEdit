@@ -39,7 +39,8 @@ namespace Skylicht
 		{
 			Default,
 			Maya,
-			Blender
+			Blender,
+			FPS
 		};
 
 	protected:

@@ -56,10 +56,10 @@ void CHelloWorld::onInitApp()
 
 	// Create 2D Canvas
 	CGameObject *canvasObject = zone->createEmptyObject();
-	CCanvas *canvas = canvasObject->addComponent<CCanvas>();
+	m_canvas = canvasObject->addComponent<CCanvas>();
 
 	// Create UI Text in Canvas
-	CGUIText *textLarge = canvas->createText(m_largeFont);
+	CGUIText *textLarge = m_canvas->createText(m_largeFont);
     textLarge->setDock(EGUIDock::DockFill);
 	textLarge->setText("Hello, World");
 	textLarge->setTextAlign(EGUIHorizontalAlign::Center, EGUIVerticalAlign::Middle);

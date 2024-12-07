@@ -39,18 +39,22 @@ namespace Skylicht
 		if (m_camera == NULL)
 		{
 			m_camera = m_gameObject->getComponent<CCamera>();
+
 		}
 	}
 
 	void CEditorCamera::endUpdate()
 	{
+		
 		CTransformEuler* transform = m_gameObject->getTransformEuler();
 
 		if (m_camera == NULL || transform == NULL)
 			return;
 
+
 		if (!m_camera->isInputReceiverEnabled())
 			return;
+
 
 		f32 timeDiff = getTimeStep();
 
@@ -98,6 +102,15 @@ namespace Skylicht
 			{
 				if (m_midMousePress)
 					updateInputOffset(offsetPosition, timeDiff);
+			}
+		}
+		else if (m_controlStyle == FPS) {
+			if (!m_cursorControl->isVisible()) {
+				if (m_midMousePress)
+					updateInputOffset(offsetPosition, timeDiff);
+				else {
+					updateInputRotate(relativeRotation, timeDiff);
+				}
 			}
 		}
 		else
@@ -176,7 +189,6 @@ namespace Skylicht
 		{
 			relativeRotation.X = MaxVerticalAngle;
 		}
-
 		m_centerCursor = m_cursorControl->getRelativePosition();
 		m_cursorPos = m_centerCursor;
 	}
@@ -277,6 +289,9 @@ namespace Skylicht
 				m_rightMousePress = true;
 				m_centerCursor = m_cursorControl->getRelativePosition();
 				m_cursorPos = m_centerCursor;
+				if (m_controlStyle == FPS) {
+					m_cursorControl->setVisible(!m_cursorControl->isVisible());
+				}
 			}
 			else if (evt.MouseInput.Event == EMIE_MMOUSE_PRESSED_DOWN)
 			{
@@ -298,11 +313,24 @@ namespace Skylicht
 			}
 			else if (evt.MouseInput.Event == EMIE_MOUSE_MOVED)
 			{
+				if (m_controlStyle == FPS && !m_cursorControl->isVisible()) {
+					m_cursorPos = m_cursorControl->getRelativePosition();
+					core::dimension2du center = getVideoDriver()->getScreenSize() / 2;
+					HWND hwnd = reinterpret_cast<HWND>(getIrrlichtDevice()->getVideoDriver()->getExposedVideoData().OpenGLWin32.HWnd);
+					RECT rect;
+					if (GetWindowRect(hwnd, &rect)) {
+						core::vector2di pos = core::vector2di(center.Width + rect.left, center.Height + rect.top);
+						m_cursorControl->setPosition(pos);
+					}
+					return true;
+				}
 				if (m_leftMousePress || m_rightMousePress || m_midMousePress)
 				{
 					m_cursorPos = m_cursorControl->getRelativePosition();
+				
 					return true;
 				}
+				
 			}
 			else if (evt.MouseInput.Event == EMIE_MOUSE_WHEEL)
 			{

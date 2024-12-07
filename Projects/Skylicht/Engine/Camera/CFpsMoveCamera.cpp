@@ -65,21 +65,23 @@ namespace Skylicht
 
 		core::vector3df movedir = transform->getFront();
 		movedir.normalize();
-
+		f32 speed = m_moveSpeed;
+		if (m_shiftKeyDown) speed= m_moveSpeed*m_shiftSpeed;
+		
 		if (m_input[MoveForward])
-			pos += movedir * timeDiff * m_moveSpeed;
+			pos += movedir * timeDiff * speed;
 
 		if (m_input[MoveBackward])
-			pos -= movedir * timeDiff * m_moveSpeed;
+			pos -= movedir * timeDiff * speed;
 
 		core::vector3df strafevect = movedir;
 		strafevect = strafevect.crossProduct(m_camera->getUpVector());
 
 		if (m_input[StrafeLeft])
-			pos += strafevect * timeDiff * m_moveSpeed;
+			pos += strafevect * timeDiff * speed;
 
 		if (m_input[StrafeRight])
-			pos -= strafevect * timeDiff * m_moveSpeed;
+			pos -= strafevect * timeDiff * speed;
 
 		m_camera->setPosition(pos);
 	}
@@ -99,6 +101,11 @@ namespace Skylicht
 					m_input[m_keyMap[i].Direction] = evt.KeyInput.PressedDown;
 					return true;
 				}
+			}
+			if (evt.KeyInput.Key == KEY_SHIFT || evt.KeyInput.Key == KEY_LSHIFT ||
+				evt.KeyInput.Key == KEY_RSHIFT) {
+				m_shiftKeyDown = evt.KeyInput.PressedDown;
+				return true;
 			}
 			break;
 		default:

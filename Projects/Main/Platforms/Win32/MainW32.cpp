@@ -175,6 +175,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	prepareApplication(g_application->getParams(), &p);
 
 	winSize = p.WindowSize;
+
 	RECT clientSize;
 	clientSize.top = 0;
 	clientSize.left = 0;
@@ -226,6 +227,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 	MoveWindow(hWnd, windowLeft, windowTop, realWidth, realHeight, TRUE);
 	// create device
+
 	IrrlichtDevice* device = irr::createDeviceEx(p);
 
 	if (device == NULL)

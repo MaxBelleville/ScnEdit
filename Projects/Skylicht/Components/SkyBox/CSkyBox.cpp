@@ -58,7 +58,7 @@ namespace Skylicht
 
 		// default
 		setColorIntensity(m_color, m_intensity);
-		setTexture6("Common/Textures/Sky/PaperMill.png");
+		//setTexture6("Common/Textures/Sky/PaperMill.png");
 	}
 
 	void CSkyBox::updateComponent()
@@ -129,16 +129,15 @@ namespace Skylicht
 		m_skyboxData->updateTexture();
 	}
 
-	void CSkyBox::setTextures(const char* textures[6]) {
-		m_texture = textures[0];
-		std::string path = textures[0];
+	void CSkyBox::setTextures(ITexture* textures[6]) {
+		m_texture = textures[0]->getName().getPath().c_str();
 		CTextureManager* textureMgr = CTextureManager::getInstance();
-		m_skyboxData->Back = textureMgr->getTexture(textures[0]);
-		m_skyboxData->Bottom = textureMgr->getTexture(textures[1]);
-		m_skyboxData->Front = textureMgr->getTexture(textures[2]);
-		m_skyboxData->Right = textureMgr->getTexture(textures[3]);
-		m_skyboxData->Left = textureMgr->getTexture(textures[4]);
-		m_skyboxData->Top = textureMgr->getTexture(textures[5]);
+		m_skyboxData->Back = textures[0];
+		m_skyboxData->Bottom = textures[1];
+		m_skyboxData->Front = textures[2];
+		m_skyboxData->Right = textures[3];
+		m_skyboxData->Left = textures[4];
+		m_skyboxData->Top = textures[5];
 		m_skyboxData->updateTexture();
 	}
 

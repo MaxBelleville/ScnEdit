@@ -56,9 +56,9 @@ namespace Skylicht
 		std::vector<SKeyMap> m_keyMap;
 
 		bool m_input[DirectionCount];
-
+		bool m_shiftKeyDown = false;
 		f32 m_moveSpeed;
-
+		f32 m_shiftSpeed;
 	public:
 		CFpsMoveCamera();
 
@@ -84,6 +84,10 @@ namespace Skylicht
 		inline void setMoveSpeed(float s)
 		{
 			m_moveSpeed = s;
+		}
+		inline void setShiftSpeed(float s)
+		{
+			m_shiftSpeed = s;
 		}
 	};
 }

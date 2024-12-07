@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "SkylichtEngine.h"
-
-#include "SCNEdit.h"
-#include "SkyBox/CSkyBox.h"
-#include "Lightmapper/CLightmapper.h"
+#include "Header/SCNEdit.h"
 
 
 //This class loads in cmd line arguments, sets up view manager and loads in scn from f
@@ -26,14 +23,12 @@ void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationP
 	getApplication()->registerAppEvent("SWAT3 SCN editor", app);
 }
 
-SCNEdit::SCNEdit(CScnArguments* options):
-	m_rendering(NULL),
-	m_camera(NULL),
-	m_guiCamera(NULL),
-	m_scene(NULL),
-	m_bakeSHLighting(true)
+SCNEdit::SCNEdit(CScnArguments* options)
 {
 	arguments = options;
+	CContext::createGetInstance();
+	CViewManager::createGetInstance()->initViewLayer(1);
+	CLightmapper::createGetInstance();
 
 }
 
@@ -41,131 +36,176 @@ SCNEdit::~SCNEdit()
 {
 	delete arguments;
 
+	CViewManager::releaseInstance();
+	CContext::releaseInstance();
+	
 }
 
 void SCNEdit::onInitApp()
 {
-	CBaseApp* app = getApplication();
-	app->getDevice()->setGammaRamp(1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
-	app->getFileSystem()->addFileArchive(app->getBuiltInPath("sedata.res"), true, true, io::EFAT_ZIP);
+	CViewManager::getInstance()->getLayer(0)->pushView<CViewInit>(arguments);
+	//CBaseApp* app = getApplication();
+	//app->getDevice()->setGammaRamp(1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+	//app->getFileSystem()->addFileArchive(app->getBuiltInPath("sedata.res"), true, true, io::EFAT_ZIP);
 
-	//printf("%S", general.c_str());
-	
-	app->getDevice()->setWindowCaption(L"SWAT3 SCN editor");;
-	io::path filename = arguments->getSCN();
-	if (!filename.empty())
-		SCNEdit::loadScnFile(filename);
+	////printf("%S", general.c_str());
+	//
+	//app->getDevice()->setWindowCaption(L"SWAT3 SCN editor");;
+	//
 
-	// load "BuiltIn.zip" to read files inside it
-	app->getFileSystem()->addFileArchive(app->getBuiltInPath("BuiltIn.zip"), false, false);
-	app->getFileSystem()->addFileArchive(app->getBuiltInPath("Common.zip"), false, false);
+	//// load basic shader
+	//CShaderManager* shaderMgr = CShaderManager::getInstance();
+	//shaderMgr->initExtremlyBasicShader();
 
+	//// load font
+	//CGlyphFreetype* freetypeFont = CGlyphFreetype::getInstance();
+	//freetypeFont->initFont("Segoe UI Light", "BuiltIn/Fonts/segoeui/segoeuil.ttf");
 
-	// load basic shader
-	CShaderManager* shaderMgr = CShaderManager::getInstance();
-	shaderMgr->initBasicShader();
-	shaderMgr->initSGDeferredShader();
-	// load font
-	CGlyphFreetype* freetypeFont = CGlyphFreetype::getInstance();
-	freetypeFont->initFont("Segoe UI Light", "BuiltIn/Fonts/segoeui/segoeuil.ttf");
+	//// create a Scene
 
-	// create a Scene
-
-	m_scene = new CScene();
+	//m_scene = new CScene();
 
 
-	// create a Zone in Scene
-	CZone* zone = m_scene->createZone();
+	//// create a Zone in Scene
+	//CZone* zone = m_scene->createZone();
 
 
-	// camera 2D
-	CGameObject* guiCameraObject = zone->createEmptyObject();
-	m_guiCamera = guiCameraObject->addComponent<CCamera>();
-	m_guiCamera->setProjectionType(CCamera::OrthoUI);
+	//// camera 2D
+	//CGameObject* guiCameraObject = zone->createEmptyObject();
+	//m_guiCamera = guiCameraObject->addComponent<CCamera>();
+	//m_guiCamera->setProjectionType(CCamera::OrthoUI);
 
-	// camera 3D
-	CGameObject* camObj = zone->createEmptyObject();
-	camObj->addComponent<CCamera>();
-	camObj->addComponent<CEditorCamera>()->setMoveSpeed(10.0f);
-	camObj->addComponent<CFpsMoveCamera>()->setMoveSpeed(50.0f);
-
-	m_camera = camObj->getComponent<CCamera>();
-	m_camera->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
-	m_camera->setFOV(60.0);
-	m_camera->lookAt(core::vector3df(-1.0f, 0.0f, 0.0f), core::vector3df(0.0f, 1.0f, 0.0f));
+	//// camera 3D
+	//CGameObject* camObj = zone->createEmptyObject();
+	//camObj->addComponent<CCamera>();
 
 
-	const char* textures[6] = { "textures/Skyboxes/a_Porch_bk.png", "textures/Skyboxes/a_Porch_dn.png",
-		"textures/Skyboxes/a_Porch_fr.png", "textures/Skyboxes/a_Porch_lf.png",
-		"textures/Skyboxes/a_Porch_rt.png","textures/Skyboxes/a_Porch_up.png"
-	};
+	//CEditorCamera * editorCam = camObj->addComponent<CEditorCamera>();
+	//editorCam->setControlStyle(CEditorCamera::EControlStyle::FPS);
+	//editorCam->setMoveSpeed(7.0f);
+	//editorCam->setZoomSpeed(7.0f);
+	//CFpsMoveCamera* fpsMoveCam = camObj->addComponent<CFpsMoveCamera>();
+	//fpsMoveCam->setMoveSpeed(75.0f);
+	//fpsMoveCam->setShiftSpeed(2.5f);
+	//
+	//m_camera = camObj->getComponent<CCamera>();
 
-	CSkyBox* skyBox = zone->createEmptyObject()->addComponent<CSkyBox>();
-	skyBox->setTextures(textures);
+	//m_camera->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
+	//m_camera->setFOV(arguments->getFov());
+	//m_camera->setFarValue(arguments->getViewDist() * 100.0f);
+	//m_camera->lookAt(core::vector3df(-1.0f, 0.0f, 0.0f), core::vector3df(0.0f, 1.0f, 0.0f));
 
-	CGameObject* scnObj = zone->createEmptyObject();
-	CScnMeshComponent* mesh = scnObj->addComponent<CScnMeshComponent>();
-	scnObj->setStatic(true);
-;	if (SCNEdit::getSCN()) {
-		mesh->setMesh(SCNEdit::getSCN(), arguments);
-		scnObj->getTransformEuler()->setPosition(core::vector3df(-1.0f, 0.0f, 0.0f));
-	}
+	//io::path filename = arguments->getSCN();
+	//if (!filename.empty())
+	//	SCNEdit::loadScnFile(filename);
 
-	m_meshes.push_back(scnObj);
-	// Reflection probe
 
-	// Rendering
-	u32 w = app->getWidth();
-	u32 h = app->getHeight();
+	//CGameObject* sky = zone->createEmptyObject();
+	//m_skyBox = sky->addComponent<CSkyBox>();
+	//CScnEnt* ent = scn->getCell(0);
+	//const char* skyName = ent->getField("SkyboxName");
+	//if (skyName) {
 
-	m_rendering = new CDeferredRP();
-	m_rendering->initRender(w, h);
-	m_rendering->enableUpdateEntity(true);
+	//	core::array<ITexture*> textures = get_skybox(skyName);
+	//	if (textures.size() == 6) {
+	//		m_skyBox->setTextures(textures.pointer());
+	//	}
+	//}
+	//sky->setStatic(true);
+	//
+	//if (scn) {
+	//	CGameObject* scnObj = zone->createEmptyObject();
+	//	CScnMeshComponent* mesh = scnObj->addComponent<CScnMeshComponent>();
+	//	mesh->setMesh(scn, arguments);
+	//	scnObj->setStatic(true);
+	//	m_meshes.push_back(scnObj);
 
-	CForwardRP* m_forwardRP = new CForwardRP(false);
-	m_forwardRP->initRender(w, h);
-	m_forwardRP->enableUpdateEntity(false);
+	//	if (arguments->isPortal()) {
+	//		CGameObject* portalObj = zone->createEmptyObject();
+	//		CScnPortalComponent* mesh = portalObj->addComponent<CScnPortalComponent>();
+	//		mesh->setMesh(scn);
+	//		scnObj->setStatic(true);
 
-	m_rendering->setNextPipeLine(m_forwardRP);
+	//		m_meshes.push_back(portalObj);
+	//	}
+	//	if (arguments->isBBVisible()) {
+	//		CGameObject* bbObj = zone->createEmptyObject();
+	//		CScnCellBBComponent* mesh = bbObj->addComponent<CScnCellBBComponent>();
+	//		mesh->setMesh(scn);
+	//		scnObj->setStatic(true);
+
+	//		m_meshes.push_back(bbObj);
+	//	}
+	//	if (arguments->isEntityVisible()) {
+	//		CGameObject* enitites = zone->createEmptyObject();
+	//		CScnEntityComponent* mesh = enitites->addComponent<CScnEntityComponent>();
+	//		mesh->setMesh(scn);
+	//		scnObj->setStatic(true);
+
+	//		m_meshes.push_back(enitites);
+	//	}
+
+	//}
+	//
+	//// Rendering
+	//u32 w = app->getWidth();
+	//u32 h = app->getHeight();
+
+	//m_rendering = new CDeferredSimpleRP();
+	//m_rendering->initRender(w, h);
+	//m_rendering->enableUpdateEntity(true);
+
+	//CForwardRP* m_forwardRP = new CForwardRP(false);
+	//m_forwardRP->initRender(w, h);
+	//m_forwardRP->enableUpdateEntity(false);
+
+	//m_rendering->setNextPipeLine(m_forwardRP);
 }
 
 void SCNEdit::onUpdate()
 {
-	m_scene->update();
+	//m_scene->update();
+	CViewManager::getInstance()->update();
 }
 
 void SCNEdit::onRender()
 {
 
-	m_rendering->render(NULL, m_camera, m_scene->getEntityManager(), core::recti());
-
-	CGraphics2D::getInstance()->render(m_guiCamera);
+	//m_rendering->render(NULL, m_camera, m_scene->getEntityManager(), core::recti());
+	CViewManager::getInstance()->render();
+	//CGraphics2D::getInstance()->render(m_guiCamera);
 }
 
 void SCNEdit::onPostRender()
 {
-	
+	CViewManager::getInstance()->postRender();
 }
 
 bool SCNEdit::onBack()
 {
-	return true;
+	// on back key press
+	// return TRUE will run default by OS (Mobile)
+	// return FALSE will cancel BACK FUNCTION by OS (Mobile)
+	return CViewManager::getInstance()->onBack();
 }
 
 void SCNEdit::onResize(int w, int h)
 {
-	if (m_rendering != NULL)
-		m_rendering->resize(w, h);
+	// on window size changed
+	if (CContext::getInstance() != NULL)
+		CContext::getInstance()->resize(w, h);
 }
 
 void SCNEdit::onResume()
 {
-	
+	// resume application
+	CViewManager::getInstance()->onResume();
 }
 
 void SCNEdit::onPause()
 {
-
+	// pause application
+	CViewManager::getInstance()->onPause();
 }
 
 
@@ -174,6 +214,8 @@ void SCNEdit::onQuitApp()
 	// end application
 	delete this;
 }
+
+
 bool SCNEdit::loadScnFile(io::path fname) {
 	CBaseApp* app = getApplication();
 	s32 pos = fname.findLastChar("\\/", 2); //search for \ or /

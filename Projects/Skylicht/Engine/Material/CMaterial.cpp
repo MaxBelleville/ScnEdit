@@ -54,6 +54,30 @@ namespace Skylicht
 
 		initMaterial();
 	}
+	CMaterial::CMaterial(const char* name, CShader* shader) :
+		m_zBuffer(video::ECFN_LESSEQUAL),
+		m_zWriteEnable(true),
+		m_backfaceCulling(true),
+		m_frontfaceCulling(false),
+		m_doubleSided(false),
+		m_manualInitMaterial(false),
+		m_deferred(false),
+		m_shaderPath(shader->getSource()),
+		m_materialName(name),
+		m_shader(shader)
+	{
+		m_shader->clear();
+		for (int i = 0; i < MATERIAL_MAX_TEXTURES; i++)
+		{
+			m_resourceTexture[i] = NULL;
+			m_textures[i] = NULL;
+		}
+
+		for (int i = 0; i < CShader::ResourceCount; i++)
+			m_overrideTextures[i] = NULL;
+
+		initMaterial();
+	}
 
 
 	CMaterial::~CMaterial()

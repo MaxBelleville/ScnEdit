@@ -14,6 +14,7 @@ if (BUILD_EXAMPLES AND BUILD_SKYLICHT_LIGHMAPPER)
 	
 	if (BUILD_SKYLICHT_COLLISION)
 	subdirs(Samples/Collision)
+	subdirs (Samples/SCNEdit)
 	endif()
 	
 	subdirs(Samples/DrawPrimitives)
@@ -27,7 +28,7 @@ if (BUILD_EXAMPLES AND BUILD_SKYLICHT_LIGHMAPPER)
 	endif()
 	
 	subdirs(Samples/HelloWorld)
-	subdirs (Samples/SCNEdit)
+	
 	subdirs(Samples/Instancing)
 	
 	if (BUILD_SKYLICHT_AUDIO)

@@ -143,6 +143,7 @@ namespace Skylicht
 
 	public:
 		CMaterial(const char* name, const char* shaderPath);
+		CMaterial(const char* name, CShader* shader);
 
 
 		virtual ~CMaterial();

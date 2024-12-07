@@ -155,6 +155,27 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/SkySun/SkySun.xml");
 	}
 
+	void CShaderManager::initExtremlyBasicShader()
+	{
+		loadShader("BuiltIn/Shader/Basic/VertexColor.xml");
+		loadShader("BuiltIn/Shader/Basic/VertexColorAlpha.xml");
+		loadShader("BuiltIn/Shader/Basic/VertexColorAdditive.xml");
+
+		loadShader("BuiltIn/Shader/Basic/TextureColor.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureColorAlpha.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureColorAlphaBGR.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureColorAlphaBW.xml");
+
+		loadShader("BuiltIn/Shader/Basic/TextureColorAdditive.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureColor2LayerAdditive.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureColorMultiply.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureColorScreen.xml");
+
+		loadShader("BuiltIn/Shader/Basic/TextureSRGB.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureLinearRGB.xml");
+		loadShader("BuiltIn/Shader/Basic/Luminance.xml");
+	}
+
 	void CShaderManager::initSGDeferredShader()
 	{
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/ColorInstancing.xml");

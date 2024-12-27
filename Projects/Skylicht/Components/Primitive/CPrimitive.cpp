@@ -62,7 +62,7 @@ namespace Skylicht
 		entityMgr->addRenderSystem<CPrimitiveRendererInstancing>();
 
 		// init material
-		m_material = new CMaterial("Primitive", "BuiltIn/Shader/SpecularGlossiness/Deferred/Color.xml");
+		m_material = new CMaterial("Primitive", "BuiltIn/Shader/Basic/DirectColor.xml");
 		m_material->setUniform4("uColor", m_color);
 		m_material->updateShaderParams();
 

@@ -71,11 +71,12 @@ CScnSolid::~CScnSolid()
 
 }
 
-int CScnSolid::loadSolid(std::ifstream * file)
+int CScnSolid::loadSolid(std::ifstream * file, u32 indx)
 {
+	solididx = indx;
 	//file offset
 	file->seekg(offset);
-	log+=SAY("offset: %u\n",offset);
+	os::Printer::log(format("\toffset: {}",offset).c_str());
 	//reads file for information in 32 bits
 	//all loading up number of...
 	if(firstVal==NULL) {
@@ -105,7 +106,7 @@ int CScnSolid::loadSolid(std::ifstream * file)
 	loadCells(file);
 	//Gives utid-unique texture name
 	s32 n_texs = calcUniqueTexturesNames(file);
-	log+=SAY("\n\t%u unique textures\n",n_texs);
+	os::Printer::log(format("\t{} unique textures",n_texs).c_str());
 	//if number of textures is not equal to the texture size
 	if (n_texs != textures.size())
 		error(true,"loadSolid: Number of unique textures and texture array size doesn't match");
@@ -117,7 +118,7 @@ int CScnSolid::loadSolid(std::ifstream * file)
 //The rest of this code just deals with loading different parts of the solid
 int CScnSolid::loadCells(std::ifstream * file)
 {
-	log+=SAY("\tGetting Cells...");
+	os::Printer::log("\tGetting Cells...");
 	//sets raw cells to number of cells
 	rawcells = new scnRawCell_t[n_cells];
 	//loop with something about the number of cells
@@ -126,43 +127,40 @@ int CScnSolid::loadCells(std::ifstream * file)
 		rawcells[i].nodesidxs=0;
 		rawcells[i].portals=0;
 
-		log+=SAY("\n\t\tcell[%u]: ",i);
 		//reads cell names in file 32 bits
 		read_generic(rawcells[i].name,file,32);
-		log+=SAY("%s ", rawcells[i].name);
 		//reads number of node ids
 		rawcells[i].n_nodesidxs=read_s32(file);
-		log+=SAY("%d ", rawcells[i].n_nodesidxs);
 		//reads number of portals
 		rawcells[i].n_portals=read_s32(file);
-		log+=SAY("%d ", rawcells[i].n_portals);
 		//reads unknow variable
 		rawcells[i].n3=read_s32(file);
-		log+=SAY("%d ", rawcells[i].n3);
 		//reads sky name in file 32 bits
 		read_generic(rawcells[i].skyname,file,32);
-		log+=SAY("%s", rawcells[i].skyname);
+		os::Printer::log(format("\t\tcell[{}]: {} {} {} {} {}", 
+			i, rawcells[i].name, rawcells[i].n_nodesidxs, rawcells[i].n_portals, rawcells[i].n3, rawcells[i].skyname).c_str());
+
 		//creates new node id
 		rawcells[i].nodesidxs = new u16[rawcells[i].n_nodesidxs];
 		//reads node id in file in a byte amount of double the number of node ids
 		read_generic(rawcells[i].nodesidxs,file,2 * rawcells[i].n_nodesidxs);
 		//creates new portals
 		rawcells[i].portals = new scnPortal_t[rawcells[i].n_portals];
-		log+=SAY("Reading %u portals... ", rawcells[i].n_portals);
+		os::Printer::log(format("\tReading {} portals... ", rawcells[i].n_portals).c_str());
 		for (s32 j=0; j < rawcells[i].n_portals; j++)
 		{
 			//sets portal vertices to 0
 			rawcells[i].portals[j].verts=0;
 			loadPortal(&(rawcells[i].portals[j]),file);
 		}
-		log+=SAY("done.");
-		log+=SAY("\n\t\tReading cell data... ");
+		os::Printer::log("\t\tdone.");
+		os::Printer::log("\tReading cell data... ");
 		loadCellData(&rawcells[i], &(rawcells[i].bvh), file);
-		log+=SAY("done.");
+		os::Printer::log("\t\tdone.");
 	}
 
 
-   log+=SAY("done.");
+   os::Printer::log("\t\tdone.");
    tree->n_cells = n_cells;
    tree->rawcells = rawcells;
 	return n_cells;
@@ -210,19 +208,19 @@ int CScnSolid::loadCellData(scnRawCell_t* rawcell,scnCellData_t * celldata,std::
 //IMPORTANT Figure out why he is hiding the fact he is reading the portals by commenting out the say commands
 int CScnSolid::loadPortal(scnPortal_t * portal, std::ifstream * file)
 {
-log+=SAY("\n\t\t\tReading portal...");
+
 	//reads portal name
 	read_generic(portal->name,file,32);
-	log+=SAY("(%u)", strlen(portal->name));
-	//log+=SAY("%s ", portal->name);
+	os::Printer::log(format("\t\tReading portal with {} names...", strlen(portal->name)).c_str());
+	//os::Printer::log("{} ", portal->name);
 	//reads next portal cell
 	portal->nextcell=read_s32(file);
-	//log+=SAY("%u ",portal->nextcell);
+	//os::Printer::log("{} ",portal->nextcell);
 	//reads the plane in the file in the size of the plane
 	read_generic(&(portal->plane),file,sizeof(scnPlane_t));
 	//read portals unk what ever that means
 	portal->unk=read_f32(file);
-	//log+=SAY("(%.1f %.1f %.1f %.1f %.1f)",portal->plane.a, portal->plane.b, portal->plane.c, portal->plane.d, portal->unk);
+	//os::Printer::log("(%.1f %.1f %.1f %.1f %.1f)",portal->plane.a, portal->plane.b, portal->plane.c, portal->plane.d, portal->unk);
 	//reads the portals number of vertices
 	portal->n_verts=read_s32(file);
 	//reads the portals bb_verices in the file in double the size of core::vector3df
@@ -231,18 +229,19 @@ log+=SAY("\n\t\t\tReading portal...");
 	portal->verts = new core::vector3df[portal->n_verts];
 	//reads the portal vertices in file in the size of core::vector3df times the number of portal vertices
 	read_generic(portal->verts, file, sizeof(core::vector3df) * portal->n_verts);
-	log+=SAY("done reading portal. ");
+
+	os::Printer::log("\t\t\tdone reading portal. ");
 	return 0;
 }
 
 int CScnSolid::loadUnk(std::ifstream * file)
 {
-	log+=SAY("\tSkipping Unk lump...");
+	os::Printer::log("\tSkipping Unk lump...");
 
 	//About this lump only know it's 9 floats per surface
 	file->seekg(36*n_surfs,ios::cur);
 
-	log+=SAY("done.\n");
+	os::Printer::log("\t\tdone.");
 	return 0;
 }
 
@@ -282,12 +281,12 @@ int CScnSolid::calcUniqueTexturesNames(std::ifstream * file)
 int CScnSolid::loadUVIdxs(std::ifstream * file)
 {
 	u32 nvui = n_vertidxs;
-	log+=SAY("\tGetting UV coordinates indices...");
+	os::Printer::log(format("\tGetting UV coordinates indices... {}", nvui).c_str());
 	//creates new uv indexes
 	uvidxs = new u32[nvui];   //allocate   n_uvidxs=n_vertidxs
 	//reads uv indexes in file
 	read_generic(uvidxs,file,sizeof(u32)*nvui);
-	log+=SAY("%u done.\n",nvui);
+	os::Printer::log("\t\tdone.");
 
 	return nvui;
 
@@ -354,18 +353,18 @@ void CScnSolid::buildBackTree()
 
 int CScnSolid::loadVertIdxs(std::ifstream * file)
 {
-	log+=SAY("\tGetting Vertex indices...");
+	os::Printer::log(format("\tGetting Vertex indices... {}", n_vertidxs).c_str());
 	vertidxs = new u32[n_vertidxs];   //allocate
 	read_generic(vertidxs,file,sizeof(u32)*n_vertidxs); //read all, should work
 
-	log+=SAY("%u done.\n",n_vertidxs);
+	os::Printer::log("\t\tdone.");
 
 	return n_vertidxs;
 }
 
 int CScnSolid::loadUVPos(std::ifstream * file)
 {
-	log+=SAY("\tGetting UV coordinates...");
+	os::Printer::log(format("\tGetting UV coordinates... {}", n_uvpos).c_str());
 	uvpos = new core::vector2df[n_uvpos];   //allocate
 	ouvpos = new core::vector2df[n_uvpos];
 	uvposad=file->tellg();
@@ -374,18 +373,18 @@ int CScnSolid::loadUVPos(std::ifstream * file)
 	ouvpos[i].X = uvpos[i].X;
 	ouvpos[i].Y = uvpos[i].Y;
 	}
-	log+=SAY("%u done.\n",n_uvpos);
+	os::Printer::log("\t\tdone.");
 
 	return n_uvpos;
 }
 
 int CScnSolid::loadVerts(std::ifstream* file)
 {
-	log+=SAY("\tGetting Vertices...");
+	os::Printer::log(format("\tGetting Vertices... {}", n_verts).c_str());
 	verts = new core::vector3df[n_verts];   //allocate
 	vertssad = file->tellg();
 	read_generic(verts, file, sizeof(core::vector3df) * n_verts); //read all, should work
-	log+=SAY("%u done.\n", n_verts);
+	os::Printer::log("\t\tdone.");
 
 	return n_verts;
 
@@ -393,14 +392,14 @@ int CScnSolid::loadVerts(std::ifstream* file)
 
 int CScnSolid::loadPlanes(std::ifstream * file)
 {
-	log+=SAY("\tGetting planes...");
+	os::Printer::log(format("\tGetting planes... {}", n_planes).c_str());
 	planes = new scnPlane_t[n_planes];   //allocate
 	planessad = file->tellg();
 	tree->planes = planes; //IMPORTANT
 							//TODO: make better
 
 	read_generic(planes,file,sizeof(scnPlane_t)*n_planes); //read all, should work
-	log+=SAY("%u done.\n",n_planes);
+	os::Printer::log("\t\tdone.");
 
 	return n_planes;
 
@@ -408,7 +407,7 @@ int CScnSolid::loadPlanes(std::ifstream * file)
 
 int CScnSolid::loadNodes(std::ifstream * file)
 {
-	log+=SAY("\tReading nodes...");
+	os::Printer::log("\tReading nodes...");
 	//file->seek(n[N_NODES]*16,true);
 
 	tree = new CScnBSPTree(n_nodes);
@@ -416,7 +415,7 @@ int CScnSolid::loadNodes(std::ifstream * file)
 	if (tree->loadNodes(file) == -1)
 		error(true,"loadNodes: Error reading nodes from solid,n_nodes < 1");
 
-	log+=SAY("done.\n");
+	os::Printer::log("\t\tdone.");
 
 	return 0;
 
@@ -424,7 +423,7 @@ int CScnSolid::loadNodes(std::ifstream * file)
 
 int CScnSolid::loadSurfs(std::ifstream * file)
 {
-	log+=SAY("\tGetting Surfaces...");
+	os::Printer::log(format("\tGetting Surfaces... {}", n_surfs).c_str());
 
 	surfs = new scnSurf_t[n_surfs];
 	surfsad = new int64_t[n_surfs];
@@ -444,9 +443,9 @@ int CScnSolid::loadSurfs(std::ifstream * file)
 			//make constructor to set initial value 0;
 		}
 		else if (surfs[i].hasVertexColors !=0)
-			error(true,"CScnSolid: loadSurfs - Unexpected surface[%u].more value - expected 0 or 1",i);
+			error(true,"CScnSolid: loadSurfs - Unexpected surface[{}].more value - expected 0 or 1",i);
 	}
-	log+=SAY("%u done.\n",i);
+	os::Printer::log("\t\tdone.");
 	return i;
 }
 
@@ -520,8 +519,7 @@ void CScnSolid::calcSurfVertices(u32 surfidx, f32* mults, IVertexBuffer* vbuff, 
 
 		tVert.TCoords2.X = uvpos[uvidxs[surfi->vertidxstart + i]].X;
 		tVert.TCoords2.Y = uvpos[uvidxs[surfi->vertidxstart + i]].Y;
-
-
+	
 		if(mults) {
 			tVert.TCoords2.X = tVert.TCoords2.X * mults[0] + mults[2];
 			tVert.TCoords2.Y = tVert.TCoords2.Y * mults[1] + mults[3];
@@ -549,13 +547,13 @@ void CScnSolid::calcSurfVertices(u32 surfidx, f32* mults, IVertexBuffer* vbuff, 
 	b = v[2].Pos - v[1].Pos;
 	cp = a.crossProduct(b);
 	if (cp == zero)
-		log+=SAY("first 3 verts are colinear");
+		os::Printer::log("first 3 verts are colinear");
 
 	a = v[surfi->vertidxlen-3].Pos - v[surfi->vertidxlen-2].Pos;
 	b = v[surfi->vertidxlen-2].Pos - v[surfi->vertidxlen-1].Pos;
 	cp = a.crossProduct(b);
 	if (cp == zero)
-		log+=SAY("last 3 verts are colinear");*/
+		os::Printer::log("last 3 verts are colinear");*/
 
 	//core::vector3df a,b,cp,zero(0,0,0);
 	//for (u32 j=0; j<surfi->vertidxlen; j++)
@@ -579,12 +577,13 @@ void CScnSolid::calcSurfVertices(u32 surfidx, f32* mults, IVertexBuffer* vbuff, 
 	//    cp = a.crossProduct(b);
 	//    //TODO: THIS
 	//    //if (cp == zero)
-	//        //log+=SAY("Surf %u: Verts %d %d %d are colinear\n",surfidx,idxs[0],idxs[1],idxs[2]);
+	//        //os::Printer::log("Surf {}: Verts {} {} {} are colinear",surfidx,idxs[0],idxs[1],idxs[2]);
 	//}
 
 
 
 }
+
 #endif
 
 #ifdef __IRRLICHT_H_INCLUDED__

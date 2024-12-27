@@ -1,35 +1,23 @@
 #pragma once
 
 #include "SkylichtEngine.h"
-#include "ViewManager/CView.h"
-#include "Decal/CDecals.h"
+#include "Managers/CView.h"
+#include "CScnArguments.h"
+#include "Header/Managers/CViewManager.h"
+#include "Collision/CCollisionManager.h"
 
 class CViewInteraction :
-	public CView,
-	public IEventReceiver
+	public CView
 {
 protected:
-	float m_mouseX;
-	float m_mouseY;
+	CScnArguments* m_arguments;
 
-	int m_currentTest;
-
-	float m_bboxSizeX;
-	float m_bboxSizeY;
-	float m_bboxSizeZ;
-
-	float m_decalSizeX;
-	float m_decalSizeY;
-	float m_decalSizeZ;
-	float m_decalLifeTime;
-	float m_decalRotation;
-
-	bool m_addDecal;
-
-	CDecals* m_decals;
-
+	static inline bool m_rebuildRequired = false;
+	static inline core::array<CGameObject*> m_hideSolids;
+	static inline core::array<CGameObject*> m_hidePortal;
+	static inline core::array<CGameObject*> m_hideEntity;
 public:
-	CViewInteraction();
+	CViewInteraction(CScnArguments* args);
 
 	virtual ~CViewInteraction();
 
@@ -37,7 +25,6 @@ public:
 
 	virtual void onDestroy();
 
-	virtual bool OnEvent(const SEvent& event);
 
 	virtual void onUpdate();
 
@@ -45,7 +32,12 @@ public:
 
 	virtual void onPostRender();
 
-protected:
 
-	void onGUI();
+protected:
+	static void updateVisbility(CGameObject* obj, bool state, bool bbCollision);
+	static void checkVisbility();
+	static void deselectAll(CGameObject* current);
+	static void updateEntityPos(core::vector3df);
+	static void resetSolid();
+	static void getClosestVertex(core::vector3df);
 };

@@ -1,7 +1,7 @@
 #ifndef CSCNBSPTREE_H_
 #define CSCNBSPTREE_H_
-#include "Header/Base/scntypes.h"
-#include "Header/Base/util.h"
+#include "scntypes.h"
+#include "util.h"
 //Not even sure if this is needed.
 class CScnBSPTree
 {
@@ -39,7 +39,7 @@ public:
 
 		read_generic(nodes, file,n_nodes*sizeof(scnNode_t));
 
-	  //  SAY("done.\n");
+	  //  os::Printer::log("done.\n");
 		return n_nodes;
 	}
 

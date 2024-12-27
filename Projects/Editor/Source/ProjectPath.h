@@ -1,1 +1,0 @@
-#define PROJECT_PATH "/home/hong-duc/Projects/skylicht-engine/Assets"

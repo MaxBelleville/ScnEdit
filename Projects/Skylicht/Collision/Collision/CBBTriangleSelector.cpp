@@ -47,7 +47,7 @@ namespace Skylicht
 
 		m_triangles.set_used(12);
 		m_bbox = mesh->getBoundingBox();
-
+		
 		core::vector3df edges[8];
 		m_bbox.getEdges(edges);
 

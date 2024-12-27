@@ -530,7 +530,8 @@ bool CD3D11MaterialRenderer::isTransparent() const
 		BaseMaterial == EMT_TRANSPARENT_ADD_COLOR ||
 		BaseMaterial == EMT_TRANSPARENT_VERTEX_ALPHA ||
 		BaseMaterial == EMT_TRANSPARENT_MULTIPLY_COLOR ||
-		BaseMaterial == EMT_TRANSPARENT_SCREEN_COLOR)
+		BaseMaterial == EMT_TRANSPARENT_SCREEN_COLOR
+		)
 	{
 		return true;
 	}
@@ -547,7 +548,11 @@ void CD3D11MaterialRenderer::OnSetMaterial(const video::SMaterial& material, con
 	{
 		D3D11_BLEND_DESC& blendDesc = static_cast<CD3D11Driver*>(Driver)->getBlendDesc();
 		D3D11_DEPTH_STENCIL_DESC& depth = static_cast<CD3D11Driver*>(Driver)->getDepthStencilDesc();
+		D3D11_RASTERIZER_DESC& raster = static_cast<CD3D11Driver*>(Driver)->getRasterizerDesc();
 
+		float depthBias = 0.00001f; // Adjust as needed
+		float slopeScaledBias = 1.0f;
+		float biasClamp = 0.0f;
 		switch (BaseMaterial)
 		{
 		case EMT_SOLID:
@@ -561,7 +566,15 @@ void CD3D11MaterialRenderer::OnSetMaterial(const video::SMaterial& material, con
 			blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 			break;
 		case EMT_TRANSPARENT_ALPHA_CHANNEL_REF:
-			blendDesc.RenderTarget[0].BlendEnable = FALSE;
+			blendDesc.RenderTarget[0].BlendEnable = TRUE;
+			blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+			blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+			blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+			blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+			depth.DepthEnable = TRUE;
+			depth.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			depth.DepthFunc = D3D11_COMPARISON_LESS;
+			raster.CullMode = D3D11_CULL_BACK;
 			break;
 		case EMT_TRANSPARENT_ADD_COLOR:
 			// dst.rgb = src.rgb * src.a + dst.rgb * 1.0

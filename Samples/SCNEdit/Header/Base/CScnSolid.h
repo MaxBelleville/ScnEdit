@@ -1,8 +1,8 @@
 #ifndef CSCNSOLID_H_
 #define CSCNSOLID_H_
-#include "Header/Base/CScnBSPTree.h"
-#include "Header/Base/scntypes.h"
-#include "Header/Base/util.h"
+#include "CScnBSPTree.h"
+#include "scntypes.h"
+#include "util.h"
 class CScnSolid
 {
 private:
@@ -21,8 +21,6 @@ private:
 	scnCellData_t* getBBFromSurf(u16 surfindx, scnCellData_t* cell_data);
 	int calcUniqueTexturesNames(std::ifstream *);
 	void buildBackTree();
-	core::stringw log;
-	
 
 
 //const static defColor = video::SColor(128,255,255,255);
@@ -30,6 +28,7 @@ public:
 	u32 n_unk1, n_verts, n_uvpos, n_vertidxs, n_planes, n_nodes, n_surfs, n_cells, n_unk2;
 	u32 offset;
 	u32 length;
+	u32 solididx;
 	int64_t* surfsad;  //array of offset in scn file to each surface i
 	int64_t uvposad;    //offset in file to start of uvpos array
 	int64_t vertssad; //ofset for vertices
@@ -52,14 +51,11 @@ public:
 	~CScnSolid();
 
 	//load from file
-	int loadSolid(std::ifstream*);
+	int loadSolid(std::ifstream*,u32);
 	s16 getCellAtPos(core::vector3df pos) const;
-	std::deque<s16> getAllCellAtPos(core::vector3df pos) const;
 	scnCellData_t* getBBFromSurf(u16 surfindx, u16 cellindx);
 
-	core::stringw getLog() {
-		return log;
-	}
+	
 
 #ifdef __IRRLICHT_H_INCLUDED__
 	//function only returns vertice from array
@@ -74,7 +70,6 @@ public:
 	}
 	void calcSurfVertices(u32 surfidx, f32*, scene::IVertexBuffer*, u16);
 	void calcSurfIndices(u32 surfidx, scene::IIndexBuffer*);
-
 	core::array<u32> * uvpos_caller;  //for uvpos[i], this array contains the index of uvidxs that points to it,
 									//ie, uvpos[uvidx[uvpos_caller[i][j]]] = uvpos[i], for all j
 

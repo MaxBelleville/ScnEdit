@@ -394,15 +394,17 @@ namespace Skylicht
 	}
 
 	CGameObject* CContainerObject::searchObject(const wchar_t* objectName)
-	{
+	{	
 		core::map<std::wstring, CGameObject*>::Node* node = m_objectByName.find(std::wstring(objectName));
 		if (node == NULL)
 		{
 			// try search in list add
 			for (CGameObject* addObject : m_add)
 			{
+				
 				if (CStringImp::comp(addObject->getName(), objectName) == 0)
 				{
+					printf("compare success?\n");
 					return addObject;
 				}
 			}

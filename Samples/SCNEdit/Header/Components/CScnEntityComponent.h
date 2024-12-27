@@ -3,6 +3,8 @@
 
 class CScnEntityComponent : public CComponentSystem
 {
+private:
+bool selected = false;
 public:
 	CScnEntityComponent();
 
@@ -10,7 +12,17 @@ public:
 
 	virtual void initComponent();
 
-	void setMesh(CScn*);
+	void setMesh(CScnEnt*);
+
+	void updateMesh(CScnEnt*);
 
 	virtual void updateComponent();
+
+	int select();
+
+	void deselect();
+
+	bool isSelected() { return selected; }
+
+	std::string getResetPos();
 };

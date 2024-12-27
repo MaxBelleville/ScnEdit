@@ -50,7 +50,7 @@ namespace Skylicht
 		CCollisionBuilder::clear();
 	}
 
-	void COctreeBuilder::build()
+	void COctreeBuilder::build(bool log)
 	{
 		if (m_root != NULL)
 			delete m_root;
@@ -101,10 +101,11 @@ namespace Skylicht
 
 		// step 3 build octree child node
 		constructOctree(m_root);
-
-		c8 tmp[256];
-		sprintf(tmp, "Needed %ums to COctreeBuilder::build (%u polys)", os::Timer::getRealTime() - start, numPoly);
-		os::Printer::log(tmp, ELL_INFORMATION);
+		if (log) {
+			c8 tmp[256];
+			sprintf(tmp, "Needed %ums to COctreeBuilder::build (%u polys)", os::Timer::getRealTime() - start, numPoly);
+			os::Printer::log(tmp, ELL_INFORMATION);
+		}
 	}
 
 	void COctreeBuilder::drawDebug()
@@ -235,7 +236,6 @@ namespace Skylicht
 		CCollisionNode*& outNode)
 	{
 		outNode = NULL;
-
 		core::vector3df mid = ray.getMiddle();
 		core::vector3df	vec = ray.getVector().normalize();
 
@@ -246,7 +246,7 @@ namespace Skylicht
 
 		// step 1: get list triangle collide with ray
 		getTrianglesFromOctree(m_triangles, m_collisions, m_root, mid, vec, halfLength);
-
+	
 		// step 2: find nearest triangle
 		s32 cnt = (s32)m_triangles.size();
 		core::triangle3df** listTris = m_triangles.pointer();
@@ -267,7 +267,9 @@ namespace Skylicht
 		for (s32 i = 0; i < cnt; ++i)
 		{
 			const core::triangle3df* triangle = listTris[i];
+		
 
+			
 			if (minX > triangle->pointA.X && minX > triangle->pointB.X && minX > triangle->pointC.X)
 				continue;
 			if (maxX < triangle->pointA.X && maxX < triangle->pointB.X && maxX < triangle->pointC.X)
@@ -281,6 +283,8 @@ namespace Skylicht
 			if (maxZ < triangle->pointA.Z && maxZ < triangle->pointB.Z && maxZ < triangle->pointC.Z)
 				continue;
 
+
+		
 			if (triangle->getIntersectionWithLine(ray.start, vec, intersection))
 			{
 				const f32 tmp = intersection.getDistanceFromSQ(ray.start);
@@ -324,12 +328,14 @@ namespace Skylicht
 		CCollisionNode** c = listCollisions.pointer();
 
 		// list triangles
+	
 		for (i = 0; i < cnt; ++i)
 		{
 			CCollisionNode* collision = node->Collisions[i];
 
 			p[n + i] = &collision->Triangles[listTriID[i]];
 			c[n + i] = collision;
+
 		}
 
 		for (i = 0; i < 8; ++i)

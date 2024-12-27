@@ -158,9 +158,9 @@ namespace Skylicht
 	void CShaderManager::initExtremlyBasicShader()
 	{
 		loadShader("BuiltIn/Shader/Basic/VertexColor.xml");
+		loadShader("BuiltIn/Shader/Basic/DirectColor.xml");
 		loadShader("BuiltIn/Shader/Basic/VertexColorAlpha.xml");
 		loadShader("BuiltIn/Shader/Basic/VertexColorAdditive.xml");
-
 		loadShader("BuiltIn/Shader/Basic/TextureColor.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColorAlpha.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColorAlphaBGR.xml");
@@ -168,6 +168,7 @@ namespace Skylicht
 
 		loadShader("BuiltIn/Shader/Basic/TextureColorAdditive.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColor2LayerAdditive.xml");
+
 		loadShader("BuiltIn/Shader/Basic/TextureColorMultiply.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColorScreen.xml");
 

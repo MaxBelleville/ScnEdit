@@ -270,7 +270,7 @@ subdirs (Projects/SpineCpp)
 endif()
 
 # recast & graph
-if (BUILD_RECAST_GRAPH)
+if (BUILD_SKYLICHT_GRAPH)
 add_definitions(-DBUILD_SKYLICHT_GRAPH)
 subdirs (Projects/Skylicht/Graph)
 endif()
@@ -327,21 +327,10 @@ endif()
 
 subdirs (Projects/Skylicht/Client)
 
-if (BUILD_EDITOR_GUI_LIB)
-subdirs (Projects/EditorGUI)
-endif()
-
-if (NOT INSTALL_LIBS)
-if (BUILD_EDITOR_TOOL AND BUILD_EDITOR_GUI_LIB)
-subdirs (Projects/Editor)
-endif()
-
 include(CMakeProjects.cmake)
 
 # unit test
 if (NOT BUILD_ANDROID AND NOT BUILD_IOS AND NOT BUILD_EMSCRIPTEN AND NOT BUILD_WINDOWS_STORE)
 enable_testing()
 subdirs (UnitTest/TestApp)
-endif()
-
 endif()

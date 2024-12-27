@@ -114,6 +114,16 @@ namespace Skylicht
 			m_linkComponent.clear();
 		}
 
+		inline void setLink(std::vector<CComponentSystem*> comp)
+		{
+			m_linkComponent = comp;
+		}
+
+		inline std::vector<CComponentSystem*> getLink()
+		{
+			return m_linkComponent;
+		}
+
 		DECLARE_GETTYPENAME(CComponentSystem)
 	};
 }

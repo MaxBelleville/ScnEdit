@@ -10,10 +10,10 @@ namespace Skylicht
 		m_camera(NULL),
 		m_moveSpeed(1.0f)
 	{
-		m_keyMap.push_back(SKeyMap{ MoveForward , irr::KEY_UP });
+	/*	m_keyMap.push_back(SKeyMap{ MoveForward , irr::KEY_UP });
 		m_keyMap.push_back(SKeyMap{ MoveBackward , irr::KEY_DOWN });
 		m_keyMap.push_back(SKeyMap{ StrafeLeft , irr::KEY_LEFT });
-		m_keyMap.push_back(SKeyMap{ StrafeRight , irr::KEY_RIGHT });
+		m_keyMap.push_back(SKeyMap{ StrafeRight , irr::KEY_RIGHT });*/
 
 		m_keyMap.push_back(SKeyMap{ MoveForward , irr::KEY_KEY_W });
 		m_keyMap.push_back(SKeyMap{ MoveBackward , irr::KEY_KEY_S });

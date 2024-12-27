@@ -24,17 +24,61 @@ void CScnEntityComponent::initComponent()
 	culling->Type = CCullingData::BoundingBox;
 }
 
-void CScnEntityComponent::setMesh(CScn* scn) {
-	CEntity* entity = m_gameObject->getEntity();
-	CScnEntityData* portals = entity->addData<CScnEntityData>(DATA_TYPE_INDEX(CRenderMeshData));
-	portals->initMesh(scn);
-	portals->setVisible(true);
+void CScnEntityComponent::setMesh(CScnEnt* ent) {
 
+	CEntity* entity = m_gameObject->getEntity();
+	CScnEntityData* entData = entity->addData<CScnEntityData>(DATA_TYPE_INDEX(CRenderMeshData));
+	entData->initMesh(ent);
+	entData->setVisible(true);
 }
+
+void CScnEntityComponent::updateMesh(CScnEnt* ent) {
+
+	CEntity* entity = m_gameObject->getEntity();
+	CScnEntityData* entData = entity->getData<CScnEntityData>();
+	if (entData) {
+		entData->initMesh(ent);
+		entData->setVisible(true);
+	}
+}
+
+
+
+int CScnEntityComponent::select() {
+
+	CEntity* entity = m_gameObject->getEntity();
+	CScnEntityData* entData = entity->getData<CScnEntityData>();
+	if (entData) {
+		selected ? entData->deselect() : entData->select();
+		selected = !selected;
+		if(selected) return entData->getEntityIndx();
+	}
+	return -1;
+}
+
+void CScnEntityComponent::deselect() {
+
+	CEntity* entity = m_gameObject->getEntity();
+	CScnEntityData* entData = entity->getData<CScnEntityData>();
+	if (entData){
+		entData->deselect();
+		selected = false;
+	}
+}
+
 
 void CScnEntityComponent::updateComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
-	CScnEntityData* portals = entity->getData<CScnEntityData>();
-	if(portals) portals->setVisible(true);
+	CScnEntityData* entData = entity->getData<CScnEntityData>();
+
+	if(entData) entData->setVisible(true);
+}
+
+std::string CScnEntityComponent::getResetPos() {
+
+	CEntity* entity = m_gameObject->getEntity();
+	CScnEntityData* entData = entity->getData<CScnEntityData>();
+	if (entData) { return entData->m_origin;  }
+	return "";
 }

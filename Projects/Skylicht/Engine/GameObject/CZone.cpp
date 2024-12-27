@@ -42,6 +42,7 @@ namespace Skylicht
 
 	CZone::~CZone()
 	{
+
 	}
 
 	void CZone::remove()

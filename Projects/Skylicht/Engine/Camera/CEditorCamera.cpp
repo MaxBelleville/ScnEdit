@@ -180,6 +180,7 @@ namespace Skylicht
 
 		// rotate Y
 		relativeRotation.X -= (m_centerCursor.Y - m_cursorPos.Y) * m_rotateSpeed * timeDiff;
+		if (m_invert) relativeRotation.X *= -1;
 
 		if (relativeRotation.X > MaxVerticalAngle * 2 && relativeRotation.X < 360.0f - MaxVerticalAngle)
 		{
@@ -289,7 +290,7 @@ namespace Skylicht
 				m_rightMousePress = true;
 				m_centerCursor = m_cursorControl->getRelativePosition();
 				m_cursorPos = m_centerCursor;
-				if (m_controlStyle == FPS) {
+				if (m_controlStyle == FPS&& m_camera->isEnable()) {
 					m_cursorControl->setVisible(!m_cursorControl->isVisible());
 				}
 			}

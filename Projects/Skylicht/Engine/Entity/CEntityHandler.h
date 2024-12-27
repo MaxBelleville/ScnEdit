@@ -68,10 +68,12 @@ namespace Skylicht
 
 		void getEntitiesTransforms(core::array<core::matrix4>& result);
 
-	protected:
-
 		void setEntities(CEntity** entities, u32 count);
 
+
+	protected:
+
+		
 		void removeChilds(CEntity* entity);
 	};
 }

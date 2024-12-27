@@ -1,8 +1,8 @@
 //To understand this file you need to learn scn.h
-#include "Header/Base/util.h"
-#include "Header/Base/scntypes.h"
-#include "Header/Base/CScn.h"
-#include "Header/Base/CScnSolid.h"
+#include "util.h"
+#include "scntypes.h"
+#include "CScn.h"
+#include "CScnSolid.h"
 
  //>------ Primary chunk
 

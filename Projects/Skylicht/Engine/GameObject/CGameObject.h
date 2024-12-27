@@ -214,6 +214,8 @@ namespace Skylicht
 
 		core::vector3df getPosition();
 
+		void setPosition(core::vector3df);
+
 		core::quaternion getRotation();
 
 		core::vector3df getUp();

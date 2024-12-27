@@ -47,7 +47,9 @@ namespace Skylicht
 	class CDecalData : public IEntityData
 	{
 	public:
+		core::vector3df Position;
 		core::vector3df Dimension;
+
 		core::vector3df Normal;
 		float TextureRotation;
 		float LifeTime;

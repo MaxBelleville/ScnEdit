@@ -237,6 +237,13 @@ namespace Skylicht
 		return getTransform()->getRelativeTransform().getTranslation();
 	}
 
+	void CGameObject::setPosition(core::vector3df pos)
+	{
+		core::matrix4 mat = getTransform()->getRelativeTransform();
+		mat.setTranslation(pos);
+	}
+
+
 	core::quaternion CGameObject::getRotation()
 	{
 		const core::matrix4& matrix = getTransform()->getRelativeTransform();

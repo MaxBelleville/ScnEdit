@@ -2,17 +2,7 @@
 #define SCNTYPES_H_
 
 #include <SkylichtEngine.h>
-
-
-struct ipoint3f
-{
-	f32 x, y, z;
-	u32 vertindx = 0;
-	u32 meshindx = 0;
-	u32 surfindx = 0;
-	u32 surf_vertindx = 0;
-};
-
+//---------------------------------Start of Original SCN TYPES-----------------------------------
 
 struct tempLight_t
 {
@@ -51,7 +41,8 @@ struct scnSurf_t
 	//IMPORTANT: keep order, we rely on it to read
 	char texture[32];
 	f32 unk[2];
-	u16 flags,alpha;
+	u8 flag1, flag2;
+	u16 alpha;
 	u16 lmsize_h, lmsize_v;
 	u16 width, height; //width and height of tex, in pixels
 	u32 vertidxstart;
@@ -189,11 +180,54 @@ struct scnRawCell_t //raw cell means it's the cell read not from the entity list
 	core::array<u16> naivesurfs;
 	//there is also more data here
 };
+struct vertProp_t
+{
+	u32 vertidxidx;
+	u32 surf_vertidx;
+	bool bShared;
+	core::array<u32> sharesWith;
+};
+
+//---------------------------------END OF Original SCN TYPES-----------------------------------
+//---------------------------------Start of Custom Types------------------------------------
+struct indexedVec3df_t
+{
+	core::vector3df pos;
+	u32 vertindx = 0;
+	u32 solidindx = 0;
+	u32 surfindx = 0;
+	u32 surf_vertindx = 0;
+};
+
 //Simplify the 3d array type call so I don't nee to refer to it as vector<vectory<vector<u8>>>
 typedef std::vector<std::vector<std::vector<u8>>> u8_3DArr;
 //Simplify the 3d array type call so I don't nee to refer to it as array<array<u8>>
 typedef std::vector<std::vector<u8>> u8_2DArr;
 
 typedef std::pair<u16, u16> u16_pair;
+
+enum KeyAugment {
+	CtrlShift,
+	Shift,
+	Ctrl,
+	None
+};
+struct pair_hash {
+	template <class T1, class T2>
+	std::size_t operator () (const std::pair<T1, T2>& p) const {
+		auto h1 = std::hash<T1>{}(p.first);
+		auto h2 = std::hash<T2>{}(p.second);
+
+		// Mainly for demonstration purposes, i.e. works but is overly simple
+		// In the real world, use sth. like boost.hash_combine
+		return h1 ^ h2;
+	}
+};
+
+typedef std::pair<irr::EKEY_CODE, KeyAugment> key_pair;
+
+typedef std::unordered_map<key_pair, bool, pair_hash> key_map; //key is (key code, augment) value is state.
+
+typedef std::pair<core::array<indexedVec3df_t>, core::array<indexedVec3df_t>> indexed_vertices;
 
 #endif

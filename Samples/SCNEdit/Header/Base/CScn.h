@@ -1,10 +1,10 @@
 #ifndef CSCN_H_
 #define CSCN_H_
-#include "Header/Base/CScnEnt.h"
-#include "Header/Base/scntypes.h"
-#include "Header/Base/CScnSolid.h"
-#include "Header/Base/util.h"
-#include "Header/Base/CScnLightmap.h"
+#include "CScnEnt.h"
+#include "scntypes.h"
+#include "CScnSolid.h"
+#include "util.h"
+#include "CScnLightmap.h"
 
 using namespace std;
 using namespace irr;
@@ -19,13 +19,11 @@ class CScn
 private:
 	void reset();
 	CScnEnt * ents;
-	CScnLightmap lmap;
+	CScnLightmap* lmap = new CScnLightmap();
 	int loadFile(std::ifstream * file);
 	int loadHeader(std::ifstream * file);
 	int loadEntities(std::ifstream * file);
 	int loadLightmap(std::ifstream* file);
-	core::stringw log;
-
 public:
 	scnHeader_t * header;
 	CScnSolid * solids;
@@ -33,13 +31,14 @@ public:
 	u32 getVersion() const {
 		return header->version;}
 
-	vector<CScnEnt*> cells;
-	vector<CScnEnt*> ambients;
+	inline static vector<CScnEnt*> cells;
+	inline static vector<CScnEnt*> ambients;
+	CScnEnt* swt_start;
 
 	//get cell by index as defined by cell_index field
-	CScnEnt * getCell(u32 cell_index);
-	CScnEnt* getAmbientByCell(const char* name);
-	CScnEnt* getGlobalAmbient();
+	static CScnEnt * getCell(u32 cell_index);
+	static CScnEnt* getAmbientByCell(const char* name);
+	static CScnEnt* getGlobalAmbient();
 
 	CScn ();
 	CScn (std::ifstream *);
@@ -73,7 +72,7 @@ public:
 			return NULL;
 	}
 
-	CScnLightmap getLightmap()
+	CScnLightmap* getLightmap()
 	{
 		return lmap;
 	}
@@ -94,9 +93,6 @@ public:
 		return header->n_lights;
 	}
 
-	core::stringw getLog() {
-		return log;
-	}
 };
 
 #endif

@@ -7,31 +7,15 @@
 #include <deque>
 using namespace irr;
 
-
-
-
-/*
-template<class T>
-  for_each(T first, T last, Function f)
-  {
-    for ( ; first!=last; ++first ) f(*first);
-    return f;
-  }
-  */
-
-
 #include "pch.h"
 
-//from furrycat's
-core::array<std::string> str_split(const char* charStr, const char* delmChar);
-int str_equals(char *one, const char *two);
-int str_nequals(char *one, const char *two,int n);
-int str_equiv(const char *one, const char *two);
-core::stringw SAY(const char* c, ...);
-core::stringw WARN(const char* c, ...);
-char* _print(const char* c, va_list args);
 
-void error(bool fatal, const char * message,...);
+core::array<std::string> str_split(const char* charStr, const char* delmChar);
+int str_equals(const char *one, const char *two);
+int str_nequals(const char *one, const char *two,int n);
+int str_equiv(const char *one, const char *two);
+
+void error(bool fatal, const char* message, ...);
 
 void read_generic(void * buffer, std::ifstream* file, int nbytes);
 
@@ -52,8 +36,17 @@ bool is_number(const char* str);
 bool CopyFile_(const char * existfile, const char * newfile);
 
 bool can_open(const char * path);
+
+SColor convert_color(const char* pos);
+core::vector3df convert_vec3(const char* pos);
+core::vector2df convert_vec2(const char* pos);
+
 core::array<std::string> search_dir(std::string dir, const char* file);
 
 core::array<ITexture*> get_skybox(const char* file);
 
+core::array<ITexture*> get_decals(const char* file);
+
 ITexture* convert_image(io::path file);
+
+

@@ -31,7 +31,13 @@ namespace Skylicht
 	{
 		CWalkingTileMap::CWalkingTileMap() :
 			m_tileWidth(0.0f),
-			m_tileHeight(0.0f)
+			m_tileHeight(0.0f),
+			m_navMesh(NULL),
+			m_obstacle(NULL),
+			m_generateId(0),
+			m_generateMax(0),
+			m_generatePercent(0.0f),
+			m_generateStep(None)
 		{
 
 		}
@@ -161,40 +167,6 @@ namespace Skylicht
 			}
 
 			// link Neighbour
-			/*
-			for (u32 i = 0, n = m_tiles.size(); i < n; i++)
-			{
-				STile* t = m_tiles[i];
-
-				for (int y = -1; y <= 1; y++)
-				{
-					for (int x = -1; x <= 1; x++)
-					{
-						for (int z = -1; z <= 1; z++)
-						{
-							//if (abs(x) == abs(z))
-							//	continue;
-
-							if (x == 0 && y == 0 && z == 0)
-								continue;
-
-							STile* nei = getTile(
-								t->X + x,
-								t->Y + y,
-								t->Z + z);
-							if (nei)
-							{
-								if (!obstacle->isLineHit(t->Position, nei->Position, tileHeight))
-								{
-									t->Neighbours.push_back(nei);
-								}
-							}
-						}
-					}
-				}
-			}
-			*/
-
 			float t = 0.0f;
 			for (u32 i = 0, n = m_tiles.size() - 1; i < n; i++)
 			{
@@ -206,8 +178,8 @@ namespace Skylicht
 					if (abs(a->Y - b->Y) > 1)
 						continue;
 
-					if (a->Position.getDistanceFromSQ(b->Position) > 400.0f)
-						continue;
+					// if (a->Position.getDistanceFromSQ(b->Position) > 400.0f)
+					//	continue;
 
 					if (!obstacle->isLineHit(a->Position, b->Position, tileHeight, t))
 					{
@@ -239,8 +211,254 @@ namespace Skylicht
 			{
 				STile* t = m_tiles[i];
 				t->Id = i;
+				t->Tris.clear();
 			}
 		}
+
+		void CWalkingTileMap::beginGenerate(float tileWidth, float tileHeight, CMesh* navMesh, CObstacleAvoidance* obstacle)
+		{
+			generate(tileWidth, tileHeight, navMesh->getBoundingBox());
+
+			m_navMesh = navMesh;
+			m_obstacle = obstacle;
+			m_generateStep = CollectTile;
+			m_generateId = 0;
+			m_generatePercent = 0.0f;
+		}
+
+		bool CWalkingTileMap::updateGenerate()
+		{
+			if (m_generateStep == CollectTile)
+				updateGenerateTile();
+			else if (m_generateStep == RemoveEmptyTile)
+				updateGenerateRemoveEmptyTile();
+			else if (m_generateStep == LinkNeighbours)
+				updateGenerateNeighbours();
+
+			bool finish = false;
+
+			if (m_generateStep == Finish)
+			{
+				finish = true;
+				m_navMesh = NULL;
+				m_obstacle = NULL;
+				m_generateStep = None;
+			}
+
+			return finish;
+		}
+
+		void CWalkingTileMap::updateGenerateTile()
+		{
+			IMeshBuffer* mb = m_navMesh->getMeshBuffer(0);
+			IVertexBuffer* vb = mb->getVertexBuffer();
+			IIndexBuffer* ib = mb->getIndexBuffer();
+
+			int t = 10;
+			int n = ib->getIndexCount();
+
+			for (; m_generateId < n; m_generateId += 3)
+			{
+				u32 i = (u32)m_generateId;
+				u32 ixA = ib->getIndex(i);
+				u32 ixB = ib->getIndex(i + 1);
+				u32 ixC = ib->getIndex(i + 2);
+
+				S3DVertex* a = (S3DVertex*)vb->getVertex(ixA);
+				S3DVertex* b = (S3DVertex*)vb->getVertex(ixB);
+				S3DVertex* c = (S3DVertex*)vb->getVertex(ixC);
+
+				core::aabbox3df box;
+				box.reset(a->Pos);
+				box.addInternalPoint(b->Pos);
+				box.addInternalPoint(c->Pos);
+
+				core::triangle3df tri(a->Pos, b->Pos, c->Pos);
+
+				for (u32 j = 0, m = m_tiles.size(); j < m; j++)
+				{
+					if (m_tiles[j]->BBox.intersectsWithBox(box))
+					{
+						m_tiles[j]->Tris.push_back(tri);
+					}
+				}
+
+				if (--t <= 0)
+				{
+					// skip for next update
+					m_generateId += 3;
+					break;
+				}
+			}
+
+			if (n > 0)
+				m_generatePercent = m_generateId / (float)n;
+
+			if (m_generateId >= n)
+			{
+				m_generateStep = RemoveEmptyTile;
+				m_generatePercent = 0.0f;
+				m_generateId = m_tiles.size() - 1;
+				m_generateMax = m_generateId;
+			}
+		}
+
+		void CWalkingTileMap::updateGenerateRemoveEmptyTile()
+		{
+			core::line3df centerLine;
+			int t = 200;
+
+			for (; m_generateId >= 0; m_generateId--)
+			{
+				u32 i = (u32)m_generateId;
+				if (m_tiles[i]->Tris.size() == 0)
+				{
+					delete m_tiles[i];
+					m_tiles.erase(i);
+				}
+				else
+				{
+					const core::aabbox3df& bbox = m_tiles[i]->BBox;
+					{
+						// try get position is center
+						core::vector3df center = bbox.getCenter();
+						core::vector3df centerTop = center;
+						core::vector3df centerBottom = center;
+						centerTop.Y = bbox.MaxEdge.Y;
+						centerBottom.Y = bbox.MinEdge.Y;
+						centerLine.setLine(centerTop, centerBottom);
+
+						bool hit = false;
+
+						if (hitTris(centerLine, m_tiles[i]->Tris, m_tiles[i]->Position))
+						{
+							hit = true;
+						}
+
+						if (!hit)
+						{
+							delete m_tiles[i];
+							m_tiles.erase(i);
+						}
+					}
+				}
+
+				if (--t <= 0)
+				{
+					// skip for next update
+					m_generateId--;
+					break;
+				}
+			}
+
+			if (m_generateMax > 0)
+				m_generatePercent = (m_generateMax - m_generateId) / (float)m_generateMax;
+
+			if (m_generateId < 0)
+			{
+				m_generateStep = LinkNeighbours;
+				m_generatePercent = 0.0f;
+				m_generateId = 0;
+
+				for (u32 i = 0, n = m_tiles.size(); i < n; i++)
+				{
+					STile* t = m_tiles[i];
+
+					STileXYZ tile(t->X, t->Y, t->Z);
+					m_hashTiles[tile] = t;
+				}
+			}
+		}
+
+		void CWalkingTileMap::updateGenerateNeighbours()
+		{
+			int step = 10;
+			float t = 0.0f;
+			int n = (int)m_tiles.size() - 1;
+
+			for (; m_generateId < n; m_generateId++)
+			{
+				u32 i = (u32)m_generateId;
+				for (u32 j = i + 1, m = m_tiles.size(); j < m; j++)
+				{
+					STile* a = m_tiles[i];
+					STile* b = m_tiles[j];
+
+					if (abs(a->Y - b->Y) > 1)
+						continue;
+
+					// if (a->Position.getDistanceFromSQ(b->Position) > 400.0f)
+					//	continue;
+
+					if (!m_obstacle->isLineHit(a->Position, b->Position, m_tileHeight, t))
+					{
+						a->Neighbours.push_back(b);
+						b->Neighbours.push_back(a);
+					}
+				}
+
+				if (--step <= 0)
+				{
+					m_generateId++;
+					break;
+				}
+			}
+
+			if (n > 0)
+				m_generatePercent = m_generateId / (float)n;
+
+			if (m_generateId >= n)
+			{
+				// remove tile have no Neighbours
+				for (int i = (int)m_tiles.size() - 1; i >= 0; i--)
+				{
+					if (m_tiles[i]->Neighbours.size() == 0)
+					{
+						// delete hash
+						STileXYZ tile(m_tiles[i]->X, m_tiles[i]->Y, m_tiles[i]->Z);
+						auto it = m_hashTiles.find(tile);
+						if (it == m_hashTiles.end())
+							m_hashTiles.erase(it);
+
+						// free data
+						delete m_tiles[i];
+						m_tiles.erase(i);
+					}
+				}
+
+				// sort id
+				for (u32 i = 0, n = m_tiles.size(); i < n; i++)
+				{
+					STile* t = m_tiles[i];
+					t->Id = i;
+					t->Tris.clear();
+				}
+
+				m_generateStep = Finish;
+				m_generatePercent = 0.0f;
+			}
+		}
+
+		float CWalkingTileMap::getGeneratePercent()
+		{
+			if (m_generateStep == CollectTile)
+			{
+				// 25%
+				return m_generatePercent * 0.25f;
+			}
+			else if (m_generateStep == RemoveEmptyTile)
+			{
+				// 50%
+				return 0.25f + m_generatePercent * 0.25f;
+			}
+			else if (m_generateStep == LinkNeighbours)
+			{
+				// 100%
+				return 0.5f + m_generatePercent * 0.5f;
+			}
+			return 1.0f;
+		}
+
 
 		STile* CWalkingTileMap::getTile(int x, int y, int z)
 		{
@@ -298,6 +516,167 @@ namespace Skylicht
 			{
 				m_tiles[i]->Visit = false;
 			}
+		}
+
+		bool CWalkingTileMap::save(const char* output)
+		{
+			io::IXMLWriter* xmlWriter = getIrrlichtDevice()->getFileSystem()->createXMLWriter(output);
+			if (!xmlWriter)
+				return false;
+
+			xmlWriter->writeXMLHeader();
+
+			io::IAttributes* attrib = getIrrlichtDevice()->getFileSystem()->createEmptyAttributes();
+
+			xmlWriter->writeElement(L"walkmap", false);
+			xmlWriter->writeLineBreak();
+
+			attrib->clear();
+			attrib->addFloat("tileWidth", m_tileWidth);
+			attrib->addFloat("tileHeight", m_tileHeight);
+			attrib->addBox3d("bbox", m_bbox);
+			attrib->write(xmlWriter);
+
+			// <tiles>
+			xmlWriter->writeElement(L"tiles", false);
+			xmlWriter->writeLineBreak();
+
+			for (u32 i = 0, n = m_tiles.size(); i < n; i++)
+			{
+				STile* tile = m_tiles[i];
+				core::stringw id = core::stringw(tile->Id);
+				core::stringw x = core::stringw(tile->X);
+				core::stringw y = core::stringw(tile->Y);
+				core::stringw z = core::stringw(tile->Z);
+
+				// <tile>
+				xmlWriter->writeElement(L"tile", false,
+					L"id", id.c_str(),
+					L"x", x.c_str(),
+					L"y", y.c_str(),
+					L"z", z.c_str());
+				xmlWriter->writeLineBreak();
+
+				attrib->clear();
+				attrib->addVector3d("position", tile->Position);
+				attrib->addBox3d("bbox", tile->BBox);
+				attrib->write(xmlWriter);
+
+				// </tile>
+				xmlWriter->writeClosingTag(L"tile");
+				xmlWriter->writeLineBreak();
+			}
+
+			// </tiles>
+			xmlWriter->writeClosingTag(L"tiles");
+			xmlWriter->writeLineBreak();
+
+			// <neighbours>
+			xmlWriter->writeElement(L"neighbours", false);
+			xmlWriter->writeLineBreak();
+
+			std::vector<std::pair<int, int>> links;
+			for (u32 i = 0, n = m_tiles.size(); i < n; i++)
+			{
+				STile* tile = m_tiles[i];
+				for (u32 j = 0, m = tile->Neighbours.size(); j < m; j++)
+				{
+					if (tile->Neighbours[j]->Id > (int)i)
+					{
+						links.push_back(std::make_pair(tile->Id, tile->Neighbours[j]->Id));
+					}
+				}
+			}
+
+			for (auto i : links)
+			{
+				core::stringw a = core::stringw(i.first);
+				core::stringw b = core::stringw(i.second);
+				xmlWriter->writeElement(L"link", true, L"a", a.c_str(), L"b", b.c_str());
+				xmlWriter->writeLineBreak();
+			}
+
+			// </neighbours>
+			xmlWriter->writeClosingTag(L"neighbours");
+			xmlWriter->writeLineBreak();
+
+			xmlWriter->writeClosingTag(L"walkmap");
+			xmlWriter->writeLineBreak();
+
+			xmlWriter->drop();
+			attrib->drop();
+			return true;
+		}
+
+		bool CWalkingTileMap::load(const char* input)
+		{
+			io::IXMLReader* xmlReader = getIrrlichtDevice()->getFileSystem()->createXMLReader(input);
+			if (!xmlReader)
+				return false;
+
+			release();
+
+			io::IAttributes* attrib = getIrrlichtDevice()->getFileSystem()->createEmptyAttributes();
+
+			while (xmlReader->read())
+			{
+				switch (xmlReader->getNodeType())
+				{
+				case io::EXN_ELEMENT:
+				{
+					std::wstring nodeName = xmlReader->getNodeName();
+					if (nodeName == L"walkmap")
+					{
+						attrib->clear();
+						attrib->read(xmlReader);
+						m_tileWidth = attrib->getAttributeAsFloat("tileWidth");
+						m_tileHeight = attrib->getAttributeAsFloat("tileHeight");
+						m_bbox = attrib->getAttributeAsBox3d("bbox");
+					}
+					else if (nodeName == L"tile")
+					{
+						STile* tile = new STile();
+
+						tile->Id = xmlReader->getAttributeValueAsInt(L"id");
+						tile->X = xmlReader->getAttributeValueAsInt(L"x");
+						tile->Y = xmlReader->getAttributeValueAsInt(L"y");
+						tile->Z = xmlReader->getAttributeValueAsInt(L"z");
+
+						attrib->clear();
+						attrib->read(xmlReader);
+
+						tile->Position = attrib->getAttributeAsVector3d("position");
+						tile->BBox = attrib->getAttributeAsBox3d("bbox");
+
+						m_tiles.push_back(tile);
+					}
+					else if (nodeName == L"link")
+					{
+						int a = xmlReader->getAttributeValueAsInt(L"a");
+						int b = xmlReader->getAttributeValueAsInt(L"b");
+
+						m_tiles[a]->Neighbours.push_back(m_tiles[b]);
+						m_tiles[b]->Neighbours.push_back(m_tiles[a]);
+					}
+					break;
+				}
+				default:
+					break;
+				}
+			}
+
+			for (u32 i = 0, n = m_tiles.size(); i < n; i++)
+			{
+				STile* t = m_tiles[i];
+
+				STileXYZ tile(t->X, t->Y, t->Z);
+				m_hashTiles[tile] = t;
+			}
+
+			xmlReader->drop();
+			attrib->drop();
+
+			return true;
 		}
 	}
 }

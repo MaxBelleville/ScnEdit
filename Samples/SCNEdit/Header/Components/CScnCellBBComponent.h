@@ -10,7 +10,7 @@ public:
 
 	virtual void initComponent();
 
-	void setMesh(CScn*);
+	void setMesh(CScnSolid* solid, u32 cellindx);
 
 	virtual void updateComponent();
 };

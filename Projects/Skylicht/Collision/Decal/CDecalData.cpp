@@ -57,6 +57,7 @@ namespace Skylicht
 		mat.TextureLayer[0].TextureWrapV = E_TEXTURE_CLAMP::ETC_CLAMP_TO_EDGE;
 	}
 
+
 	CDecalData::~CDecalData()
 	{
 		MeshBuffer->drop();

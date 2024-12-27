@@ -1,20 +1,21 @@
 #include "pch.h"
 #include "Header/CViewInit.h"
 #include "Header/CViewInteraction.h"
-#include "GridPlane/CGridPlane.h"
-#include "SkyDome/CSkyDome.h"
+#include "Header/CViewGui.h"
+#include "SkySun/CSkySun.h"
+#include "Header/Managers/CContext.h"
 
 CViewInit::CViewInit(CScnArguments* args) :
-	m_initState(CViewInit::DownloadBundles),
-	m_getFile(NULL),
-	m_downloaded(0)
+	m_initState(CViewInit::Start)
 {
-
+	m_start = os::Timer::getRealTime();
+	
+	m_arguments = args;
 }
 
 CViewInit::~CViewInit()
 {
-
+	
 }
 
 io::path CViewInit::getBuiltInPath(const char* name)
@@ -24,18 +25,10 @@ io::path CViewInit::getBuiltInPath(const char* name)
 
 void CViewInit::onInit()
 {
-	CBaseApp* app = getApplication();
-	app->showDebugConsole();
-	app->getFileSystem()->addFileArchive(getBuiltInPath("BuiltIn.zip"), false, false);
-
-	CShaderManager* shaderMgr = CShaderManager::getInstance();
-	shaderMgr->initExtremlyBasicShader();
-	//shaderMgr->initSGDeferredShader();
-
-	CGlyphFreetype* freetypeFont = CGlyphFreetype::getInstance();
-	freetypeFont->initFont("Segoe UI Light", "BuiltIn/Fonts/segoeui/segoeuil.ttf");
-
+	CScene* prevScene = CContext::getInstance()->getScene();
+	if(prevScene) CContext::getInstance()->releaseScene();
 	CScene* scene = CContext::getInstance()->initScene();
+
 	CZone* zone = scene->createZone();
 
 	m_guiObject = zone->createEmptyObject();
@@ -47,13 +40,13 @@ void CViewInit::onInit()
 	// create text
 	m_textInfo = canvas->createText(m_font);
 	m_textInfo->setTextAlign(EGUIHorizontalAlign::Center, EGUIVerticalAlign::Middle);
-	m_textInfo->setText(L"Init assets");
+	m_textInfo->setText("Starting...");
 
 	// crate gui camera
 	CGameObject* guiCameraObject = zone->createEmptyObject();
-	CCamera* guiCamera = guiCameraObject->addComponent<CCamera>();
-	guiCamera->setProjectionType(CCamera::OrthoUI);
-	CContext::getInstance()->setGUICamera(guiCamera);
+	m_guiCamera = guiCameraObject->addComponent<CCamera>();
+	m_guiCamera->setProjectionType(CCamera::OrthoUI);
+	CContext::getInstance()->setGUICamera(m_guiCamera);
 }
 
 void CViewInit::initScene()
@@ -67,57 +60,251 @@ void CViewInit::initScene()
 
 	// camera
 	CGameObject* camObj = zone->createEmptyObject();
-	camObj->addComponent<CCamera>();
-	camObj->addComponent<CEditorCamera>()->setMoveSpeed(2.0f);
-	camObj->addComponent<CFpsMoveCamera>()->setMoveSpeed(1.0f);
+	m_camera = camObj->addComponent<CCamera>();
 
-	CCamera* camera = camObj->getComponent<CCamera>();
-	camera->setPosition(core::vector3df(-10.0f, 5.0f, 10.0f));
-	camera->lookAt(core::vector3df(0.0f, 0.0f, 0.0f), core::vector3df(0.0f, 1.0f, 0.0f));
+	CEditorCamera * editorCam = camObj->addComponent<CEditorCamera>();
+	editorCam->setControlStyle(CEditorCamera::EControlStyle::FPS);
+	editorCam->setMoveSpeed(7.0f);
+	editorCam->setZoomSpeed(7.0f);
+	editorCam->setInvert(m_arguments->isMouseInvert());
+	CFpsMoveCamera* fpsMoveCam = camObj->addComponent<CFpsMoveCamera>();
+	fpsMoveCam->setMoveSpeed(100.0f);
+	fpsMoveCam->setShiftSpeed(2.5f);
 
+	
+	m_camera->setFOV(m_arguments->getFov());
+	m_camera->setFarValue(m_arguments->getViewDist() * 100.0f);
+	m_camera->setPosition(core::vector3df(0.0f, 4.0f, 0.0f));
+	m_camera->lookAt(core::vector3df(0.0f, 4.0f, 1.0f), core::vector3df(0.0f, 1.0f, 0.0f));
+	
 	// gui camera
 	CGameObject* guiCameraObj = zone->createEmptyObject();
 	guiCameraObj->addComponent<CCamera>();
 	CCamera* guiCamera = guiCameraObj->getComponent<CCamera>();
 	guiCamera->setProjectionType(CCamera::OrthoUI);
+	// sky
+	CSkySun* skySun = zone->createEmptyObject()->addComponent<CSkySun>();
 
 	// sky
-	ITexture* skyDomeTexture = CTextureManager::getInstance()->getTexture("Common/Textures/Sky/MonValley.png");
-	if (skyDomeTexture != NULL)
-	{
-		CSkyDome* skyDome = zone->createEmptyObject()->addComponent<CSkyDome>();
-		skyDome->setData(skyDomeTexture, SColor(255, 255, 255, 255));
-	}
-
-	// lighting
-	CGameObject* lightObj = zone->createEmptyObject();
-	CDirectionalLight* directionalLight = lightObj->addComponent<CDirectionalLight>();
-	SColor c(255, 255, 244, 214);
-	directionalLight->setColor(SColorf(c));
-
-	CTransformEuler* lightTransform = lightObj->getTransformEuler();
-	lightTransform->setPosition(core::vector3df(2.0f, 2.0f, 2.0f));
-
-	core::vector3df direction = core::vector3df(0.0f, -1.5f, 2.0f);
-	lightTransform->setOrientation(direction, Transform::Oy);
-
-
-
+	m_skyObject = zone->createEmptyObject();
+	m_skyObject->setName("skybox");
+	m_skyBox = m_skyObject->addComponent<CSkyBox>();
+	zone->registerObjectInSearchList(m_skyObject);
+	m_skyObject->setVisible(false);
+	//m_skyObject->setStatic(true);
 	// save to context
+
+
+	//Setup sel vert, shared vert, vertover
+	CGameObject* verticesObj = zone->createEmptyObject();
+	CCube* cube = verticesObj->addComponent<CCube>();
+	cube->setColor(SColor(150, 255, 0, 0));
+	cube->removeAllEntities();
+	verticesObj->setName("sel_verts");
+	zone->registerObjectInSearchList(verticesObj);
+
+
+	CGameObject* sharedvObj = zone->createEmptyObject();
+	CCube* cube2= sharedvObj->addComponent<CCube>();
+	cube2->setColor(SColor(150,255,0,255));
+	cube2->removeAllEntities();
+	sharedvObj->setName("shared_verts");
+	zone->registerObjectInSearchList(sharedvObj);
+
+	CGameObject* vertoverObj = zone->createEmptyObject();
+	CSphere* sphere = vertoverObj->addComponent<CSphere>();
+	sphere->removeAllEntities();
+	sphere->setColor(SColor(255, 0, 0, 0));
+	vertoverObj->setName("vert_over"); //hover over 
+	zone->registerObjectInSearchList(vertoverObj);
+
 	context->initSimpleRenderPipeline(app->getWidth(), app->getHeight());
 	context->setActiveZone(zone);
-	context->setActiveCamera(camera);
+	context->setActiveCamera(m_camera);
 	context->setGUICamera(guiCamera);
-	context->setDirectionalLight(directionalLight);
+}
 
-	// build collision before change to scene Demo
-	scene->update();
-	scene->getEntityManager()->update();
-//	context->getCollisionManager()->build();
+void CViewInit::buildScnComponents() {
+
+	CScn* scn = SCNEdit::getSCN();
+	if (!scn->swt_start) {
+		m_camera->setPosition(core::vector3df(0.0f, 4.0f, 0.0f));
+	}
+	else {
+		core::vector3df tmp = convert_vec3(scn->swt_start->getField("Origin"));
+		m_camera->setPosition(tmp);
+	}
+	CContext* context = CContext::getInstance();
+
+	CScene* scene = context->getScene();
+	CZone* zone = scene->getZone(0);
+	CScnSolid* solid = scn->getSolid(0);
+	const char* skyName ="";
+	for (int i = 0; solid->n_cells; i++) {
+		if (!str_equiv(solid->rawcells[i].skyname,"")) {
+			skyName = solid->rawcells[i].skyname;
+			break;
+		}
+	}
+	if (skyName) {
+		core::array<ITexture*> textures = get_skybox(skyName);
+		if (textures.size() == 6) {
+			m_skyObject->setVisible(true);
+			m_skyBox->setTextures(textures.pointer());
+		}
+	}
+	
+	//Structure of scn components goes as follows
+	//Zone->Body
+	//Body->Solid
+	//Body->ExtraGroup->Extra(doors etc)
+	//Body->PortalGroup->PortalCellGroup->Portals
+	//Body->EntityGroup->Entities.
+
+	//Define body, solid group and solid.
+
+	CContainerObject* body = zone->createContainerObject();
+	body->setName("body");
+	zone->registerObjectInSearchList(body);
+
+	CGameObject* scnObj = body->createEmptyObject();
+	scnObj->setName("solid");
+	zone->registerObjectInSearchList(scnObj);
+	CScnMeshComponent* mesh = scnObj->addComponent<CScnMeshComponent>();
+	mesh->setMesh(scn, solid, m_arguments);
+	//scnObj->setStatic(true);
+	context->getCollisionManager()->addComponentCollision(scnObj);
+
+	//Define components, objects and groups needed in extras
+	CContainerObject* extraGroup = body->createContainerObject();
+	extraGroup->setName("group_extra");
+	if (m_arguments->isExtrasEnabled()) {
+		for (u32 s = 1; s < scn->getSolidSize(true); s++) {
+			CScnSolid* solid = scn->getSolid(s);
+
+			CGameObject* extra = extraGroup->createEmptyObject();
+			extra->setName("solid_extra");
+
+			CScnMeshComponent* mesh = extra->addComponent<CScnMeshComponent>();
+			mesh->setMesh(scn, solid, m_arguments);
+		//	scnObj->setStatic(true);
+			context->getCollisionManager()->addComponentCollision(extra);
+		}
+	}
+	zone->registerObjectInSearchList(extraGroup);
+	CContainerObject* decalsGroup = body->createContainerObject();
+	decalsGroup->setName("group_decals");
+	if (m_arguments->isDecalEnabled()) {
+		scene->update();
+		scene->getEntityManager()->update();
+		context->getCollisionManager()->build();
+		for (u32 i = 0; i < scn->getTotalEnts(); i++) {
+			CScnEnt* ent = scn->getEnt(i);
+			const char* originStr = ent->getField("origin");
+			const char* className = ent->getField("classname");
+			if (str_equals(className, "infodecal")) {
+
+				const char* rotation = ent->getField("angle");
+				float rot = 0.0f;
+				if (rotation) rot = stof(rotation) * (core::PI / 180);
+		
+				core::array<ITexture*> textures = get_decals(ent->getField("Sprite"));
+				if (textures.size() > 0) {
+					CGameObject* obj = decalsGroup->createEmptyObject();
+					obj->setName("decals");
+					CDecals* decal = obj->addComponent<CDecals>();
+					decal->setTexture(textures[0]);
+					decal->addDecal(
+						convert_vec3(originStr),
+						core::vector3df(10.f, 7.0f, 10.f),
+						core::vector3df(0.0f, 1.0f, 0.0f),
+						0.0,
+						0.0f,
+						0.1f);
+
+					decal->bake(context->getCollisionManager());
+					decalsGroup->registerObjectInSearchList(obj);
+				}
+				
+			}
+		}
+	}
+	zone->registerObjectInSearchList(decalsGroup);
+	
+	//Define components, objects and groups needed in portals
+	CContainerObject* portalGroup = body->createContainerObject();
+	portalGroup->setName("group_portal");
+	if (m_arguments->isPortalEnabled()) {
+		for (u32 s = 0; s < scn->getSolidSize(m_arguments->isExtrasEnabled()); s++) { //Should only exist when solid= 0 but you never know
+			CScnSolid* solid = scn->getSolid(s);
+			for (u32 c = 0; c < solid->n_cells; c++) {
+				CContainerObject* portalCellGroup = portalGroup->createContainerObject();
+				portalCellGroup->setName("cellgroup_portal");
+
+				for (u32 p = 0; p < solid->rawcells[c].n_portals; p++) {
+
+					CGameObject* portalObj = portalCellGroup->createEmptyObject();
+					portalObj->setName("portal");
+
+					CScnPortalComponent* mesh = portalObj->addComponent<CScnPortalComponent>();
+					mesh->setMesh(solid, c, p);
+					portalObj->setStatic(true);
+					context->getCollisionManager()->addBBComponentCollision(portalObj);
+				}
+				portalGroup->registerObjectInSearchList(portalCellGroup);
+			}
+		}
+	}
+	zone->registerObjectInSearchList(portalGroup);
+	//Define components, objects and groups needed in bounding boxes
+	CContainerObject* bbGroup = body->createContainerObject();
+	bbGroup->setName("group_bb");
+	if (m_arguments->isBBEnabled()) {
+		for (u32 s = 0; s < scn->getSolidSize(m_arguments->isExtrasEnabled()); s++) {//Should only exist when solid= 0 but you never know
+			CScnSolid* solid = scn->getSolid(s);
+			for (u32 c = 0; c < solid->n_cells; c++) {
+
+				CGameObject* bbObj = bbGroup->createEmptyObject();
+				bbObj->setName("bb");
+
+				CScnCellBBComponent* mesh = bbObj->addComponent<CScnCellBBComponent>();
+				mesh->setMesh(solid, c);
+				bbObj->setStatic(true);
+				context->getCollisionManager()->addBBComponentCollision(bbObj);
+
+			}
+		}
+	}
+	zone->registerObjectInSearchList(bbGroup);
+	//Define components, objects and groups needed in entities
+	CContainerObject* entityGroup = body->createContainerObject();
+	entityGroup->setName("group_entity");
+	if (m_arguments->isEntityEnabled()) {
+		
+		for (u32 i = 0; i < scn->getTotalEnts(); i++) {
+			CScnEnt* ent = scn->getEnt(i);
+			const char* originStr = ent->getField("origin");
+			const char* className = ent->getField("classname");
+
+			if (originStr && className && !str_equiv(className, "Door")) {
+				CGameObject* entity = entityGroup->createEmptyObject();
+				entity->setName("entity");
+				CScnEntityComponent* mesh = entity->addComponent<CScnEntityComponent>();
+				mesh->setMesh(ent);
+				entity->setStatic(true);
+				context->getCollisionManager()->addBBComponentCollision(entity);
+			}
+		}
+	
+	}
+	zone->registerObjectInSearchList(entityGroup);
+ 
+	
 }
 
 void CViewInit::onDestroy()
 {
+
 	m_guiObject->remove();
 	delete m_font;
 }
@@ -125,86 +312,80 @@ void CViewInit::onDestroy()
 void CViewInit::onUpdate()
 {
 	CContext* context = CContext::getInstance();
-
+	
 	switch (m_initState)
 	{
-	case CViewInit::DownloadBundles:
+	case CViewInit::Start:
 	{
 		io::IFileSystem* fileSystem = getApplication()->getFileSystem();
+		m_textInfo->setText("Loading Swat Files and Assets...");
 
-		std::vector<std::string> listBundles;
-		listBundles.push_back("Common.zip");
-		//listBundles.push_back("TankScene.zip");
-		//listBundles.push_back(getApplication()->getTexturePackageName("TankScene"));
 
-#ifdef __EMSCRIPTEN__
-		const char* filename = listBundles[m_downloaded].c_str();
+		m_initState = CViewInit::ReadScn;
 
-		if (m_getFile == NULL)
-		{
-			m_getFile = new CGetFileURL(filename, filename);
-			m_getFile->download(CGetFileURL::Get);
+	}
+	break;
+	case CViewInit::ReadScn:
+	{
 
-			char log[512];
-			sprintf(log, "Download asset: %s", filename);
-			os::Printer::log(log);
+		io::path filename = m_arguments->getSCNPath();
+		if (!filename.empty()) {
+			SCNEdit::loadScnFile(filename);
+			m_arguments->setScnLoaded(true);
+			m_textInfo->setText("Initializing Mission Scene...");
 		}
-		else
-		{
-			char log[512];
-			sprintf(log, "Download asset: %s - %d%%", filename, m_getFile->getPercent());
-			m_textInfo->setText(log);
-
-			if (m_getFile->getState() == CGetFileURL::Finish)
-			{
-				// [bundles].zip
-				fileSystem->addFileArchive(filename, false, false);
-
-				if (++m_downloaded >= listBundles.size())
-					m_initState = CViewInit::InitScene;
-				else
-				{
-					delete m_getFile;
-					m_getFile = NULL;
-				}
-			}
-			else if (m_getFile->getState() == CGetFileURL::Error)
-			{
-				// retry download
-				delete m_getFile;
-				m_getFile = NULL;
-			}
+		else {
+			//No file found...
+			m_textInfo->setText("Initializing Empty Scene...");
 		}
-#else
-
-		for (std::string& bundle : listBundles)
-		{
-			const char* r = bundle.c_str();
-			fileSystem->addFileArchive(getBuiltInPath(r), false, false);
-		}
-
 		m_initState = CViewInit::InitScene;
-#endif
+		
 	}
 	break;
 	case CViewInit::InitScene:
 	{
 		initScene();
-		m_initState = CViewInit::Finished;
+
+		if (SCNEdit::getSCN()) {
+			m_initState = CViewInit::BuildScnComponents;
+			m_textInfo->setText("Building SCN Mesh...");
+		}
+		else {
+			
+			m_initState = CViewInit::Finished;
+			m_textInfo->setText("Completed Init... Updating Viewport");
+		}
 	}
 	break;
+	case CViewInit::BuildScnComponents:
+	{
+		buildScnComponents();
+		m_initState = CViewInit::Finished;
+		m_textInfo->setText("Completed Build... Updating Viewport");
+
+	}
+	break;
+
 	case CViewInit::Error:
 	{
+		os::Printer::log("Error...",irr::ELL_ERROR);
 		// todo nothing with black screen
 	}
 	break;
 	default:
 	{
 		CScene* scene = context->getScene();
-		if (scene != NULL)
+		if (scene != NULL) {
 			scene->update();
-
-		//CViewManager::getInstance()->getLayer(0)->changeView<CViewInteraction>();
+			scene->getEntityManager()->update();
+			if(SCNEdit::getSCN())context->getCollisionManager()->build();
+	
+		
+		}
+		os::Printer::log(format("Loaded everything in: {:3f} seconds", (os::Timer::getRealTime() - m_start) / 1000.0).c_str());
+	
+		CViewManager::getInstance()->getLayer(0)->changeView<CViewInteraction>(m_arguments);
+		CViewManager::getInstance()->getLayer(1)->pushView<CViewGui>(m_arguments);
 	}
 	break;
 	}
@@ -215,3 +396,4 @@ void CViewInit::onRender()
 	CCamera* guiCamera = CContext::getInstance()->getGUICamera();
 	CGraphics2D::getInstance()->render(guiCamera);
 }
+

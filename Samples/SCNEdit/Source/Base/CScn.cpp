@@ -53,14 +53,13 @@ int CScn::loadFile(std::ifstream * file)
 	for (u32 i=0; i < header->n_solids; i++)
 	{
 		//Loads solids
-		log+=(SAY("Getting solid %i/%u...\n",i,header->n_solids-1));
-		solids[i].loadSolid(file);
-		log += solids[i].getLog();
+		os::Printer::log(format("\nGetting solid {}/{}...",i,header->n_solids-1).c_str());
+		solids[i].loadSolid(file,i);
 		if (i < header->n_solids - 1)
 		//Sets overall offset of solid by the offset and length
 			solids[i+1].offset=solids[i].offset + solids[i].length;
 
-		log+=(SAY("done.\n"));
+		os::Printer::log("\tdone.");
 	}
 
 	loadEntities(file);
@@ -70,7 +69,7 @@ int CScn::loadFile(std::ifstream * file)
 
 int CScn::loadHeader(ifstream * file)
 {
-	log+=(SAY("Getting header..."));
+	os::Printer::log("\nGetting header...");
 
 	//header=(scnHeader_t*) malloc(sizeof(struct scnHeader_t));
 	header = new scnHeader_t;
@@ -84,7 +83,7 @@ int CScn::loadHeader(ifstream * file)
 	if (header->version!=269)
 		error(true,"CScn::loadHeader: Wrong scn file version!");
 
-	log+=(SAY("done.\n"));
+	os::Printer::log("\tdone.");
 	return 0;
 }
 
@@ -93,7 +92,7 @@ int CScn::loadEntities(std::ifstream * file)
 {
 
 	u32 n_ents = header->n_ents;
-	log+=(SAY("Getting %u Entities...",n_ents));
+	os::Printer::log(format("\nGetting {} Entities...",n_ents).c_str());
 
 	ents = new (std::nothrow) CScnEnt[n_ents];
 	if (ents==NULL) {
@@ -106,24 +105,24 @@ int CScn::loadEntities(std::ifstream * file)
 	CScnEnt * enti;
 	char str1[512]{};
 	char str2[512]{};
-
+	CScn::cells.clear();
+	CScn::ambients.clear();
 	for (u32 i=0;i<n_ents;i++)
 	{
 		enti=&ents[i];
-
+		enti->indx = i;
 		enti->n_fields = read_u32(file);
 		enti->srefidx = read_u32(file);
 
 		enti->fields = new (std::nothrow) CScnEnt::field[enti->n_fields];
 		if (enti->fields == NULL)
-			error(true,"Error allocating memory for %d fields of ent[%d]",enti->n_fields,i);
-		log+=(SAY("\r\n"));
+			error(true,"Error allocating memory for %u fields of ent[%u]",enti->n_fields,i);
 		for (u32 n=0;n<enti->n_fields;n++)
 		{
 			keylen=read_u16(file);
 			vallen=read_u16(file);
 			if (keylen >= 512 || vallen >= 512)
-				error(true,"Ent[%i] has field %i with too large a string",i,n);
+				error(true,"Ent[%u] has field %u with too large a string",i,n);
 			
 			enti->entsad.push_back(file->tellg());
 			read_generic(enti->fields[n].key,file,keylen);
@@ -131,30 +130,43 @@ int CScn::loadEntities(std::ifstream * file)
 			enti->keylengths.push_back(keylen);
 			enti->vallengths.push_back(vallen);
 			
-			log+=(SAY("(%s) (%s) %i %i\n", enti->fields[n].key, enti->fields[n].value, str_equiv(enti->fields[n].key, "Classname"), str_equiv(enti->fields[n].value, "Cell")));
+			if(str_equiv(enti->fields[n].key, "Classname")) os::Printer::log(format("({}) ({})",
+				enti->fields[n].key, 
+				enti->fields[n].value).c_str());
+			else os::Printer::log(format("\t({}) ({})",
+					enti->fields[n].key,
+					enti->fields[n].value).c_str());
+
 			//TODO: make sorted according to cell indexs
+			if (str_equiv(enti->fields[n].key, "Classname") && str_equiv(enti->fields[n].value, "swt_start")) {
+				if (!swt_start) swt_start = enti;
+			}
+			if (str_equiv(enti->fields[n].key, "Position") && str_equiv(enti->fields[n].value, "0")) {
+				if(str_equiv(enti->getField("Classname"),"swt_start")) swt_start = enti;
+			}
+
 			if (str_equiv(enti->fields[n].key,"Classname") && str_equiv(enti->fields[n].value,"Cell"))
-				cells.push_back(enti);
+				CScn::cells.push_back(enti);
 			if (str_equiv(enti->fields[n].key, "Classname") && str_equiv(enti->fields[n].value, "light_ambient"))
-				ambients.push_back(enti);
+				CScn::ambients.push_back(enti);
 		}
 	}
-	log+=(SAY("%u done.\n",n_ents));
+	os::Printer::log("done.");
 	return n_ents;
 }
 
 int CScn::loadLightmap(std::ifstream* file) {
 	u32 n_lights = header->n_lights;
 
-	log+=(SAY("Getting %u Lightmaps...", n_lights));
-
+	os::Printer::log(format("\nGetting {} Lightmaps...", n_lights).c_str());
 
 	file->seekg(header->lmaps_offset);
-	log+=(SAY("Char at %u\n", file->peek()));
+	os::Printer::log(format("\tlightmap offset at {}", file->peek()).c_str());
 	if (file->peek() != EOF) { //Verify that there is a lightmap.
-		lmap.loadLightmap(file, solids, header->n_solids, header->n_extralmaps);
+		lmap->loadLightmap(file, solids, header->n_solids, header->n_extralmaps);
 	}
 	else error(false, "CScn::loadLightmap: No lightmap found");
+	os::Printer::log("\tdone.");
 	return n_lights;
 }
 
@@ -162,14 +174,14 @@ int CScn::loadLightmap(std::ifstream* file) {
 CScnEnt * CScn::getCell(u32 idx)
 {
 	CScnEnt * celli;
-	for (u16 i=0; i < cells.size(); i++)
+	for (u16 i=0; i < CScn::cells.size(); i++)
 	{
-		celli = cells[i];
+		celli = CScn::cells[i];
 		const char * val=celli->getField("cell_index");
 		if (atoi(val) == idx)
 			return celli;
 	}
-	return NULL;
+	return nullptr;
 }
 
 CScnEnt* CScn::getAmbientByCell(const char* name)
@@ -177,9 +189,9 @@ CScnEnt* CScn::getAmbientByCell(const char* name)
 	CScnEnt* ambienti;
 	if (!name) return NULL;
 
-	for (u16 i = 0; i < ambients.size(); i++)
+	for (u16 i = 0; i < CScn::ambients.size(); i++)
 	{
-		ambienti = ambients[i];
+		ambienti = CScn::ambients[i];
 
 		const char * val = ambienti->getField("cells");
 		if (val) {
@@ -190,18 +202,18 @@ CScnEnt* CScn::getAmbientByCell(const char* name)
 			}
 		}
 	}
-	return NULL;
 }
 CScnEnt* CScn::getGlobalAmbient()
 {
+
 	CScnEnt* ambienti;
-	if (ambients.size() == 1) {
-		ambienti = ambients[0];
+	if (CScn::ambients.size() == 1) {
+		ambienti = CScn::ambients[0];
 		return ambienti;
 	}
-	for (u16 i = 0; i < ambients.size(); i++)
+	for (u16 i = 0; i < CScn::ambients.size(); i++)
 	{
-		ambienti = ambients[i];
+		ambienti = CScn::ambients[i];
 		const char* val = ambienti->getField("TargetName");
 		
 		if (val) {
@@ -211,7 +223,6 @@ CScnEnt* CScn::getGlobalAmbient()
 		}
 
 	}
-	return NULL;
 }
 
 

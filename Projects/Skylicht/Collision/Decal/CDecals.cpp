@@ -99,6 +99,7 @@ namespace Skylicht
 		CEntity* entity = createEntity();
 
 		CDecalData* decalData = entity->addData<CDecalData>();
+		decalData->Position = position;
 		decalData->Dimension = dimension;
 		decalData->Normal = normal;
 		decalData->Normal.normalize();
@@ -141,6 +142,7 @@ namespace Skylicht
 			{
 				initDecal(entity, decalData, decalTransform->Relative.getTranslation(), collisionMgr);
 				decalData->Change = false;
+	
 			}
 		}
 	}

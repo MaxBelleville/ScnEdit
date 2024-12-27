@@ -37,8 +37,14 @@ namespace Skylicht
 
 		virtual ~CCollisionManager();
 
+		bool addComponentCollision(CGameObject* gameObject);
+
+		bool addBBComponentCollision(CGameObject* gameObject);
+
 		bool addMeshCollision(CGameObject* gameObject);
 
 		bool addBBoxCollision(CGameObject* gameObject);
+
+		bool hasNodes();
 	};
 }

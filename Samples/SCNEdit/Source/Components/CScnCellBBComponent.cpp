@@ -24,10 +24,11 @@ void CScnCellBBComponent::initComponent()
 	culling->Type = CCullingData::BoundingBox;
 }
 
-void CScnCellBBComponent::setMesh(CScn* scn) {
+void CScnCellBBComponent::setMesh(CScnSolid* solid, u32 cellindx)
+{
 	CEntity* entity = m_gameObject->getEntity();
 	CScnCellBBData* portals = entity->addData<CScnCellBBData>(DATA_TYPE_INDEX(CRenderMeshData));
-	portals->initMesh(scn);
+	portals->initMesh(solid,cellindx);
 	portals->setVisible(true);
 
 }

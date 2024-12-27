@@ -1,6 +1,6 @@
 #ifndef CSCNENT_H_
 #define CSCNENT_H_
-#include "Header/Base/util.h"
+#include "util.h"
 class CScnEnt
 {
 public:
@@ -9,6 +9,7 @@ public:
 	core::array<u32> keylengths;
 	core::array<u32> vallengths;
 	core::array<int64_t> entsad;
+	int indx;
 
 	struct field
 	{

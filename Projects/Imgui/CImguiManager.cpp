@@ -35,19 +35,18 @@ namespace Skylicht
 
 	CImguiManager::CImguiManager()
 	{
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
 		ImGuiStyle& style = ImGui::GetStyle();
-
 #if defined(IOS) || defined(ANDROID)
 		// scale in the big screen size
 		style.ScaleAllSizes(2.0f);
 #endif
 
 		ImGui_Impl_Skylicht_Init();
-
 		CEventManager::getInstance()->registerProcessorEvent("ImguiManager", this);
 	}
 

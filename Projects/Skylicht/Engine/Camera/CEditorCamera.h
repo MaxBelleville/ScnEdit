@@ -60,7 +60,7 @@ namespace Skylicht
 		bool m_leftMousePress;
 		bool m_rightMousePress;
 		bool m_midMousePress;
-
+		bool m_invert;
 		bool m_mouseWhell;
 		float m_wheel;
 
@@ -89,6 +89,10 @@ namespace Skylicht
 		inline void setMoveSpeed(float speed)
 		{
 			m_moveSpeed = speed;
+		}
+		inline void setInvert(bool invert)
+		{
+			m_invert = invert;
 		}
 
 		inline float getMoveSpeed()

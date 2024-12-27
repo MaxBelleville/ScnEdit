@@ -43,7 +43,7 @@ namespace Skylicht
 
 		virtual ~COctreeBuilder();
 
-		virtual void build();
+		virtual void build(bool log = true);
 
 		virtual void clear();
 

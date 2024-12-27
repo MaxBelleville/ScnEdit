@@ -3,6 +3,8 @@
 
 class CScnPortalComponent : public CComponentSystem
 {
+private:
+	bool selected = false;
 public:
 	CScnPortalComponent();
 
@@ -10,7 +12,11 @@ public:
 
 	virtual void initComponent();
 
-	void setMesh(CScn*);
+	void setMesh(CScnSolid* solid, u32 cellindx, s32 portalindx);
 
 	virtual void updateComponent();
+
+	std::pair<u32, s32> select();
+
+	void deselect();
 };

@@ -2,21 +2,23 @@
 
 #include "IApplicationEventReceiver.h"
 #include <SkylichtEngine.h>
-#include "Header/CScnArguments.h"
-#include "Header/Base/CScn.h"
-#include "Header/Components/CScnMeshComponent.h"
-#include "Header/Components/CScnPortalComponent.h"
-#include "Header/Components/CScnCellBBComponent.h"
-#include "Header/Components/CScnEntityComponent.h"
-#include "Header/Context/CContext.h"
-#include "Header/ViewManager/CViewManager.h"
+#include "CScnArguments.h"
+#include "Base/CScn.h"
+#include "Components/CScnMeshComponent.h"
+#include "Components/CScnPortalComponent.h"
+#include "Components/CScnCellBBComponent.h"
+#include "Components/CScnEntityComponent.h"
+#include "Primitive/CCube.h"
+#include "Primitive/CSphere.h"
+#include "Base/export.h"
 
-#include "Header/CViewInit.h"
+
+
 
 class SCNEdit : public IApplicationEventReceiver
 {
 private:
-	CScnArguments* arguments = nullptr;
+	CScnArguments* m_arguments = nullptr;
 	inline static std::ofstream* output=0;
 	inline static CScn* scn;
 protected:
@@ -43,8 +45,23 @@ public:
 
 	virtual void onQuitApp();
 
+	static void closeScnFile() {
+		if (scn) {
+			//clears scn
+			delete scn;
+			scn = 0;
+		}
+	}
+
+
 	static bool loadScnFile(io::path fname);
 
+	static bool saveSCN(io::path path, bool bExtra);
+	static void exportSCN(bool bExtra) {
+		scnExportObj(scn, "exported");
+		scnExport3ds(scn->getAllSolids(), scn->getSolidSize(bExtra), "exported");
+		scnExportMap(scn, "exported");
+	}
 	static CScn* getSCN() {
 		return scn;
 	}

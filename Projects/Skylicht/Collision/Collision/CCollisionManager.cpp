@@ -62,6 +62,27 @@ namespace Skylicht
 		return renderers.size() > 0;
 	}
 
+	bool CCollisionManager::addComponentCollision(CGameObject* gameObject)
+	{
+		CEntity* entity = gameObject->getEntity();
+		m_nodes.push_back(
+			new CCollisionNode(gameObject, entity, new CMeshTriangleSelector(entity))
+		);
+		return 1;
+	}
+
+	bool CCollisionManager::addBBComponentCollision(CGameObject* gameObject)
+	{
+		CEntity* entity = gameObject->getEntity();
+
+		m_nodes.push_back(
+			new CCollisionNode(gameObject, entity, new CBBTriangleSelector(entity))
+		);
+
+		return 1;
+	}
+
+
 	bool CCollisionManager::addBBoxCollision(CGameObject* gameObject)
 	{
 		CRenderMesh* renderMesh = gameObject->getComponent<CRenderMesh>();
@@ -80,5 +101,9 @@ namespace Skylicht
 		}
 
 		return renderers.size() > 0;
+	}
+
+	bool CCollisionManager::hasNodes() {
+		return m_nodes.size();
 	}
 }

@@ -1,28 +1,21 @@
 #ifndef CSCNLIGHTMAP_H_
 #define CSCNLIGHTMAP_H_
-#include "Header/Base/CScnSolid.h"
-#include "Header/Base/scntypes.h"
-#include "Header/Base/util.h"
+#include "CScnSolid.h"
+#include "scntypes.h"
+#include "CScnEnt.h"
 class CScnLightmap
 {
 private:
-	bool CHECKS = true;
+	bool loaded=false;
 	
 	size_t offset = 0;
 	core::array <core::array<f32*>> omults;
-	struct pair_hash {
-		template <class T1, class T2>
-		std::size_t operator () (const std::pair<T1, T2>& p) const {
-			auto h1 = std::hash<T1>{}(p.first);
-			auto h2 = std::hash<T2>{}(p.second);
-
-			// Mainly for demonstration purposes, i.e. works but is overly simple
-			// In the real world, use sth. like boost.hash_combine
-			return h1 ^ h2;
-		}
-	};
-	video::IImage* image = nullptr;
-	std::unordered_map<u16_pair, std::vector<u8>, pair_hash> bitmap;
+	
+	std::vector<video::IImage*> atlas;
+	video::IImage* current_atlas;
+	core::vector3di curr_atlas_pos = core::vector3di(0,0,0);
+	std::unordered_map<u16_pair, core::vector3di, pair_hash> atlas_pos; // the z value = indx of atlas;
+	std::unordered_map<u16_pair,std::vector<s8>, pair_hash> bitmap; // the z value = indx of atlas;
 	scnSwitchableLMapHeader_t* hslmaps;
 	core::array<scnLMapHeader_t*> hlmaps;
 	core::array <scnLMapLump_t*> lumps;
@@ -30,27 +23,27 @@ private:
 	void createBitmaps(CScnSolid*,u32);
 	u16_pair getMasterBitmapId(scnLMapHeader_t hlmap);
 
-	//Do something related to changing the textures.
-
-
-
 
 public:
 	//constructor - do nothing for now
 	CScnLightmap();
 	~CScnLightmap();
 	int TEXSIZE = 128;
+	int ATLASSIZE = 128;
+
 	int loadLightmap(std::ifstream*,  CScnSolid*, u32, u32);
-	video::IImage* genLightMapTextures(u32 solidi, u32 surfi, const char*);
+	video::IImage* getAtlas(s32 indx);
+	core::vector3di getAtlasPos(u32 solidi, u32 surfi);
    u16 getCellIndex(u32 solidi, u32 surfi) {
 	   return hlmaps[solidi][surfi].cellidx;
    }
 
 	f32* getMults(u32 solidindx, u32 surfindx) {
-		if(hslmaps) return hlmaps[solidindx][surfindx].uv_mults;
+		if(hslmaps&&loaded) return hlmaps[solidindx][surfindx].uv_mults;
 		return nullptr;
 	};
 	size_t getOffset() const { return offset; }
-	bool hasLightmaps() { return hslmaps; }
+	bool hasLightmaps() { return loaded; }
+	
 };
 #endif

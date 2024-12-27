@@ -42,46 +42,27 @@ IMeshBuffer *g_meshBuffer = NULL;
 bool ImGui_Impl_Skylicht_Init()
 {
 	ImGuiIO& io = ImGui::GetIO();
-
+	printf("Setup imgui io\n");
 	io.BackendPlatformName = "imgui_impl_skylicht";
 
-	io.KeyMap[ImGuiKey_Tab] = irr::KEY_TAB;
-	io.KeyMap[ImGuiKey_LeftArrow] = irr::KEY_LEFT;
-	io.KeyMap[ImGuiKey_RightArrow] = irr::KEY_RIGHT;
-	io.KeyMap[ImGuiKey_UpArrow] = irr::KEY_UP;
-	io.KeyMap[ImGuiKey_DownArrow] = irr::KEY_DOWN;
-	io.KeyMap[ImGuiKey_PageUp] = irr::KEY_PRIOR;
-	io.KeyMap[ImGuiKey_PageDown] = irr::KEY_NEXT;
-	io.KeyMap[ImGuiKey_Home] = irr::KEY_HOME;
-	io.KeyMap[ImGuiKey_End] = irr::KEY_END;
-	io.KeyMap[ImGuiKey_Insert] = irr::KEY_INSERT;
-	io.KeyMap[ImGuiKey_Delete] = irr::KEY_DELETE;
-	io.KeyMap[ImGuiKey_Backspace] = irr::KEY_BACK;
-	io.KeyMap[ImGuiKey_Space] = irr::KEY_SPACE;
-	io.KeyMap[ImGuiKey_Enter] = irr::KEY_RETURN;
-	io.KeyMap[ImGuiKey_Escape] = irr::KEY_ESCAPE;
-	io.KeyMap[ImGuiKey_KeyPadEnter] = irr::KEY_RETURN;
-	io.KeyMap[ImGuiKey_A] = 'A';
-	io.KeyMap[ImGuiKey_C] = 'C';
-	io.KeyMap[ImGuiKey_V] = 'V';
-	io.KeyMap[ImGuiKey_X] = 'X';
-	io.KeyMap[ImGuiKey_Y] = 'Y';
-	io.KeyMap[ImGuiKey_Z] = 'Z';
-
-	unsigned char* pixels = NULL;
+	unsigned char* pixels = nullptr;
 	int width = 0, height = 0;
 	io.Fonts->AddFontDefault();
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
 	IVideoDriver *driver = getVideoDriver();
 	core::dimension2du size((u32)width, (u32)height);
+
 	IImage *img = driver->createImageFromData(video::ECF_A8R8G8B8, size, pixels, true, false);
+
 	g_fontTexture = driver->addTexture("imgui_font", img);
-	io.Fonts->SetTexID((ImTextureID*)g_fontTexture);
+
+	io.Fonts->SetTexID((ImTextureID)(intptr_t)g_fontTexture);
 	img->drop();
 
 	g_meshBuffer = new CMeshBuffer<S3DVertex>(driver->getVertexDescriptor(EVT_STANDARD), video::EIT_32BIT);
 	g_meshBuffer->setHardwareMappingHint(EHM_STREAM);
+
 	return true;
 }
 
@@ -279,17 +260,17 @@ void ImGui_Impl_Skylicht_CharFunc(unsigned int c)
 void ImGui_Impl_Skylicht_KeyPressedFunc(int key, bool ctrl, bool shift, bool alt)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	io.KeysDown[key] = true;
-	io.KeyCtrl = ctrl;
-	io.KeyShift = shift;
-	io.KeyAlt = alt;
+	io.AddKeyEvent(ImGuiKey(key), true); // Notify ImGui about the key press
+	io.AddKeyEvent(ImGuiMod_Ctrl, ctrl); // Update modifier state
+	io.AddKeyEvent(ImGuiMod_Shift, shift);
+	io.AddKeyEvent(ImGuiMod_Alt, alt);
 }
 
 void ImGui_Impl_Skylicht_KeyReleasedFunc(int key, bool ctrl, bool shift, bool alt)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	io.KeysDown[key] = false;
-	io.KeyCtrl = ctrl;
-	io.KeyShift = shift;
-	io.KeyAlt = alt;
+	io.AddKeyEvent(ImGuiKey(key), false); // Notify ImGui about the key release
+	io.AddKeyEvent(ImGuiMod_Ctrl, ctrl); // Update modifier state
+	io.AddKeyEvent(ImGuiMod_Shift, shift);
+	io.AddKeyEvent(ImGuiMod_Alt, alt);
 }

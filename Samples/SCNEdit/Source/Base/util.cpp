@@ -4,58 +4,19 @@
 #include <stdlib.h>
 #include <filesystem>
 
-core::stringw SAY(const char* message, ...)
-{
-	core::stringw str;
-	va_list args;
-	va_start(args, message);
-	str= _print(message, args);
-	va_end(args);
-	return str;
-}
-core::stringw WARN(const char* message, ...)
-{
-	core::stringw str;
-	va_list args;
-	printf("WARN: ");
-	va_start(args, message);
-	str=_print(message, args);
-	va_end(args);
-	return str;
-}
-
-
-
-void error(bool fatal, const char * message,...)
+void error(bool fatal, const char* message, ...)
 {
 	va_list args;
 
-   printf("ERROR: ");
+	printf("ERROR: ");
 
 	va_start(args, message);
-	_print(message, args);
+	std::vprintf(message, args);
 	va_end(args);
 
 	printf("\n");
-   
-	if (fatal) {
-		system("pause");
+	if (fatal)
 		exit(1);
-	}
-}
-char* _print(const char* message, va_list args)
-{
-	std::string str="";
-	char* buff;
-	int len;
-	len = _vscprintf(message, args)+1;
-	buff = (char*)malloc(len * sizeof(char));
-	if (NULL != buff)
-	{
-		vsprintf_s(buff, len, message, args);
-		fputs(buff,stdout);
-	}
-	return buff;
 }
 
 core::array<std::string> str_split(const char* charStr, const char * delmChar) {
@@ -76,7 +37,7 @@ core::array<std::string> str_split(const char* charStr, const char * delmChar) {
 
 
 //stolen from furrycat
-int str_nequals(char *one, const char *two,int n){
+int str_nequals(const char *one, const char *two,int n){
   int i;
   for (i = 0;i<n; i++) {
 	if (two[i] != one[i]) return 0;
@@ -84,7 +45,7 @@ int str_nequals(char *one, const char *two,int n){
   }
   return 1;
 }
-int str_equals(char *one, const char *two) {
+int str_equals(const char *one, const char *two) {
   int i;
   for (i = 0; ; i++) {
 	if (two[i] != one[i]) return 0;
@@ -109,8 +70,8 @@ void read_generic(void * buffer, std::ifstream* file, int nbytes)
 			return;
 	}
 	//else
-	//error(true,"read_generic: Error reading %s, %i bytes",file->getFileName(),nbytes);
-	error(true,"read_generic: Error reading %i bytes",nbytes);
+	//error(true,"read_generic: Error reading {}, {} bytes",file->getFileName(),nbytes);
+	error(true,"read_generic: Error reading {} bytes",nbytes);
 }
 
 //Reads files characters
@@ -123,8 +84,8 @@ void write_generic(void* buffer, std::ofstream* file, int nbytes)
 			return;
 	}
 	//else
-	//error(true,"read_generic: Error reading %s, %i bytes",file->getFileName(),nbytes);
-	error(true, "read_generic: Error reading %i bytes", nbytes);
+	//error(true,"read_generic: Error reading {}, {} bytes",file->getFileName(),nbytes);
+	error(true, "read_generic: Error reading {} bytes", nbytes);
 }
 
 
@@ -195,6 +156,38 @@ bool can_open(const char* path) {
 		return false;
 	}
 }
+core::vector2df convert_vec2(const char* pos) {
+	core::array<std::string> split = str_split(pos, " ");
+	if (split.size() == 2) {
+		return core::vector2df(stof(split[0]), stof(split[1]));
+	}
+}
+
+
+
+core::vector3df convert_vec3(const char* pos) {
+	core::array<std::string> split= str_split(pos," ");
+	if (split.size() == 2) {
+		return core::vector3df(stof(split[0]), stof(split[1]),0);
+	}
+	if (split.size() == 3) {
+		return core::vector3df(stof(split[0]), stof(split[1]), stof(split[2]));
+	}
+	if (split.size() == 4) {
+		return core::vector3df(stof(split[1]), stof(split[2]), stof(split[3]));// Assume argb
+	}
+
+}
+
+SColor convert_color(const char* pos) {
+	core::array<std::string> split = str_split(pos, " ");
+	if (split.size() == 3) {
+		return SColor(255,stof(split[0]), stof(split[1]), stof(split[2]));
+	}
+	if (split.size() == 4) {
+		return SColor(255,stof(split[1]), stof(split[2]), stof(split[3]));// Assume argb
+	}
+}
 
 ITexture* convert_image(io::path file) {
 	ITexture* t = getVideoDriver()->findTexture(file);
@@ -233,13 +226,17 @@ core::array<ITexture*> get_skybox(const char* file) {
 	core::array<ITexture*> textures;
 	core::array<std::string> split = str_split(file, "\\");
 	core::array<std::string> found;
-	if (split.size() == 1) {
+	if (split.size() == 1 && !str_equiv(file,"")) {
 	   found= search_dir("textures/skybox/", file);
  
 		if (found.size()==0) found = search_dir("textures/Skyboxes/", file);
 	}
 	else {
 		printf("other case %s\n",file);
+	}
+
+	if (found.size() == 0) {
+		os::Printer::log("Warning: using default skybox", irr::ELL_WARNING);
 	}
 	for (int i = 0; i < found.size(); i++) {
 		ITexture* texture = convert_image(found[i].c_str());
@@ -248,3 +245,22 @@ core::array<ITexture*> get_skybox(const char* file) {
 
 	return textures;
  }
+core::array<ITexture*> get_decals(const char* file) {
+	core::array<ITexture*> textures;
+	core::array<std::string> found;
+
+	found = search_dir("textures/sprites/", file);
+
+	if (found.size() == 0) found = search_dir("textures/decals/", file);
+
+	if (found.size() == 0) found = search_dir("textures/decal/", file);
+
+	if (found.size() == 0) found = search_dir("textures/", file);
+
+	for (int i = 0; i < found.size(); i++) {
+		ITexture* texture = convert_image(found[i].c_str());
+		textures.push_back(texture);
+	}
+
+	return textures;
+}

@@ -55,8 +55,9 @@ namespace Skylicht
 
 			std::string m_inputCollision;
 			std::string m_inputRecastMesh;
-			std::string m_inputObstacle;
+			std::string m_inputWalkingTileMap;
 
+			CMesh* m_navMesh;
 		public:
 			CGraphComponent();
 
@@ -92,15 +93,43 @@ namespace Skylicht
 				return m_inputRecastMesh.c_str();
 			}
 
-			inline void setInputObstacle(const char* source)
+			inline bool haveInputRecastMesh()
 			{
-				m_inputObstacle = source;
+				return !m_inputRecastMesh.empty();
 			}
 
-			inline const char* getInputObstacle()
+			inline CMesh* getNavMesh()
 			{
-				return m_inputObstacle.c_str();
+				return m_navMesh;
 			}
+
+			inline CObstacleAvoidance* getObstacle()
+			{
+				return m_obstacle;
+			}
+
+			inline CWalkingTileMap* getWalkingMap()
+			{
+				return m_walkingTileMap;
+			}
+
+			bool loadRecastMesh();
+
+			bool buildRecastMesh();
+
+			bool beginBuildWalkingMap();
+
+			bool updateBuildWalkingMap();
+
+			float getBuildPercent();
+
+			bool saveWalkMap(const char* output);
+
+			bool loadWalkMap();
+
+			void release();
+
+			DECLARE_GETTYPENAME(CGraphComponent)
 		};
 	}
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include "Header/Base/CScn.h"
 #include "Header/Base/util.h"
-#include <set>
 
 class CScnCellBBData : public CRenderMeshData
 {
@@ -13,6 +12,6 @@ public:
 
 	virtual ~CScnCellBBData();
 
-	void initMesh(CScn* scn);
+	void initMesh(CScnSolid* solid, u32 cellindx);
 
 };

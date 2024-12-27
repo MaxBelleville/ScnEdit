@@ -61,6 +61,12 @@ namespace Skylicht
 			float textureRotation,
 			float lifeTime,
 			float distance);
+		
+		CDecalData* getDecal(int indx) {
+			 CEntity* entity = getEntities()[indx];
+			CDecalData* decalData = entity->addData<CDecalData>();
+			return decalData;
+		}
 
 		void bake(CCollisionBuilder* collisionMgr);
 

@@ -113,6 +113,7 @@ namespace Skylicht
 		{
 			zone->updateAddRemoveObject();
 			delete zone;
+
 		}
 		m_zones.clear();
 

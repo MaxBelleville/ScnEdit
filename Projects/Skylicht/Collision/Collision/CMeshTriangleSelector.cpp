@@ -44,7 +44,7 @@ namespace Skylicht
 	{
 		CRenderMeshData* renderMeshData = GET_ENTITY_DATA(m_entity, CRenderMeshData);
 		CMesh* mesh = renderMeshData->getMesh();
-
+		
 		u32 meshBuffers = mesh->getMeshBufferCount();
 
 		u32 totalTris = 0;

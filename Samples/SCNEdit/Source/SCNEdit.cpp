@@ -1,21 +1,28 @@
 #include "pch.h"
 #include "SkylichtEngine.h"
 #include "Header/SCNEdit.h"
-
+#include "Header/Managers/CContext.h"
+#include "Header/Managers/CViewManager.h"
+#include "CImguiManager.h"
+#include "Header/CViewInit.h"
+#include "Header/Managers/CInteractionManager.h"
+#include "UserInterface/CUIEventManager.h"
+#include <filesystem>
 
 //This class loads in cmd line arguments, sets up view manager and loads in scn from f
 using namespace std;
 
 void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param) {
-	getApplication()->showDebugConsole();
+	
 	CScnArguments* options = new CScnArguments(argv);
+	if(options->isDebugEnabled())getApplication()->showDebugConsole();
 	SCNEdit* app = new SCNEdit(options);
 	param->DriverType = options->getDriverType();
 	if (options->getDriverType() != EDT_DIRECT3D11) {
 		param->AntiAlias = 0;
 	}
 	param->Fullscreen = options->isFullscreen();
-	param->WindowSize = options->isFullscreen() ? options->getDesktopRes() : options->getRes();
+	param->WindowSize = options->getCurrentRes();
 	param->Borderless = options->isBorderless();
 	param->Resizeable = options->isResizeable();
 
@@ -25,141 +32,46 @@ void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationP
 
 SCNEdit::SCNEdit(CScnArguments* options)
 {
-	arguments = options;
-	CContext::createGetInstance();
-	CViewManager::createGetInstance()->initViewLayer(1);
-	CLightmapper::createGetInstance();
+	m_arguments = options;
 
+	CContext::createGetInstance();
+	CViewManager::createGetInstance()->initViewLayer(2);
 }
 
 SCNEdit::~SCNEdit()
 {
-	delete arguments;
-
+	CViewManager::getInstance()->releaseAllLayer();
 	CViewManager::releaseInstance();
 	CContext::releaseInstance();
-	
+	CImguiManager::releaseInstance();
+	if (UI::CUIEventManager::getInstance()) {
+		UI::CUIEventManager::releaseInstance();
+	}
+	CInteractionManager::releaseInstance();
+	delete m_arguments;
 }
 
 void SCNEdit::onInitApp()
 {
-	CViewManager::getInstance()->getLayer(0)->pushView<CViewInit>(arguments);
-	//CBaseApp* app = getApplication();
-	//app->getDevice()->setGammaRamp(1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
-	//app->getFileSystem()->addFileArchive(app->getBuiltInPath("sedata.res"), true, true, io::EFAT_ZIP);
 
-	////printf("%S", general.c_str());
-	//
-	//app->getDevice()->setWindowCaption(L"SWAT3 SCN editor");;
-	//
+	CImguiManager::createGetInstance();
+	UI::CUIEventManager::createGetInstance();
+	CInteractionManager::createGetInstance();
+	CBaseApp* app = getApplication();
 
-	//// load basic shader
-	//CShaderManager* shaderMgr = CShaderManager::getInstance();
-	//shaderMgr->initExtremlyBasicShader();
+	app->getFileSystem()->addFileArchive(app->getBuiltInPath("sedata.res"), true, true, io::EFAT_ZIP);
 
-	//// load font
-	//CGlyphFreetype* freetypeFont = CGlyphFreetype::getInstance();
-	//freetypeFont->initFont("Segoe UI Light", "BuiltIn/Fonts/segoeui/segoeuil.ttf");
+	app->getDevice()->setWindowCaption(L"SWAT3 SCN editor");;
+	
 
-	//// create a Scene
+	// load basic shader
+	CShaderManager* shaderMgr = CShaderManager::getInstance();
+	shaderMgr->initExtremlyBasicShader();
 
-	//m_scene = new CScene();
-
-
-	//// create a Zone in Scene
-	//CZone* zone = m_scene->createZone();
-
-
-	//// camera 2D
-	//CGameObject* guiCameraObject = zone->createEmptyObject();
-	//m_guiCamera = guiCameraObject->addComponent<CCamera>();
-	//m_guiCamera->setProjectionType(CCamera::OrthoUI);
-
-	//// camera 3D
-	//CGameObject* camObj = zone->createEmptyObject();
-	//camObj->addComponent<CCamera>();
-
-
-	//CEditorCamera * editorCam = camObj->addComponent<CEditorCamera>();
-	//editorCam->setControlStyle(CEditorCamera::EControlStyle::FPS);
-	//editorCam->setMoveSpeed(7.0f);
-	//editorCam->setZoomSpeed(7.0f);
-	//CFpsMoveCamera* fpsMoveCam = camObj->addComponent<CFpsMoveCamera>();
-	//fpsMoveCam->setMoveSpeed(75.0f);
-	//fpsMoveCam->setShiftSpeed(2.5f);
-	//
-	//m_camera = camObj->getComponent<CCamera>();
-
-	//m_camera->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
-	//m_camera->setFOV(arguments->getFov());
-	//m_camera->setFarValue(arguments->getViewDist() * 100.0f);
-	//m_camera->lookAt(core::vector3df(-1.0f, 0.0f, 0.0f), core::vector3df(0.0f, 1.0f, 0.0f));
-
-	//io::path filename = arguments->getSCN();
-	//if (!filename.empty())
-	//	SCNEdit::loadScnFile(filename);
-
-
-	//CGameObject* sky = zone->createEmptyObject();
-	//m_skyBox = sky->addComponent<CSkyBox>();
-	//CScnEnt* ent = scn->getCell(0);
-	//const char* skyName = ent->getField("SkyboxName");
-	//if (skyName) {
-
-	//	core::array<ITexture*> textures = get_skybox(skyName);
-	//	if (textures.size() == 6) {
-	//		m_skyBox->setTextures(textures.pointer());
-	//	}
-	//}
-	//sky->setStatic(true);
-	//
-	//if (scn) {
-	//	CGameObject* scnObj = zone->createEmptyObject();
-	//	CScnMeshComponent* mesh = scnObj->addComponent<CScnMeshComponent>();
-	//	mesh->setMesh(scn, arguments);
-	//	scnObj->setStatic(true);
-	//	m_meshes.push_back(scnObj);
-
-	//	if (arguments->isPortal()) {
-	//		CGameObject* portalObj = zone->createEmptyObject();
-	//		CScnPortalComponent* mesh = portalObj->addComponent<CScnPortalComponent>();
-	//		mesh->setMesh(scn);
-	//		scnObj->setStatic(true);
-
-	//		m_meshes.push_back(portalObj);
-	//	}
-	//	if (arguments->isBBVisible()) {
-	//		CGameObject* bbObj = zone->createEmptyObject();
-	//		CScnCellBBComponent* mesh = bbObj->addComponent<CScnCellBBComponent>();
-	//		mesh->setMesh(scn);
-	//		scnObj->setStatic(true);
-
-	//		m_meshes.push_back(bbObj);
-	//	}
-	//	if (arguments->isEntityVisible()) {
-	//		CGameObject* enitites = zone->createEmptyObject();
-	//		CScnEntityComponent* mesh = enitites->addComponent<CScnEntityComponent>();
-	//		mesh->setMesh(scn);
-	//		scnObj->setStatic(true);
-
-	//		m_meshes.push_back(enitites);
-	//	}
-
-	//}
-	//
-	//// Rendering
-	//u32 w = app->getWidth();
-	//u32 h = app->getHeight();
-
-	//m_rendering = new CDeferredSimpleRP();
-	//m_rendering->initRender(w, h);
-	//m_rendering->enableUpdateEntity(true);
-
-	//CForwardRP* m_forwardRP = new CForwardRP(false);
-	//m_forwardRP->initRender(w, h);
-	//m_forwardRP->enableUpdateEntity(false);
-
-	//m_rendering->setNextPipeLine(m_forwardRP);
+	// load font
+	CGlyphFreetype* freetypeFont = CGlyphFreetype::getInstance();
+	freetypeFont->initFont("Segoe UI Light", "BuiltIn/Fonts/segoeui/segoeuil.ttf");
+	CViewManager::getInstance()->getLayer(0)->pushView<CViewInit>(m_arguments);
 }
 
 void SCNEdit::onUpdate()
@@ -171,9 +83,7 @@ void SCNEdit::onUpdate()
 void SCNEdit::onRender()
 {
 
-	//m_rendering->render(NULL, m_camera, m_scene->getEntityManager(), core::recti());
 	CViewManager::getInstance()->render();
-	//CGraphics2D::getInstance()->render(m_guiCamera);
 }
 
 void SCNEdit::onPostRender()
@@ -211,13 +121,13 @@ void SCNEdit::onPause()
 
 void SCNEdit::onQuitApp()
 {
-	// end application
 	delete this;
 }
 
 
 bool SCNEdit::loadScnFile(io::path fname) {
 	CBaseApp* app = getApplication();
+	if (scn) closeScnFile();
 	s32 pos = fname.findLastChar("\\/", 2); //search for \ or /
 	if (pos > -1) {
 		//Changes working directory based on the postion
@@ -235,10 +145,10 @@ bool SCNEdit::loadScnFile(io::path fname) {
 
 	if (scnFile.is_open()) {
 		if (!CopyFile_(fname.c_str(), bakname.c_str()))
-			error(true, "can't copy from %s to %s", fname.c_str(), bakname.c_str());
+			error(true, "can't copy from {} to {}", fname.c_str(), bakname.c_str());
 	}
 	if (!scnFile.is_open()) {
-		error(true, "Can't open %s, and or it doesn't exist", fname.c_str());
+		error(true, "Can't open {}, and or it doesn't exist", fname.c_str());
 	}
 	else {
 		scn= new CScn(&scnFile); //sets scn to file
@@ -250,4 +160,71 @@ bool SCNEdit::loadScnFile(io::path fname) {
 	output = new ofstream(fname.c_str(), ios::in | ios::binary | ios::ate);
 
 	return false;
+}
+bool SCNEdit::saveSCN(io::path path,bool bExtra) {
+	//Gets solids
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	guiSettings_t * gui=  interaction->getGuiSettings();
+	//Record texture names
+	//if file is open
+	if (output && output->is_open()) {
+		for (u32 s = 0; s < scn->getSolidSize(bExtra); s++) {
+			CScnSolid* solid = scn->getSolid(s);
+			//save textures to file
+			for (u32 i = 0; i < solid->n_surfs; i++) {
+				output->seekp(solid->surfsad[i]);
+				write_generic(&solid->surfs[i], output, 72);
+
+			}
+
+			//save planes
+			output->seekp(solid->planessad);
+			u32 len = (solid->n_planes) * sizeof(scnPlane_t);
+			output->write((char*)(solid->planes), len);
+
+			//save vertices
+			output->seekp(solid->vertssad);
+			len = (solid->n_verts) * sizeof(core::vector3df);
+			output->write((char*)(solid->verts), len);
+
+
+			//save uvpos
+			output->seekp(solid->uvposad);
+			len = (solid->n_uvpos) * sizeof(core::vector2df);
+			output->write((char*)(solid->uvpos), len);
+
+			for (u32 c = 0; c < solid->n_cells; c++) {
+				for (u32 l = 0; l < solid->rawcells[c].leafnode.size(); l++) {
+					scnCellData_t* celldata = solid->rawcells[c].leafnode[l];
+					output->seekp(celldata->bbsad);
+					u32 len = 2 * sizeof(core::vector3df);
+					output->write((char*)celldata->bb_verts, len);
+				}
+			}
+		}
+		for (u32 e = 0; e < scn->getTotalEnts(); e++) {
+			CScnEnt* ent = scn->getEnt(e);
+			for (u32 f = 0; f < ent->n_fields; f++)
+			{
+				CScnEnt::field* fi = &ent->fields[f];
+				output->seekp(ent->entsad[f]);
+				write_generic(fi->key, output, ent->keylengths[f]);
+				write_generic(fi->value, output, ent->vallengths[f]);
+			}
+		}
+		if (gui->scrape_lightmaps && scn->getLightmap()->hasLightmaps()) {
+			size_t pos = scn->getLightmap()->getOffset();
+			output->close();
+			filesystem::resize_file(path.c_str(), pos);
+		}
+
+
+		os::Printer::log("Changes saved to file.");
+	
+		return true;
+	}
+	else
+		//Displays error if file isn't open
+		error(false, "Output file stream is not open! Make sure it's not read only.");
+	return 0;
 }

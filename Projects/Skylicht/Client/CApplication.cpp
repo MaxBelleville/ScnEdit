@@ -225,7 +225,9 @@ namespace Skylicht
 		const float maxTimeStep = 1000.0f / 15.0f;
 		if (m_timeStep > maxTimeStep)
 		{
-			printf("Warning: Low FPS: %f tpf, %f fps \n", m_timeStep, 1000.0f / m_timeStep);
+			char logString[512];
+			std::sprintf(logString, "Warning: Low FPS: %f tpf, %f fps", m_timeStep, 1000.0f / m_timeStep);
+			os::Printer::log(logString, irr::ELL_WARNING);
 			m_timeStep = maxTimeStep;
 		}
 

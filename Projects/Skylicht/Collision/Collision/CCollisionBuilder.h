@@ -48,7 +48,7 @@ namespace Skylicht
 
 		int findNode(CCollisionNode* node, CCollisionNode** nodes, int count);
 
-		virtual void build() = 0;
+		virtual void build(bool log = true) = 0;
 
 		virtual void drawDebug() {}
 

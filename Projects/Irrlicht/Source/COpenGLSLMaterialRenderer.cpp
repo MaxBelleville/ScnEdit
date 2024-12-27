@@ -235,8 +235,11 @@ void COpenGLSLMaterialRenderer::OnSetMaterial(const video::SMaterial& material,
 	}
 	else if (BaseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
 	{
+		bridgeCalls->setCullFace(GL_BACK);
+		bridgeCalls->setDepthTest(true);
+		bridgeCalls->setDepthMask(true);
 		bridgeCalls->setAlphaTest(true);
-		bridgeCalls->setAlphaFunc(GL_GREATER, 0.5f);
+		bridgeCalls->setAlphaFunc(GL_GREATER, 0.4f);
 	}
 	else
 	{

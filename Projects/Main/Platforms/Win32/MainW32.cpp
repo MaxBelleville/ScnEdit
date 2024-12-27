@@ -226,6 +226,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		ShowWindow(hWnd, SW_SHOW); //display window
 	}
 	MoveWindow(hWnd, windowLeft, windowTop, realWidth, realHeight, TRUE);
+	if (hWnd && IsWindow(hWnd)) {
+		SetForegroundWindow(hWnd);
+		SetFocus(hWnd);
+	}
 	// create device
 
 	IrrlichtDevice* device = irr::createDeviceEx(p);

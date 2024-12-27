@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Header/Managers/CContext.h"
+#include "Context/CContext.h"
 
 IMPLEMENT_SINGLETON(CContext);
 
@@ -8,7 +8,6 @@ CContext::CContext() :
 	m_beginRP(NULL),
 	m_rendering(NULL),
 	m_lightmapRP(NULL),
-	m_simpleRP(NULL),
 	m_shadowMapRendering(NULL),
 	m_forwardRP(NULL),
 	m_postProcessor(NULL),
@@ -134,7 +133,7 @@ CBaseRP* CContext::initShadowForwarderPipeline(int w, int h, bool postEffect)
 	{
 		// post processor
 		m_postProcessor = new CPostProcessorRP();
-		m_postProcessor->enableAutoExposure(false);
+		m_postProcessor->enableAutoExposure(true);
 		m_postProcessor->enableBloomEffect(true);
 		m_postProcessor->enableFXAA(true);
 		m_postProcessor->enableScreenSpaceReflection(false);
@@ -200,24 +199,6 @@ CBaseRP* CContext::initLightmapRenderPipeline(int w, int h, bool postEffect)
 	return m_beginRP;
 }
 
-CBaseRP* CContext::initSimpleRenderPipeline(int w, int h)
-{
-	// 1nd
-	m_simpleRP = new CDeferredSimpleRP();
-	m_simpleRP->initRender(w, h);
-	m_simpleRP->enableUpdateEntity(true);
-	// 3rd
-	m_forwardRP = new CForwardRP(false);
-	m_forwardRP->initRender(w, h);
-	m_forwardRP->enableUpdateEntity(false);
-	// link rp
-	m_simpleRP->setNextPipeLine(m_forwardRP);
-	
-	m_beginRP = m_simpleRP;
-	return m_beginRP;
-}
-
-
 void CContext::resize(int w, int h)
 {
 	if (m_shadowMapRendering != NULL)
@@ -228,10 +209,6 @@ void CContext::resize(int w, int h)
 
 	if (m_lightmapRP != NULL)
 		m_lightmapRP->resize(w, h);
-
-
-	if (m_simpleRP != NULL)
-		m_simpleRP->resize(w, h);
 
 	if (m_forwardRP != NULL)
 		m_forwardRP->resize(w, h);
@@ -247,38 +224,38 @@ void CContext::releaseRenderPipeline()
 {
 	if (m_beginRP != m_rendering &&
 		m_beginRP != m_forwardRP &&
-		m_beginRP != m_simpleRP &&
+		m_beginRP != m_lightmapRP &&
 		m_beginRP != m_shadowMapRendering)
 	{
 		// delete customRP
 		delete m_beginRP;
 		m_beginRP = NULL;
 	}
+
 	if (m_rendering != NULL)
 	{
 		delete m_rendering;
 		m_rendering = NULL;
 	}
+
 	if (m_lightmapRP != NULL)
 	{
 		delete m_lightmapRP;
 		m_lightmapRP = NULL;
 	}
-	if (m_simpleRP != NULL)
-	{
-		delete m_simpleRP;
-		m_simpleRP = NULL;
-	}
+
 	if (m_shadowMapRendering != NULL)
 	{
 		delete m_shadowMapRendering;
 		m_shadowMapRendering = NULL;
 	}
+
 	if (m_forwardRP != NULL)
 	{
 		delete m_forwardRP;
 		m_forwardRP = NULL;
 	}
+
 	if (m_postProcessor != NULL)
 	{
 		delete m_postProcessor;

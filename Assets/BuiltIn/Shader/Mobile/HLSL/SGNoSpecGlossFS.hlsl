@@ -15,6 +15,7 @@ cbuffer cbPerFrame
 	float4 uLightColor;
 	float4 uColor;
 	float2 uSpecGloss;
+	float2 uLightMul;
 	float4 uSHConst[4];
 };
 static const float gamma = 2.2;
@@ -45,13 +46,16 @@ float4 main(PS_INPUT input) : SV_TARGET
 	ambientLighting = sRGB(ambientLighting);
 	float3 diffuseColor = sRGB(diffuseMap.rgb);
 	float3 lightColor = sRGB(uLightColor.rgb);
+	float spec = specMap.r;
+	float gloss = specMap.g;
 	float NdotL = max(dot(n, input.worldLightDir), 0.0);
 	float3 directionalLight = NdotL * lightColor;
-	float3 color = directionalLight * diffuseColor;
+	float3 color = directionalLight * diffuseColor * 0.3 * uLightMul.y;
+	float3 specularColor = float3(0.5, 0.5, 0.5);
 	float3 H = normalize(input.worldLightDir + input.worldViewDir);
 	float NdotE = max(0.0,dot(n, H));
-	float specular = pow(NdotE, 100.0f * specMap.g) * specMap.r;
-	color += specular * diffuseColor;
+	float specular = pow(NdotE, 10.0 + 100.0 * gloss) * spec;
+	color += specular * specularColor * uLightMul.x;
 	color += ambientLighting * diffuseColor / PI;
 	return float4(color, diffuseMap.a);
 }

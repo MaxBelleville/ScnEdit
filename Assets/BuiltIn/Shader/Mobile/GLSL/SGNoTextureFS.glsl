@@ -4,6 +4,7 @@ precision highp sampler2D;
 precision highp sampler2DArray;
 uniform vec4 uLightColor;
 uniform vec4 uColor;
+uniform vec2 uLightMul;
 uniform vec2 uSpecGloss;
 uniform vec4 uSHConst[4];
 in vec2 vTexCoord0;
@@ -40,13 +41,16 @@ void main(void)
 	ambientLighting = sRGB(ambientLighting);
 	vec3 diffuseColor = sRGB(diffuseMap.rgb);
 	vec3 lightColor = sRGB(uLightColor.rgb);
+	float spec = specMap.r;
+	float gloss = specMap.g;
 	float NdotL = max(dot(n, vWorldLightDir), 0.0);
 	vec3 directionalLight = NdotL * lightColor;
-	vec3 color = directionalLight * diffuseColor;
+	vec3 color = directionalLight * diffuseColor * 0.3 * uLightMul.y;
+	vec3 specularColor = vec3(0.5, 0.5, 0.5);
 	vec3 H = normalize(vWorldLightDir + vWorldViewDir);
 	float NdotE = max(0.0, dot(n, H));
-	float specular = pow(NdotE, 100.0f * specMap.g) * specMap.r;
-	color += specular * diffuseColor;
+	float specular = pow(NdotE, 10.0 + 100.0 * gloss) * spec;
+	color += specular * specularColor * uLightMul.x;
 	color += ambientLighting * diffuseColor / PI;
 	FragColor = vec4(color, diffuseMap.a);
 }

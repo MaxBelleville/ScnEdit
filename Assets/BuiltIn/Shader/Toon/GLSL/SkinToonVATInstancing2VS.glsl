@@ -30,8 +30,6 @@ out vec4 vColor;
 
 void main(void)
 {
-	mat4 skinMatrix = mat4(0.0);
-	
 	vec2 uv;
 	
 	// Vertex id

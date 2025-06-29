@@ -40,4 +40,5 @@ protected:
 	static void updateEntityPos(core::vector3df);
 	static void resetSolid();
 	static void getClosestVertex(core::vector3df);
+	static void getSelectedVertex();
 };

@@ -27,15 +27,22 @@ void CScnCellBBComponent::initComponent()
 void CScnCellBBComponent::setMesh(CScnSolid* solid, u32 cellindx)
 {
 	CEntity* entity = m_gameObject->getEntity();
-	CScnCellBBData* portals = entity->addData<CScnCellBBData>(DATA_TYPE_INDEX(CRenderMeshData));
-	portals->initMesh(solid,cellindx);
-	portals->setVisible(true);
+	CScnCellBBData* cellbb = entity->addData<CScnCellBBData>(DATA_TYPE_INDEX(CRenderMeshData));
+	cellbb->initMesh(solid,cellindx);
+	cellbb->setVisible(true);
 
 }
+void CScnCellBBComponent::updateBB(CScn* scn, indexedVec3df_t vert, bool reset)
+{
+	CEntity* entity = m_gameObject->getEntity();
+	CScnCellBBData* cellbb = entity->getData<CScnCellBBData>();
+	if (cellbb) cellbb->updateBB(scn,vert,reset);
+}
+
 
 void CScnCellBBComponent::updateComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
-	CScnCellBBData* portals = entity->getData<CScnCellBBData>();
-	if(portals) portals->setVisible(true);
+	CScnCellBBData* cellbb = entity->getData<CScnCellBBData>();
+	if(cellbb) cellbb->setVisible(true);
 }

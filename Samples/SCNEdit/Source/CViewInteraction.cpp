@@ -19,30 +19,49 @@ CViewInteraction::CViewInteraction(CScnArguments* args)
 
 CViewInteraction::~CViewInteraction()
 {
-
+	m_hidePortal.clear();
+	m_hideEntity.clear();
+	m_hideSolids.clear();
+	m_rebuildRequired = false;
 }
 
 void CViewInteraction::onInit()
 {
 	CContext* context = CContext::getInstance();
 	CCamera* camera = context->getActiveCamera();
+	if (SCNEdit::getSCN()) {
+		if (!SCNEdit::getSCN()->swt_start) {
+			camera->setPosition(core::vector3df(0.0f, 4.0f, 0.0f));
+		}
+		else {
+			const char* str = SCNEdit::getSCN()->swt_start->getField("Origin");
+
+			core::vector3df tmp = convert_vec3(str) + core::vector3df(0,4,0);
+			camera->setPosition(tmp);
+
+		}
+	}
 	CScene* scene = context->getScene();
-	CZone* zone = context->getActiveZone();
+	
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	bool moveable = m_arguments->isVertMoveable();
-	interaction->OnKeyEvent([moveable,interaction, camera](key_pair pair) {
+	bool isFlipped = m_arguments->isFlippedUV();
+	interaction->OnKeyEvent([interaction, isFlipped](key_pair pair) {
 		if (!SCNEdit::getSCN()) return;
 		if (!interaction->getSelectObj()) return;
 		CContext* context = CContext::getInstance();
+		CCamera* camera = context->getActiveCamera();
+		CZone* zone = context->getActiveZone();
 		CCollisionManager* collisionMgr = context->getCollisionManager();
-		if (interaction->getKeyState(make_pair(KEY_KEY_H, KeyAugment::None))) {
+		if (interaction->findKeyState({ make_pair(KEY_KEY_H, KeyAugment::None),
+			make_pair(KEY_KEY_H, KeyAugment::Shift),
+			})) {
 			if (interaction->findSelectedType(SelectedType::Entity, SelectedType::Portal)) {
 				collisionMgr->removeCollision(interaction->getSelectObj());
 				collisionMgr->build(false);
 				interaction->getSelectObj()->setVisible(false);
 			}
 			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				interaction->getSelectObj()->getComponent<CScnMeshComponent>()->hide();
+				interaction->getSelectObj()->getComponent<CScnMeshComponent>()->hide(pair.second == KeyAugment::Shift);
 				m_hideSolids.push_back(interaction->getSelectObj());
 				collisionMgr->removeCollision(interaction->getSelectObj());
 				collisionMgr->addComponentCollision(interaction->getSelectObj());
@@ -82,27 +101,44 @@ void CViewInteraction::onInit()
 			int posY = 0;
 			int posZ = 0;
 			if (pair.first == KEY_DOWN || pair.first == KEY_UP) {
-				if(pair.second == KeyAugment::Shift) posY = 39 - pair.first;
+				if(pair.second == KeyAugment::Ctrl) posY = 39 - pair.first;
 				else posX = 39 - pair.first;
 			}
 			else posZ = 38- pair.first;
 			if (interaction->getSelectedType() == SelectedType::Entity) {
 				if (pair.second == KeyAugment::Shift || 
-					pair.second == KeyAugment::None)updateEntityPos(core::vector3df(posX, posY, posZ));
+					pair.second == KeyAugment::Ctrl)updateEntityPos(core::vector3df(posX, posY, posZ));
 			}
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra) && moveable) {
+			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
 				if (pair.second == KeyAugment::Shift || 
-					pair.second == KeyAugment::None) { 
+					pair.second == KeyAugment::Ctrl) {
 					CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-					interaction->updateVertPos(meshcomp->updateVert(SCNEdit::getSCN(),interaction->getMoveableVert(), core::vector3df(posX, posY, posZ)));
+					interaction->updateVertPos(
+						meshcomp->updateVert(SCNEdit::getSCN(),interaction->getMoveableVert(), 
+							core::vector3df(posX, posY, posZ)));
 					interaction->VertexCallback();
 					collisionMgr->removeCollision(interaction->getSelectObj());
 					collisionMgr->addComponentCollision(interaction->getSelectObj());
 					collisionMgr->build(false);
+					if (interaction->getMoveableVert().solidindx == 0) {
+						CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
+						if (group_bb) {
+						
+							for (int i = 0; i < group_bb->getChilds()->size(); i++) {
+								CScnCellBBComponent* cellbb = group_bb->getChilds()->at(i)->getComponent<CScnCellBBComponent>();
+								cellbb->updateBB(SCNEdit::getSCN(), interaction->getMoveableVert(), false);
+							}
+						}
+					}
+				}
+				else {
+					CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
+					meshcomp->updateUV(SCNEdit::getSCN(), interaction->getUVMode(),
+						core::vector2df(posZ, posX)*interaction->getUVScalar());
 				}
 			}
 		}
-		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::None))) {
+		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::Ctrl))) {
 			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
 				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
 				interaction->updateVertPos(meshcomp->resetVert(SCNEdit::getSCN(), interaction->getMoveableVert()));
@@ -110,8 +146,82 @@ void CViewInteraction::onInit()
 				collisionMgr->removeCollision(interaction->getSelectObj());
 				collisionMgr->addComponentCollision(interaction->getSelectObj());
 				collisionMgr->build(false);
+				if (interaction->getMoveableVert().solidindx == 0) {
+				CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
+				if (group_bb) {
+					for (int i = 0; i < group_bb->getChilds()->size(); i++) {
+						CScnCellBBComponent* cellbb = group_bb->getChilds()->at(i)->getComponent<CScnCellBBComponent>();
+						cellbb->updateBB(SCNEdit::getSCN(), interaction->getMoveableVert(), true);
+					}
+				}
+				}
+
 			}
 			if(interaction->findSelectedType(SelectedType::Entity)) updateEntityPos(core::vector3df(0, 0, 0)); //Reset
+		}
+		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::None))) {
+			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
+				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
+				meshcomp->resetUV(SCNEdit::getSCN());
+			}
+		}
+		if (interaction->getKeyState(make_pair(KEY_KEY_X, KeyAugment::None)) && isFlipped) {
+			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
+				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
+				meshcomp->updateUV(SCNEdit::getSCN(),UVMode::FlipH,core::vector2df(0,0));
+			}
+		}
+		if (interaction->getKeyState(make_pair(KEY_KEY_V, KeyAugment::None)) && isFlipped) {
+			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
+				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
+				meshcomp->updateUV(SCNEdit::getSCN(), UVMode::FlipV, core::vector2df(0, 0));
+			}
+		}
+		if (interaction->findKeyAugment(KeyAugment::Ctrl, KeyAugment::Shift)) {
+			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
+				interaction->VertexCallback();
+			}
+		}
+		else if (interaction->getKeyAugment() == KeyAugment::None) {
+			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
+				interaction->VertexCallback();
+			}
+		}
+
+		if (interaction->getKeyState(make_pair(KEY_OEM_2,KeyAugment::Shift))) {
+			//In the future might want to make a dialog box.
+			os::Printer::log("Controls:");
+			os::Printer::log("H (ANY SELECTED): Hides element from editor");
+			os::Printer::log("SHIFT+H (SOLID SELECTED): Hides shared and selected surfaces");
+			os::Printer::log("CTRL+H: Unhides hidden elements");
+
+			os::Printer::log("X (SOLID SELECTED & -flip): Flips selected texture horizontally");
+			os::Printer::log("V (SOLID SELECTED & -flip): Flips selected texture vertically");
+			os::Printer::log("T (SOLID SELECTED): Change texture using file dialog.");
+
+			os::Printer::log("Ctrl+T (SOLID SELECTED): Change alpha of selected surface");
+			os::Printer::log("CTRL+F (SOLID SELECTED): Change flags of selected surface");
+
+			os::Printer::log("F: Change face uv mode");
+			os::Printer::log("Q: Decrease UV Scalar");
+			os::Printer::log("E: Increase UV Scalar");
+
+			os::Printer::log("CTRL+R (SOLID/ENTITY SELECTED): Reset position");
+			os::Printer::log("R (SOLID SELECTED): Reset uv");
+
+			os::Printer::log("CTRL or SHIFT (SOLID): Select vertex to move");
+			os::Printer::log("SHIFT+UP (SOLID/ENTITY SELECTED): Move X+");
+			os::Printer::log("SHIFT+DOWN (SOLID/ENTITY SELECTED): Move X-");
+			os::Printer::log("SHIFT+LEFT (SOLID/ENTITY SELECTED): Move Z+");
+			os::Printer::log("SHIFT+RIGHT (SOLID/ENTITY SELECTED): Move Z-");
+			os::Printer::log("CTRL+UP (SOLID/ENTITY SELECTED): Move Y+");
+			os::Printer::log("CTRL+DOWN (SOLID/ENTITY SELECTED): Move Y-");
+
+			os::Printer::log("UP (SOLID SELECTED): Change UV v+");
+			os::Printer::log("DOWN (SOLID SELECTED): Change UV v-");
+			os::Printer::log("LEFT (SOLID SELECTED): Change UV u+");
+			os::Printer::log("RIGHT (SOLID SELECTED): Change UV v-");
+			
 		}
 	});
 	if (SCNEdit::getSCN()) CViewInteraction::checkVisbility();
@@ -219,7 +329,7 @@ void CViewInteraction::onUpdate()
 			//Read click update interaction manager accordingly.
 			if (interaction->isLeftClicked()) {
 
-				CCube* sel =zone->searchObject(L"sel_verts")->getComponent<CCube>();
+				CCube* sel =zone->searchObject(L"surf_verts")->getComponent<CCube>();
 				CCube* shared = zone->searchObject(L"shared_verts")->getComponent<CCube>();
 				resetSolid();
 		
@@ -228,7 +338,7 @@ void CViewInteraction::onUpdate()
 				{
 					CScnMeshComponent* meshcomp = node->GameObject->getComponent<CScnMeshComponent>();
 					std::pair<int, int> surfdata = meshcomp->select(SCNEdit::getSCN(), triangle,
-						interaction->getLeftClickAug() == KeyAugment::Ctrl);
+						interaction->getLeftClickAug() == KeyAugment::Shift);
 				
 					interaction->setSurfISelected(surfdata);
 					if (surfdata.second != -1) {
@@ -238,10 +348,10 @@ void CViewInteraction::onUpdate()
 						
 						interaction->setVertData(meshcomp->getVertices(SCNEdit::getSCN()));
 						for (int i = 0; i < interaction->getVerts().size(); i++) {
-							sel->addPrimitive(interaction->getVerts()[i].pos, core::vector3df(0, 0, 0), core::vector3df(3, 3, 3));
+							sel->addPrimitive(interaction->getVerts()[i].pos, core::vector3df(0, 0, 0), core::vector3df(2.9, 2.9, 2.9));
 						}
 						for (int i = 0; i < interaction->getSharedVerts().size(); i++) {
-							shared->addPrimitive(interaction->getSharedVerts()[i].pos, core::vector3df(0, 0, 0), core::vector3df(3, 3, 3));
+							shared->addPrimitive(interaction->getSharedVerts()[i].pos, core::vector3df(0, 0, 0), core::vector3df(2.9, 2.9, 2.9));
 						}
 					}
 					else interaction->setSelectedType(SelectedType::Empty);
@@ -264,7 +374,10 @@ void CViewInteraction::onUpdate()
 				interaction->setSelectObj(node->GameObject);
 				interaction->CollisionCallback(triangle, intersection);
 			}
-			getClosestVertex(intersection);
+			if (interaction->getKeyAugment() == KeyAugment::None || interaction->getMoveableVert().pos.equals(core::vector3df(0,0,0),0.5))
+				getClosestVertex(intersection);
+			else if (interaction->findKeyAugment(KeyAugment::Ctrl, KeyAugment::Shift))
+				getSelectedVertex();
 			interaction->resetLeftClick();
 		}
 
@@ -274,6 +387,11 @@ void CViewInteraction::onUpdate()
 			CViewInteraction::checkVisbility();
 			if (m_arguments->isLightmapEnable() && SCNEdit::getSCN()->getLightmap()->hasLightmaps()) {
 				zone->searchObject(L"solid")->getComponent<CScnMeshComponent>()->setLightmapVisible(gui->vis_lightmaps);
+				CContainerObject* group_extra = (CContainerObject*)zone->searchObject(L"group_extra");
+				if (group_extra) {
+					for (int i = 0; i < group_extra->getChilds()->size(); i++) 
+						group_extra->getChilds()->at(i)->getComponent<CScnMeshComponent>()->setLightmapVisible(gui->vis_lightmaps);
+				}
 			}
 			interaction->resetPrevGui();
 		}
@@ -402,7 +520,7 @@ void CViewInteraction::checkVisbility()
 	CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
 	if (group_bb) {
 		for (int i = 0; i < group_bb->getChilds()->size(); i++) {
-			updateVisbility(group_bb->getChilds()->at(i), gui->vis_bb, false);
+			group_bb->getChilds()->at(i)->setVisible(gui->vis_bb);
 		}
 	}
 	CContainerObject* group_entity = (CContainerObject*)zone->searchObject(L"group_entity");
@@ -423,14 +541,17 @@ void CViewInteraction::resetSolid() {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
-	CCube* sel = zone->searchObject(L"sel_verts")->getComponent<CCube>();
+	CCube* sel = zone->searchObject(L"sel_vert")->getComponent<CCube>();
+	CCube* surf = zone->searchObject(L"surf_verts")->getComponent<CCube>();
 	CCube* shared = zone->searchObject(L"shared_verts")->getComponent<CCube>();
-	CSphere* sphere = zone->searchObject(L"vert_over")->getComponent< CSphere>();
-	sphere->removeAllEntities();
+	CCube* hover = zone->searchObject(L"hover_vert")->getComponent< CCube>();
+	hover->removeAllEntities();
 	sel->removeAllEntities();
+	surf->removeAllEntities();
 	shared->removeAllEntities();
 	interaction->resetSelectObj();
 	interaction->resetVerts();
+
 }
 
 void CViewInteraction::getClosestVertex(core::vector3df pos) {
@@ -457,13 +578,27 @@ void CViewInteraction::getClosestVertex(core::vector3df pos) {
 			closest = interaction->getSharedVerts()[i];
 		}
 	}
-	CSphere* sphere= zone->searchObject(L"vert_over")->getComponent< CSphere>();
-		sphere->removeAllEntities();
-		sphere->addPrimitive(closest.pos, core::vector3df(0, 0, 0), core::vector3df(3, 3, 3));
+	CCube* movevert= zone->searchObject(L"hover_vert")->getComponent< CCube>();
+    movevert->removeAllEntities();
+	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
+	selvert->removeAllEntities();
+	movevert->addPrimitive(closest.pos, core::vector3df(0, 0, 0), core::vector3df(3.1, 3.1, 3.1));
 
-		if (closest.pos != interaction->getMoveableVert().pos) {
+		if (closest.vertindx != interaction->getMoveableVert().vertindx) {
+			CScnSolid* solid = SCNEdit::getSCN()->getSolid(closest.solidindx);
 			interaction->setMoveableVert(closest);
 			interaction->VertexCallback();
 		}
 	}
+}
+void CViewInteraction::getSelectedVertex() {
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	CContext* context = CContext::getInstance();
+	CZone* zone = context->getActiveZone();
+	CCube* movevert = zone->searchObject(L"hover_vert")->getComponent< CCube>();
+	movevert->removeAllEntities();
+	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
+	selvert->removeAllEntities();
+	selvert->addPrimitive(interaction->getMoveableVert().pos, 
+		core::vector3df(0, 0, 0), core::vector3df(3.1, 3.1, 3.1));
 }

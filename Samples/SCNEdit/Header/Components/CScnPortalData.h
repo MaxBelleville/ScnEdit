@@ -15,7 +15,6 @@ public:
 
 	void initMesh(CScnSolid* solid, u32 cellindx, s32 portalindx);
 
-
 	void select();
 
 	void deselect();

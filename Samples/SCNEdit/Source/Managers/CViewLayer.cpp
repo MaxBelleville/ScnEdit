@@ -180,8 +180,10 @@ void CViewLayer::destroyAllView()
 	int numView = (int)m_views.size();
 	for (int i = 0; i < numView; i++)
 	{
-		m_views[i]->onDestroy();
-		delete m_views[i];
+		if (m_views[i]) {
+			m_views[i]->onDestroy();
+			delete m_views[i];
+		}
 	}
 
 	m_views.clear();

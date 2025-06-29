@@ -14,7 +14,8 @@ public:
 	scnPlane_t * planes; //also needs pointer to planes given from parent cscnsolid
 
 	///constructor. Needs number of nodes
-	CScnBSPTree(u32 n)
+	inline CScnBSPTree(u32 n): planes(NULL), planes_ad(NULL), 
+		rawcells(NULL), nodes(NULL)
 	{
 		//because, at the time this is called, planes in CScnsolid hasn't been set
 		//solid->plane point to nowhere, so we have to use a pointer to a pointer
@@ -26,14 +27,14 @@ public:
 	}
 
 	///destructor
-	~CScnBSPTree()
+	inline ~CScnBSPTree()
 	{
 		if (nodes)
 			delete[] nodes;
 	}
 
 
-	int loadNodes(std::ifstream * file)
+	inline int loadNodes(std::ifstream * file)
 	{
 		if (n_nodes <= 0) return -1;
 
@@ -43,7 +44,7 @@ public:
 		return n_nodes;
 	}
 
-	u16 findNodePos(core::vector3df pos, u16 nodeindx=0)
+	inline u16 findNodePos(core::vector3df pos, u16 nodeindx=0)
 	{
 
 		if (nodes[nodeindx].plane == -1) {  //it's a leaf, no more nodes
@@ -66,7 +67,7 @@ public:
  
 
 	///returns 1 if pos is in front of splitting plane, -1 if behind, 0 if in plane
-	s32 evalNodePos(int nodeidx, core::vector3df pos)
+	inline s32 evalNodePos(int nodeidx, core::vector3df pos)
 	{
 		scnPlane_t * plane = &planes[nodes[nodeidx].plane];
 		//dot product

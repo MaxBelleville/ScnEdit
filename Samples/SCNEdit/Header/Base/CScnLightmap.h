@@ -9,6 +9,8 @@ private:
 	bool loaded=false;
 	
 	size_t offset = 0;
+	size_t lump_offset =0;
+	size_t hl_offset =0;
 	core::array <core::array<f32*>> omults;
 	
 	std::vector<video::IImage*> atlas;
@@ -19,6 +21,7 @@ private:
 	scnSwitchableLMapHeader_t* hslmaps;
 	core::array<scnLMapHeader_t*> hlmaps;
 	core::array <scnLMapLump_t*> lumps;
+
 	s8* getBitmap(CScnSolid*, u32, u32);
 	void createBitmaps(CScnSolid*,u32);
 	u16_pair getMasterBitmapId(scnLMapHeader_t hlmap);
@@ -34,16 +37,26 @@ public:
 	int loadLightmap(std::ifstream*,  CScnSolid*, u32, u32);
 	video::IImage* getAtlas(s32 indx);
 	core::vector3di getAtlasPos(u32 solidi, u32 surfi);
-   u16 getCellIndex(u32 solidi, u32 surfi) {
+	
+	inline u16 getCellIndex(u32 solidi, u32 surfi) {
 	   return hlmaps[solidi][surfi].cellidx;
-   }
-
-	f32* getMults(u32 solidindx, u32 surfindx) {
+    }
+	inline f32* resetMults(u32 solidindx, u32 surfindx) {
+		if (hslmaps && loaded) {
+			hlmaps[solidindx][surfindx].uv_mults[0] = omults[solidindx][surfindx][0];
+			hlmaps[solidindx][surfindx].uv_mults[1] = omults[solidindx][surfindx][1];
+			hlmaps[solidindx][surfindx].uv_mults[2] = omults[solidindx][surfindx][2];
+			hlmaps[solidindx][surfindx].uv_mults[3] = omults[solidindx][surfindx][3];
+		}
+	}
+	inline f32* getMults(u32 solidindx, u32 surfindx) {
 		if(hslmaps&&loaded) return hlmaps[solidindx][surfindx].uv_mults;
 		return nullptr;
 	};
-	size_t getOffset() const { return offset; }
-	bool hasLightmaps() { return loaded; }
-	
+	inline size_t getLumpOffset() const { return lump_offset; }
+	inline size_t getHLOffset() const { return hl_offset; }
+	inline size_t getOffset() const { return offset; }
+	inline bool hasLightmaps() { return loaded; }
+	inline scnLMapHeader_t* getHLmap(int i) { return hlmaps[i]; }
 };
 #endif

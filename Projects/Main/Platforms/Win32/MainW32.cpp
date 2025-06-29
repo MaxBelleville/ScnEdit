@@ -202,7 +202,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		windowTop = y;
 	}
 #endif
-	if (p.Borderless && !p.Fullscreen) {
+	if (p.Borderless || p.Fullscreen) {
 
 		hWndStyle = WS_POPUP | WS_VISIBLE;
 		BOOL composition_enabled = FALSE;

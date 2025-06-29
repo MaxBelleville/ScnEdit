@@ -10,7 +10,16 @@ using namespace video;
 
 CScnLightmap::~CScnLightmap()
 {
+	omults.clear();
+	atlas.clear();
 
+	if(hslmaps) delete hslmaps;
+	if (current_atlas) delete current_atlas;
+	curr_atlas_pos = core::vector3di(0, 0, 0);
+	bitmap.clear();
+	atlas_pos.clear();
+	hlmaps.clear();
+	lumps.clear();
 }
 
 int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_solid, u32 n_extralmaps)
@@ -18,6 +27,7 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 	hslmaps = new (std::nothrow) scnSwitchableLMapHeader_t[n_extralmaps];
 	offset = file->tellg();
 	read_generic(hslmaps, file, sizeof(scnSwitchableLMapHeader_t) * n_extralmaps);
+	hl_offset = file->tellg();
 	for (u32 i = 0; i < n_solid; i++) {
 		scnLMapHeader_t* tmp_hlmap = new (std::nothrow) scnLMapHeader_t[solids[i].n_surfs];
 
@@ -33,7 +43,9 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 					read_generic(tmp_lump->data, file, sizeof(s8)* tmp_lump->size);
 				}
 				lumps.push_back(tmp_lump);
+				
 			}
+			lump_offset = file->tellg();
 		}
 	}
 	for (u32 i = 0; i < hlmaps.size(); i++) {
@@ -78,6 +90,7 @@ u16_pair CScnLightmap::getMasterBitmapId(scnLMapHeader_t hlmap)
 
 void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 {
+	CScnEnt* ambient = CScn::getGlobalAmbient();
 	for (u32 i = 0; i < hlmaps.size(); i++) {
 		for (u32 j = 0; j < solids[i].n_surfs; j++) {
 			scnLMapHeader_t hlmap = hlmaps[i][j];
@@ -86,12 +99,11 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 				continue; // Surfaces are not lit
 			u16 lmapcell = hlmap.cellidx;
 			CScnEnt* cellEnt = CScn::getCell(lmapcell);
-			CScnEnt* ambient = CScn::getGlobalAmbient();
-
+		
 			if (cellEnt&& !ambient) {
 				ambient = CScn::getAmbientByCell(cellEnt->getField("TargetName"));
 			}
-			std::string color = "0.02 0.02 0.02";
+			std::string color = "0.00 0.00 0.00";
 			if (!ambient) {
 				color = ambient->getField("color");
 			}
@@ -166,7 +178,9 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 	atlas.push_back(current_atlas);
 }
 
-CScnLightmap::CScnLightmap()
+CScnLightmap::CScnLightmap():
+	current_atlas(NULL),
+	hslmaps(NULL)
 {
 
 }

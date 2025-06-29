@@ -52,7 +52,8 @@ public:
 	virtual void onRender();
 
 	void buildScnComponents();
-
+	template<class T>
+	void initShapeCollection(SColor, const char*);
 
 protected:
 

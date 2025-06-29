@@ -63,16 +63,10 @@ void CScnEntityData::initMesh(CScnEnt* ent)
 		core::vector3df start = og_start;
 		core::vector3df end = start + scale;
 		start -= scale / 2;
-		CMaterial* material = new CMaterial(originStr, m_firstLoad? "TextureColor2Layer.xml":"TextureColor2LayerAlpha.xml");
+		CMaterial* material = new CMaterial(originStr, m_firstLoad? "TextureColor.xml":"TextureColorAlpha.xml");
 		material->setBackfaceCulling(true);
-
-
-		
 		material->setTexture(0, texture);
-		material->setUniform("uLightMapEnabled", 0.0f);
-		material->setUniform("uSelected", 0.0f);
-		material->setUniform4("uSelectedColor", SColor(0, 0, 0, 0));
-		material->updateShaderParams();
+
 		
 		MeshBuffer = new CMeshBuffer<S3DVertex>(driver->getVertexDescriptor(EVT_STANDARD), EIT_16BIT);
 		IIndexBuffer* ib = MeshBuffer->getIndexBuffer();
@@ -179,18 +173,12 @@ void CScnEntityData::initMesh(CScnEnt* ent)
 void CScnEntityData::select() {
 
 	
-	RenderMesh->Materials[0]->changeShader("TextureColor2Layer.xml");
-	RenderMesh->Materials[0]->setUniform("uLightMapEnabled", 0.0f);
-	RenderMesh->Materials[0]->setUniform("uSelected", 0.0f);
-	RenderMesh->Materials[0]->setUniform4("uSelectedColor", SColor(0, 0, 0, 0));
-	RenderMesh->Materials[0]->updateShaderParams();
-
-
+	RenderMesh->Materials[0]->changeShader("TextureColor.xml");
 }
 
 void CScnEntityData::deselect() {
-;	if (!str_equals("TextureColor2LayerAlpha.xml", RenderMesh->Materials[0]->getShaderPath())) {
-		RenderMesh->Materials[0]->changeShader("TextureColor2LayerAlpha.xml");
+;	if (!str_equals("TextureColor.xml", RenderMesh->Materials[0]->getShaderPath())) {
+		RenderMesh->Materials[0]->changeShader("TextureColorAlpha.xml");
 
 	}
 

@@ -35,7 +35,7 @@ void CScnPortalData::initMesh(CScnSolid* solid, u32 cellindx, s32 portalIndx)
 	IIndexBuffer* ib = MeshBuffer->getIndexBuffer();
 	IVertexBuffer* vb = MeshBuffer->getVertexBuffer();
 	// Create vertices
-	video::SColor clr(75, 25, 100, 25);
+	video::SColor clr(125, 25, 100, 25);
 
 	vb->reallocate(12);
 

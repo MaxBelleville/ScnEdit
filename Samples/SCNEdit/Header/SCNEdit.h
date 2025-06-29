@@ -45,28 +45,28 @@ public:
 
 	virtual void onQuitApp();
 
-	static void closeScnFile() {
+	inline static void closeScnFile() {
 		if (scn) {
-			//clears scn
 			delete scn;
 			scn = 0;
 		}
 	}
 
-
 	static bool loadScnFile(io::path fname);
 
+	static void proccessQuit();
+
 	static bool saveSCN(io::path path, bool bExtra);
-	static void exportSCN(bool bExtra) {
+	static inline void exportSCN(bool bExtra) {
 		scnExportObj(scn, "exported");
 		scnExport3ds(scn->getAllSolids(), scn->getSolidSize(bExtra), "exported");
 		scnExportMap(scn, "exported");
 	}
-	static CScn* getSCN() {
+	inline static CScn* getSCN() {
 		return scn;
 	}
 
-	static std::ofstream* getOutput() {
+	inline static std::ofstream* getOutput() {
 		return output;
 	}
 

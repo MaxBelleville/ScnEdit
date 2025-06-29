@@ -37,8 +37,6 @@ CScnSolid::~CScnSolid()
 	//Deletes uvpos
 	if (uvpos)
 		delete [] uvpos;
-	if (ouvpos)
-		delete [] ouvpos;
 	//Deletes vertices
 	if (verts)
 		delete [] verts;
@@ -366,13 +364,9 @@ int CScnSolid::loadUVPos(std::ifstream * file)
 {
 	os::Printer::log(format("\tGetting UV coordinates... {}", n_uvpos).c_str());
 	uvpos = new core::vector2df[n_uvpos];   //allocate
-	ouvpos = new core::vector2df[n_uvpos];
 	uvposad=file->tellg();
 	read_generic(uvpos,file,sizeof(core::vector2df)*n_uvpos); //read all, should work
-	for(u16 i=0; i< n_uvpos;i++){
-	ouvpos[i].X = uvpos[i].X;
-	ouvpos[i].Y = uvpos[i].Y;
-	}
+
 	os::Printer::log("\t\tdone.");
 
 	return n_uvpos;
@@ -488,7 +482,6 @@ CScnSolid::CScnSolid()
 	uvidxs=0;
 	vertidxs=0;
 	uvpos=0;
-	ouvpos=0;
 	verts=0;
 	planes=0;
 	tree=0;

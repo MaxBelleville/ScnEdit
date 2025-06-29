@@ -36,12 +36,18 @@ namespace Skylicht
 			CGUIElement* m_background;
 			CGUIText* m_text;
 
-			bool m_editable;
+			bool m_removeable;
+			bool m_addable;
+			bool m_completed;
+			//-1 is any, 0 is none, 1 is shift
+			core::array<std::pair<irr::EKEY_CODE, int>> m_acceptedKeys;
 
 			int m_maxLength;
+			int m_minLength;
 
 		public:
 			std::function<void(CUIBase*)> OnTextChanged;
+			std::function<void(CUIBase*)> OnTextSet;
 
 		public:
 			CUITextBox(CUIContainer* container, CGUIElement* element);
@@ -68,14 +74,37 @@ namespace Skylicht
 
 			int getTextLength();
 
-			inline void setEditable(bool b)
+			inline void setRemoveable(bool b)
 			{
-				m_editable = b;
+				m_removeable = b;
 			}
 
-			inline bool isEditable()
+			inline void setAddable(bool b)
 			{
-				return m_editable;
+				m_addable = b;
+			}
+
+			inline bool isRemoveable()
+			{
+				return m_removeable;
+			}
+			inline bool isAddable()
+			{
+				return m_addable;
+			}
+			inline bool isCompleted()
+			{
+				return m_completed;
+			}
+
+			inline void addAcceptedKeys(std::pair<irr::EKEY_CODE, int> key) {
+				m_acceptedKeys.push_back(key);
+			}
+			inline void setAcceptedKeys(core::array<std::pair<irr::EKEY_CODE, int>> keys) {
+				m_acceptedKeys = keys;
+			}
+			inline void resetAcceptedKeys() {
+				m_acceptedKeys.set_used(0);
 			}
 
 			inline void setMaxLength(int l)
@@ -83,9 +112,25 @@ namespace Skylicht
 				m_maxLength = l;
 			}
 
+			inline void setLength(int minl, int maxl)
+			{
+				m_minLength = minl;
+				m_maxLength = maxl;
+			}
+
 			inline int getMaxLength()
 			{
 				return m_maxLength;
+			}
+
+			inline void setMinLength(int l)
+			{
+				m_minLength = l;
+			}
+
+			inline int getMinLength()
+			{
+				return m_minLength;
 			}
 
 			virtual void onPointerHover(float pointerX, float pointerY);

@@ -8,6 +8,9 @@ void CScn::reset()
 	solids=0;
 	ents=0;
 	header=0;
+	cells.clear();
+	ambients.clear();
+	swt_start = nullptr;
 }
 
 //default constructor
@@ -35,6 +38,10 @@ CScn::~CScn()
 	if (ents)
 		delete [] ents;
  
+	if (lmap) {
+		delete lmap;
+		lmap = new CScnLightmap();
+	}
 }
 
 int CScn::loadFile(std::ifstream * file)
@@ -107,15 +114,17 @@ int CScn::loadEntities(std::ifstream * file)
 	char str2[512]{};
 	CScn::cells.clear();
 	CScn::ambients.clear();
+	
+
 	for (u32 i=0;i<n_ents;i++)
 	{
 		enti=&ents[i];
 		enti->indx = i;
 		enti->n_fields = read_u32(file);
 		enti->srefidx = read_u32(file);
-
+		bool hasPos = false;
 		enti->fields = new (std::nothrow) CScnEnt::field[enti->n_fields];
-		if (enti->fields == NULL)
+		if (enti->fields == nullptr)
 			error(true,"Error allocating memory for %u fields of ent[%u]",enti->n_fields,i);
 		for (u32 n=0;n<enti->n_fields;n++)
 		{
@@ -143,12 +152,19 @@ int CScn::loadEntities(std::ifstream * file)
 			}
 			if (str_equiv(enti->fields[n].key, "Position") && str_equiv(enti->fields[n].value, "0")) {
 				if(str_equiv(enti->getField("Classname"),"swt_start")) swt_start = enti;
+
+			}
+			if (str_equiv(enti->fields[n].key, "Position")) {
+				if (str_equiv(enti->getField("Classname"), "swt_start")) hasPos = true;
 			}
 
 			if (str_equiv(enti->fields[n].key,"Classname") && str_equiv(enti->fields[n].value,"Cell"))
 				CScn::cells.push_back(enti);
 			if (str_equiv(enti->fields[n].key, "Classname") && str_equiv(enti->fields[n].value, "light_ambient"))
 				CScn::ambients.push_back(enti);
+		}
+		if (!hasPos && str_equiv(enti->getField("Classname"), "swt_start")) {
+			swt_start = enti;
 		}
 	}
 	os::Printer::log("done.");
@@ -187,7 +203,7 @@ CScnEnt * CScn::getCell(u32 idx)
 CScnEnt* CScn::getAmbientByCell(const char* name)
 {
 	CScnEnt* ambienti;
-	if (!name) return NULL;
+	if (!name) return nullptr;
 
 	for (u16 i = 0; i < CScn::ambients.size(); i++)
 	{

@@ -9,13 +9,14 @@
 #include "UserInterface/CUIEventManager.h"
 #include <filesystem>
 
-//This class loads in cmd line arguments, sets up view manager and loads in scn from f
-using namespace std;
 
+using namespace std;
+///Prepares scn arguments singleton and initalizes the application (will create win32 window with these parameters)
 void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationParameters* param) {
 	
 	CScnArguments* options = new CScnArguments(argv);
 	if(options->isDebugEnabled())getApplication()->showDebugConsole();
+
 	SCNEdit* app = new SCNEdit(options);
 	param->DriverType = options->getDriverType();
 	if (options->getDriverType() != EDT_DIRECT3D11) {
@@ -25,8 +26,7 @@ void prepareApplication(const std::vector<std::string>& argv, SIrrlichtCreationP
 	param->WindowSize = options->getCurrentRes();
 	param->Borderless = options->isBorderless();
 	param->Resizeable = options->isResizeable();
-
-
+	
 	getApplication()->registerAppEvent("SWAT3 SCN editor", app);
 }
 
@@ -40,30 +40,25 @@ SCNEdit::SCNEdit(CScnArguments* options)
 
 SCNEdit::~SCNEdit()
 {
-	CViewManager::getInstance()->releaseAllLayer();
-	CViewManager::releaseInstance();
-	CContext::releaseInstance();
-	CImguiManager::releaseInstance();
-	if (UI::CUIEventManager::getInstance()) {
-		UI::CUIEventManager::releaseInstance();
-	}
-	CInteractionManager::releaseInstance();
+	proccessQuit();
+	getApplication()->unRegisterAppEvent(this);
 	delete m_arguments;
+	//CContext::releaseInstance();
 }
 
 void SCNEdit::onInitApp()
 {
-
+	//Create essential managers.
 	CImguiManager::createGetInstance();
-	UI::CUIEventManager::createGetInstance();
 	CInteractionManager::createGetInstance();
-	CBaseApp* app = getApplication();
+	UI::CUIEventManager::createGetInstance();
 
+	CBaseApp* app = getApplication();
+	//Load in sedata which contains all the resources needed for the app including font and shaders. 
 	app->getFileSystem()->addFileArchive(app->getBuiltInPath("sedata.res"), true, true, io::EFAT_ZIP);
 
 	app->getDevice()->setWindowCaption(L"SWAT3 SCN editor");;
 	
-
 	// load basic shader
 	CShaderManager* shaderMgr = CShaderManager::getInstance();
 	shaderMgr->initExtremlyBasicShader();
@@ -71,6 +66,8 @@ void SCNEdit::onInitApp()
 	// load font
 	CGlyphFreetype* freetypeFont = CGlyphFreetype::getInstance();
 	freetypeFont->initFont("Segoe UI Light", "BuiltIn/Fonts/segoeui/segoeuil.ttf");
+
+	//Shift the view manager layer to be init which will load in the actual scn and more.
 	CViewManager::getInstance()->getLayer(0)->pushView<CViewInit>(m_arguments);
 }
 
@@ -124,6 +121,18 @@ void SCNEdit::onQuitApp()
 	delete this;
 }
 
+void SCNEdit::proccessQuit() {
+	CInteractionManager::releaseInstance();
+	CImguiManager::releaseInstance();
+	CViewManager::getInstance()->getLayer(1)->destroyAllView();
+	CViewManager::getInstance()->getLayer(0)->destroyAllView();
+	CViewManager::getInstance()->releaseAllLayer();
+	CViewManager::releaseInstance();
+	if (UI::CUIEventManager::getInstance()) {
+		UI::CUIEventManager::releaseInstance();
+	}
+	closeScnFile();
+}
 
 bool SCNEdit::loadScnFile(io::path fname) {
 	CBaseApp* app = getApplication();
@@ -165,6 +174,8 @@ bool SCNEdit::saveSCN(io::path path,bool bExtra) {
 	//Gets solids
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	guiSettings_t * gui=  interaction->getGuiSettings();
+	CScnLightmap* lmap = scn->getLightmap();
+
 	//Record texture names
 	//if file is open
 	if (output && output->is_open()) {
@@ -217,6 +228,21 @@ bool SCNEdit::saveSCN(io::path path,bool bExtra) {
 			output->close();
 			filesystem::resize_file(path.c_str(), pos);
 		}
+		//else if(scn->getLightmap()->hasLightmaps()) {
+		//	//Save lightmaps.
+		//	size_t pos = scn->getLightmap()->getHLOffset();
+		//	output->seekp(pos);
+		//	for (u32 i = 0; i < scn->getSolidSize(bExtra); i++) {
+		//		CScnSolid* solids = scn->getSolid(i);
+		//		u32 len = solids->n_surfs * sizeof(scnLMapHeader_t);
+		//		write_generic(scn->getLightmap()->getHLmap(i), output, len);
+		//		if (i == 0) {
+		//			size_t lump_pos = scn->getLightmap()->getLumpOffset();
+		//			output->seekp(lump_pos);
+		//		}
+		//	}
+		//	output->close();
+		//}
 
 
 		os::Printer::log("Changes saved to file.");

@@ -37,7 +37,6 @@ public:
 	scnPlane_t * planes;
 	core::vector3df	* verts;
 	core::vector2df * uvpos;
-	core::vector2df * ouvpos;
 	u32 * vertidxs;
 	u32 * uvidxs;
 	CScnBSPTree * tree;
@@ -61,7 +60,7 @@ public:
 	//function only returns vertice from array
 	//so it doesn't include surface specifics like color, tcoords or normal
 	//irrlicht specific
-	video::S3DVertex2TCoords getVertice(u32 idx)
+	inline video::S3DVertex2TCoords getVertice(u32 idx)
 	{
 		video::S3DVertex2TCoords vert = video::S3DVertex2TCoords(
 					verts[idx].X,verts[idx].Y,verts[idx].Z,        //coords

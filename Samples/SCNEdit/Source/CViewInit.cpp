@@ -4,9 +4,18 @@
 #include "Header/CViewGui.h"
 #include "SkySun/CSkySun.h"
 #include "Header/Managers/CContext.h"
+#include "Header/Managers/CInteractionManager.h"
+#include "CImguiManager.h"
 
 CViewInit::CViewInit(CScnArguments* args) :
-	m_initState(CViewInit::Start)
+	m_initState(CViewInit::Start),
+	m_camera(NULL),
+	m_font(NULL),
+	m_guiCamera(NULL),
+	m_guiObject(NULL),
+	m_skyBox(NULL),
+	m_skyObject(NULL),
+	m_textInfo(NULL)
 {
 	m_start = os::Timer::getRealTime();
 	
@@ -15,7 +24,6 @@ CViewInit::CViewInit(CScnArguments* args) :
 
 CViewInit::~CViewInit()
 {
-	
 }
 
 io::path CViewInit::getBuiltInPath(const char* name)
@@ -60,15 +68,16 @@ void CViewInit::initScene()
 
 	// camera
 	CGameObject* camObj = zone->createEmptyObject();
-	m_camera = camObj->addComponent<CCamera>();
 
+	m_camera = camObj->addComponent<CCamera>();
 	CEditorCamera * editorCam = camObj->addComponent<CEditorCamera>();
 	editorCam->setControlStyle(CEditorCamera::EControlStyle::FPS);
-	editorCam->setMoveSpeed(7.0f);
-	editorCam->setZoomSpeed(7.0f);
+	editorCam->setMoveSpeed(8.0f);
+	editorCam->setRotateSpeed(24.0f);
+	editorCam->setZoomSpeed(8.0f);
 	editorCam->setInvert(m_arguments->isMouseInvert());
 	CFpsMoveCamera* fpsMoveCam = camObj->addComponent<CFpsMoveCamera>();
-	fpsMoveCam->setMoveSpeed(100.0f);
+	fpsMoveCam->setMoveSpeed(150.0f);
 	fpsMoveCam->setShiftSpeed(2.5f);
 
 	
@@ -95,50 +104,41 @@ void CViewInit::initScene()
 	// save to context
 
 
-	//Setup sel vert, shared vert, vertover
-	CGameObject* verticesObj = zone->createEmptyObject();
-	CCube* cube = verticesObj->addComponent<CCube>();
-	cube->setColor(SColor(150, 255, 0, 0));
-	cube->removeAllEntities();
-	verticesObj->setName("sel_verts");
-	zone->registerObjectInSearchList(verticesObj);
-
-
-	CGameObject* sharedvObj = zone->createEmptyObject();
-	CCube* cube2= sharedvObj->addComponent<CCube>();
-	cube2->setColor(SColor(150,255,0,255));
-	cube2->removeAllEntities();
-	sharedvObj->setName("shared_verts");
-	zone->registerObjectInSearchList(sharedvObj);
-
-	CGameObject* vertoverObj = zone->createEmptyObject();
-	CSphere* sphere = vertoverObj->addComponent<CSphere>();
-	sphere->removeAllEntities();
-	sphere->setColor(SColor(255, 0, 0, 0));
-	vertoverObj->setName("vert_over"); //hover over 
-	zone->registerObjectInSearchList(vertoverObj);
+	initShapeCollection<CCube>(SColor(255, 255, 0, 0), "surf_verts");
+	initShapeCollection<CCube>(SColor(255, 255, 0, 255), "shared_verts");
+	initShapeCollection<CCube>(SColor(255, 0, 0, 0), "hover_vert");
+	initShapeCollection<CCube>(SColor(255, 255, 255, 255), "sel_vert");
 
 	context->initSimpleRenderPipeline(app->getWidth(), app->getHeight());
 	context->setActiveZone(zone);
 	context->setActiveCamera(m_camera);
 	context->setGUICamera(guiCamera);
 }
+template<class T>
+void CViewInit::initShapeCollection(SColor color, const char* name) {
+	CContext* context = CContext::getInstance();
+
+	CScene* scene = context->getScene();
+	CZone* zone = scene->getZone(0);
+	CGameObject* shapeObj = zone->createEmptyObject();
+	T* shape = shapeObj->addComponent<T>();
+	shape->setColor(color);
+	shape->removeAllEntities();
+	shapeObj->setName(name); //hover over 
+	zone->registerObjectInSearchList(shapeObj);
+}
 
 void CViewInit::buildScnComponents() {
-
+	
 	CScn* scn = SCNEdit::getSCN();
-	if (!scn->swt_start) {
-		m_camera->setPosition(core::vector3df(0.0f, 4.0f, 0.0f));
-	}
-	else {
-		core::vector3df tmp = convert_vec3(scn->swt_start->getField("Origin"));
-		m_camera->setPosition(tmp);
-	}
+	
 	CContext* context = CContext::getInstance();
 
 	CScene* scene = context->getScene();
 	CZone* zone = scene->getZone(0);
 	CScnSolid* solid = scn->getSolid(0);
+	
+
 	const char* skyName ="";
 	for (int i = 0; solid->n_cells; i++) {
 		if (!str_equiv(solid->rawcells[i].skyname,"")) {
@@ -270,7 +270,7 @@ void CViewInit::buildScnComponents() {
 				CScnCellBBComponent* mesh = bbObj->addComponent<CScnCellBBComponent>();
 				mesh->setMesh(solid, c);
 				bbObj->setStatic(true);
-				context->getCollisionManager()->addBBComponentCollision(bbObj);
+				//context->getCollisionManager()->addBBComponentCollision(bbObj);
 
 			}
 		}
@@ -321,7 +321,11 @@ void CViewInit::onUpdate()
 		m_textInfo->setText("Loading Swat Files and Assets...");
 
 
-		m_initState = CViewInit::ReadScn;
+		if (m_arguments->hasError()) {
+			m_textInfo->setText("Error... check console.");
+			m_initState = CViewInit::Error;
+		}
+		else m_initState = CViewInit::ReadScn;
 
 	}
 	break;
@@ -345,7 +349,6 @@ void CViewInit::onUpdate()
 	case CViewInit::InitScene:
 	{
 		initScene();
-
 		if (SCNEdit::getSCN()) {
 			m_initState = CViewInit::BuildScnComponents;
 			m_textInfo->setText("Building SCN Mesh...");
@@ -362,14 +365,28 @@ void CViewInit::onUpdate()
 		buildScnComponents();
 		m_initState = CViewInit::Finished;
 		m_textInfo->setText("Completed Build... Updating Viewport");
-
+		Sleep(1500);
 	}
 	break;
 
 	case CViewInit::Error:
 	{
-		os::Printer::log("Error...",irr::ELL_ERROR);
-		// todo nothing with black screen
+		
+		os::Printer::log(m_arguments->getErrorText(), irr::ELL_ERROR);
+		
+		system("pause");
+		CInteractionManager::releaseInstance();
+		CImguiManager::releaseInstance();
+		CViewManager::getInstance()->getLayer(1)->destroyAllView();
+		CViewManager::getInstance()->getLayer(0)->destroyAllView();
+		CViewManager::getInstance()->releaseAllLayer();
+		CViewManager::releaseInstance();
+		if (UI::CUIEventManager::getInstance()) {
+			UI::CUIEventManager::releaseInstance();
+		}
+		
+		delete m_arguments;
+		exit(1337);
 	}
 	break;
 	default:
@@ -379,11 +396,9 @@ void CViewInit::onUpdate()
 			scene->update();
 			scene->getEntityManager()->update();
 			if(SCNEdit::getSCN())context->getCollisionManager()->build();
-	
-		
 		}
+
 		os::Printer::log(format("Loaded everything in: {:3f} seconds", (os::Timer::getRealTime() - m_start) / 1000.0).c_str());
-	
 		CViewManager::getInstance()->getLayer(0)->changeView<CViewInteraction>(m_arguments);
 		CViewManager::getInstance()->getLayer(1)->pushView<CViewGui>(m_arguments);
 	}

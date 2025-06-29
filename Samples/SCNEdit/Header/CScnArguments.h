@@ -7,7 +7,7 @@
 class CScnArguments {
 	public:
 		
-		CScnArguments(const std::vector<std::string>& argv) {
+		inline CScnArguments(const std::vector<std::string>& argv) {
 			m_Deskres.Width = GetSystemMetrics(SM_CXSCREEN);
 			m_Deskres.Height = GetSystemMetrics(SM_CYSCREEN);
 			//Assigns BaseDirectory
@@ -55,6 +55,7 @@ class CScnArguments {
 					bCellBVH = true;
 					bLoadExtra = true;
 					bLoadLightmaps = true;
+					m_Alpha = 125;
 				}
 				else if (argv[i] == "-map") {
 
@@ -73,10 +74,8 @@ class CScnArguments {
 						if (m_Viewdist <= 0)m_Viewdist = 20;
 					}
 					else {
-						printf("View distance isnt a number\n");
-						system("pause");
-						exit(1337);
-
+						getApplication()->showDebugConsole();
+						errorMessage += "View distance isnt a number";
 					}
 				}
 				else if (argv[i] == "-forcealpha" ||
@@ -106,7 +105,9 @@ class CScnArguments {
 				else if(argv[i] == "-decals") {
 					bDecal = true;
 				}
-
+				else if (argv[i] == "-flip") {
+					bFlipUV = true;
+				}
 				else if (argv[i] == "-l" ||
 					argv[i] == "-lightmap") {
 					bLoadLightmaps = true;
@@ -121,8 +122,9 @@ class CScnArguments {
 					bBorderless = true;
 				}
 				else {
-					printf("Unknown option %s. \nAvailable options are:\n\n", argv[i].c_str());
-					printf("   -res <width> <height>            Set screen resolution.\n"
+					getApplication()->showDebugConsole();
+					errorMessage += (std::format("\nUnknown option {}. \nAvailable options are:\n", argv[i].c_str()).c_str());
+					errorMessage += ("   -res <width> <height>            Set screen resolution.\n"
 						"   -f, -fullscreen                  Run in full screen mode.\n"
 						"   -borderless                      Run in borderless mode.(Windows only)\n"
 						"   -resize                          Allow the window to be resizeable\n"
@@ -131,53 +133,53 @@ class CScnArguments {
 						"   -im, -invertmouse                Inverts mouse. Because, you know, we are people too!\n\n"
 						"   -map <mapname>                   Load <mapname> on start.\n"
 						"   -dx, -directx                    Force Direct3d9 mode. Default is OpenGL.\n"
-						"   -vd,-viewdistance <dist>         Set view distance. Default is 20"
-						"   -fov <fov>                       Set camera fov. Default is 60"
+						"   -vd,-viewdistance <dist>         Set view distance. Default is 20\n"
+						"   -fov <fov>                       Set camera fov. Default is 60\n"
 						"   -fa, -forcealpha                 Forces showing transparent materials.\n"
 						"   -p, -portal                      Displays portals\n"
 						"   -e, -entity                      Displays entites\n"
-						"   -decals                      Visually display a rough idea of what decals will look like(WIP)\n"
-						"   -all							 Will load every component with lightmaps(same as -l -es -e -p -bb)\n"
+						"   -flip							 Flip the texture UV's (WIP)\n"
+						"   -decals							 Visually display a rough idea of what decals will look like(WIP)\n"
+						"   -all							 Will load every component with lightmaps(same as -l -es -e -p -bb -fa)\n"
 						"   -es, -extrasolids                Load extra solids(ex: doors) instead of just the base geometry\n"
-						"   -mv, -movevertex                 Allows vertices to be moveable after surface selection\n"
 						"   -bb, -boundingbox                Displays a gray box around all of the cell collison bounding boxes\n"
 						"   -l, -lightmap                    Visually shows lightmaps(Warning: slower loading times)\n"
-						"\n");
-					system("pause");
-					exit(1337);
+						);
 				}
 			}
 		}
 
-		~CScnArguments() {};
+		inline ~CScnArguments() {};
 
-		E_DRIVER_TYPE getDriverType() { return m_DrivType;  }
-		core::dimension2du getRes() { return m_Res; }
-		core::dimension2du getDesktopRes() { return m_Deskres; }
-		core::dimension2du getCurrentRes() { return bFullscreen ? m_Deskres : m_Res; }
-		f32 getViewDist() { return m_Viewdist; }
-		f32 getFov() { return m_Fov; }
-		io::path  getSCNPath() { return m_SCNFile; }
-		void setSCNPath(io::path path) { m_SCNFile = path; }
-		u16  getAlpha() { return m_Alpha; }
-		wchar_t* getBaseDirectory() { return m_BaseDirectory; } //Not sure if even needed
-		bool isDefault() { return bResDefault; }
-		bool isMouseInvert() { return bInvertMouse; }
-		bool isDecalEnabled() { return bDecal; }
-		bool isPortalEnabled() { return bPortal; }
-		bool isBBEnabled() { return bCellBVH; }
-		bool isEntityEnabled() { return bEntity; }
-		bool isExtrasEnabled() { return bLoadExtra; }
-		bool isLightmapEnable() { return bLoadLightmaps; }
-		bool isDebugEnabled() { return bDebug; }
-		bool isInternalDebug() { return bLoadInbuiltDebugger; }
-		bool isVertMoveable() { return bMoveVertex; }
-		bool isBorderless() { return bBorderless; }
-		bool isResizeable() { return bResizeable; }
-		bool isFullscreen() { return bFullscreen; }
-		bool getScnLoaded() { return bLoaded; }
-		void setScnLoaded(bool state) { bLoaded = state; }
-
+		inline E_DRIVER_TYPE getDriverType() { return m_DrivType;  }
+		inline core::dimension2du getRes() { return m_Res; }
+		inline core::dimension2du getDesktopRes() { return m_Deskres; }
+		inline core::dimension2du getCurrentRes() { return bFullscreen ? m_Deskres : m_Res; }
+		inline f32 getViewDist() { return m_Viewdist; }
+		inline f32 getFov() { return m_Fov; }
+		inline io::path  getSCNPath() { return m_SCNFile; }
+		inline void setSCNPath(io::path path) { m_SCNFile = path; }
+		inline u16  getAlpha() { return m_Alpha; }
+		inline wchar_t* getBaseDirectory() { return m_BaseDirectory; } //Not sure if even needed
+		inline bool isDefault() { return bResDefault; }
+		inline bool isMouseInvert() { return bInvertMouse; }
+		inline bool isDecalEnabled() { return bDecal; }
+		inline bool isPortalEnabled() { return bPortal; }
+		inline bool isBBEnabled() { return bCellBVH; }
+		inline bool isEntityEnabled() { return bEntity; }
+		inline bool isFlippedUV() { return bFlipUV; }
+		inline bool isExtrasEnabled() { return bLoadExtra; }
+		inline bool isLightmapEnable() { return bLoadLightmaps; }
+		inline bool isDebugEnabled() { return bDebug; }
+		inline bool isInternalDebug() { return bLoadInbuiltDebugger; }
+		inline bool isVertMoveable() { return bMoveVertex; }
+		inline bool isBorderless() { return bBorderless; }
+		inline bool isResizeable() { return bResizeable; }
+		inline bool isFullscreen() { return bFullscreen; }
+		inline bool getScnLoaded() { return bLoaded; }
+		inline void setScnLoaded(bool state) { bLoaded = state; }
+		inline bool hasError() { return !errorMessage.empty(); }
+		inline const char* getErrorText() { return errorMessage.c_str(); }
 	private:
 		bool bResDefault = true;
 		bool bInvertMouse = false;
@@ -192,8 +194,10 @@ class CScnArguments {
 		bool bMoveVertex = false;
 		bool bBorderless = false;
 		bool bFullscreen = false;
+		bool bFlipUV = false;
 		bool bResizeable = false;
 		bool bDecal = false;
+		std::string errorMessage = "";
 		E_DRIVER_TYPE m_DrivType = EDT_OPENGL;
 		core::dimension2du m_Res = core::dimension2du(800,600);
 		core::dimension2du m_Deskres = m_Res;

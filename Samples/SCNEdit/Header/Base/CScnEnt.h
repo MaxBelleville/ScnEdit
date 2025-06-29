@@ -9,7 +9,7 @@ public:
 	core::array<u32> keylengths;
 	core::array<u32> vallengths;
 	core::array<int64_t> entsad;
-	int indx;
+	int indx = 0;
 
 	struct field
 	{
@@ -19,26 +19,27 @@ public:
 
 	field * fields = nullptr;
 
-	const char * getField(const char * key)
+	inline const char * getField(const char * key)
 	{
-		for (field * fi = fields; fi!=&fields[n_fields]; fi++)
-			if (str_equiv(fi->key,key))
-				return fi->value;
+		for (int i = 0; i < n_fields; i++) {
+			if (str_equiv(fields[i].key, key))
+				return fields[i].value;
+		}
 
-		return NULL;
+		return nullptr;
 	}
 
-	const char* getValue(const char* value)
+	inline const char* getValue(const char* value)
 	{
 		for (field* fi = fields; fi != &fields[n_fields]; fi++)
 			if (str_equiv(fi->value, value))
 				return fi->key;
 
-		return NULL;
+		return nullptr;
 	}
 
 
-	void setField(const char* key, const char* val)
+	inline void setField(const char* key, const char* val)
 	{
 		for (field* fi = fields; fi != &fields[n_fields]; fi++)
 			if (str_equiv(fi->key, key))
@@ -46,13 +47,21 @@ public:
 	}
 
 
-	CScnEnt() : srefidx(0), n_fields(0)
-	{}
-
-   ~CScnEnt()
+	inline CScnEnt() : srefidx(0), n_fields(0)
 	{
-		if (fields)
-			delete [] fields;
+		keylengths.clear();
+		vallengths.clear();
+		entsad.clear();
+		if (fields) delete[] fields;
+		fields = nullptr;
+	}
+
+	inline ~CScnEnt()
+	{
+	   if (fields) {
+		   delete[] fields;
+		   fields = nullptr;
+	   }
 	}
 };
 

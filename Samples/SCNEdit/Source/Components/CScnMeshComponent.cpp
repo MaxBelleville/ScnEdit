@@ -87,15 +87,20 @@ void CScnMeshComponent::updateComponent()
 	if(scnMesh)scnMesh->setVisible(true);
 }
 
-void CScnMeshComponent::hide() {
+void CScnMeshComponent::hide(bool shared) {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
 	if (scnMesh) {
 		for (int i = 0; i < selsurfs.size(); i++) {
 			scnMesh->hide(selsurfs[i]);
 		}
+		if(shared)
+		for (int i = 0; i < sharedsurfs.size(); i++) {
+			scnMesh->hide(sharedsurfs[i]);
+		}
 		scnMesh->deselectAll();
 		selsurfs.clear();
+		sharedsurfs.clear();
 	}
 }
 
@@ -106,6 +111,7 @@ void CScnMeshComponent::show() {
 		scnMesh->show();
 		scnMesh->deselectAll();
 		selsurfs.clear();
+		sharedsurfs.clear();
 	}
 }
 void CScnMeshComponent::setTexture(CScn* scn, const char* path) {
@@ -136,7 +142,12 @@ indexedVec3df_t CScnMeshComponent::updateVert(CScn* scn, indexedVec3df_t vert, c
 	CEntity* entity = m_gameObject->getEntity();
 	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
 	if (scnMesh) {
-	   return scnMesh->updateVert(scn, vert, add);
+		indexedVec3df_t pos = scnMesh->updateVert(scn, vert, add);
+		for (int i = 0; i < vert.sharesWith.size(); i++) {
+			indexedVec3df_t sharedVert= scnMesh->getVertexFromPos(scn, vert.sharesWith[i], vert.vertindx);
+			scnMesh->updateVert(scn, sharedVert, core::vector3df(0,0,0));
+		}
+		return pos;
 	}
 }
 
@@ -145,5 +156,19 @@ indexedVec3df_t CScnMeshComponent::resetVert(CScn* scn, indexedVec3df_t vert) {
 	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
 	if (scnMesh) {
 		return scnMesh->resetVert(scn, vert);
+	}
+}
+void CScnMeshComponent::updateUV(CScn* scn, int resize, core::vector2df shift) {
+	CEntity* entity = m_gameObject->getEntity();
+	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
+	if (scnMesh) {
+		scnMesh->updateUV(scn, selsurfs, sharedsurfs, resize,shift);
+	}
+}
+void CScnMeshComponent::resetUV(CScn* scn) {
+	CEntity* entity = m_gameObject->getEntity();
+	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
+	if (scnMesh) {
+		scnMesh->resetUV(scn, selsurfs,sharedsurfs);
 	}
 }

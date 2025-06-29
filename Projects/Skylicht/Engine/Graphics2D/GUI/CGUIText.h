@@ -215,6 +215,9 @@ namespace Skylicht
 		{
 			m_showCaret = b;
 		}
+		inline bool hasCaret() {
+			return m_showCaret;
+		}
 
 		inline void setCaret(int line, int character)
 		{

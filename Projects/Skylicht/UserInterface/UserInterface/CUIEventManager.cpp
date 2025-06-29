@@ -115,7 +115,12 @@ namespace Skylicht
 				if (m_focus)
 				{
 					m_focus->onKeyEvent(event);
-					return m_focus->isContinueGameEvent();
+					if (m_focus) {
+						return m_focus->isContinueGameEvent();
+					}
+					else {
+						return true;
+					}
 				}
 			}
 
@@ -153,7 +158,7 @@ namespace Skylicht
 		{
 			if (m_focus == focus)
 				return;
-
+		
 			if (m_focus && m_focus != focus)
 			{
 				m_focus->onLostFocus();

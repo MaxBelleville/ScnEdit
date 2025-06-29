@@ -130,7 +130,7 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 				}
 				material->setBackfaceCulling(true);
 				material->setUniform("uSelected", 0.0f);
-				material->setUniform4("uSelectedColor", SColor(0, 0, 0, 0));
+				material->setUniform4("uSelectedColor", SColor(255, 0, 0, 0));
 				material->updateShaderParams();
 
 			}
@@ -225,7 +225,6 @@ core::array<int> CScnMeshData::getSharedSurface(CScn* scn, core::array<int>sindi
 	}
 	return final;
 }
-
 
 core::array<vertProp_t> CScnMeshData::getSurfVertProps(CScn* scn, int si) {
 	CScnSolid* solid = scn->getSolid(solidindx);
@@ -328,6 +327,20 @@ core::array<int> CScnMeshData::getSharedSurface(CScn* scn, int si) {
 	return shared;
 }
 
+indexedVec3df_t CScnMeshData::getVertexFromPos(CScn* scn, u32 si, u32 vertidxidx) {
+	CScnSolid* solid = scn->getSolid(solidindx);
+	scnSurf_t* surfi = &solid->surfs[si];
+	for (u32 j = 0; j < surfi->vertidxlen; j++)
+	{
+		u32 sharedvertidx =surfi->vertidxstart + j;
+		core::vector3df vert = solid->verts[solid->vertidxs[sharedvertidx]];
+		if (solid->vertidxs[sharedvertidx] == solid->vertidxs[vertidxidx]) {
+			return { vert,sharedvertidx,solidindx,si,j };
+		}
+	}
+	return {};
+}
+
 indexed_vertices CScnMeshData::getVertices(CScn* scn,core::array<int> selsurf, core::array<int> sharedsurf){
 	CScnSolid* solid = scn->getSolid(solidindx);
 
@@ -342,7 +355,7 @@ indexed_vertices CScnMeshData::getVertices(CScn* scn,core::array<int> selsurf, c
 			
 			vertProp_t vp = vprops[v];
 			core::vector3df vert = solid->verts[solid->vertidxs[vp.vertidxidx]];
-			indexedVec3df_t indexedVert ={ vert,vp.vertidxidx,solidindx,r,vp.surf_vertidx };
+			indexedVec3df_t indexedVert ={ vert,vp.vertidxidx,solidindx,r,vp.surf_vertidx,vp.bShared, vp.sharesWith };
 			
 
 			for (u32 s = 0; s < vp.sharesWith.size(); s++) {
@@ -368,25 +381,43 @@ indexed_vertices CScnMeshData::getVertices(CScn* scn,core::array<int> selsurf, c
 	}
 	return make_pair(selverts, sharedverts);
 }
+
+
+core::array<u32> CScnMeshData::getSurfUVIdxs(CScn* scn, core::array<int> selsurfs) {
+	CScnSolid* solid = scn->getSolid(solidindx);
+	core::array<u32> all;
+
+	for (int i = 0; i < selsurfs.size(); i++) {
+		int si = selsurfs[i];
+		scnSurf_t* surfi = &solid->surfs[si];
+		for (u32 v = 0; v < surfi->vertidxlen; v++) {
+			u32 uvi = solid->uvidxs[surfi->vertidxstart + v];
+			if (all.binary_search(uvi) == -1) //if not already there, add
+				all.push_back(uvi);
+		}
+	}
+	return all;
+}
 void CScnMeshData::select(int si, bool bShared) {
 	RenderMesh->Materials[si]->setUniform("uSelected", 1.0f);
-	if(bShared)RenderMesh->Materials[si]->setUniform4("uSelectedColor", SColor(150,100,100,255));
-	else RenderMesh->Materials[si]->setUniform4("uSelectedColor", SColor(150, 255, 100, 100));
+	if(bShared)RenderMesh->Materials[si]->setUniform4("uSelectedColor", SColor(50,100,100,255));
+	else RenderMesh->Materials[si]->setUniform4("uSelectedColor", SColor(50, 255, 100, 100));
 	RenderMesh->Materials[si]->updateShaderParams();
 }
 void CScnMeshData::deselect(int si) {
 	RenderMesh->Materials[si]->setUniform("uSelected", 0.0f);
-	RenderMesh->Materials[si]->setUniform4("uSelectedColor", SColor(0, 0, 0, 0));
+	RenderMesh->Materials[si]->setUniform4("uSelectedColor", SColor(255, 0, 0, 0));
 	RenderMesh->Materials[si]->updateShaderParams();
 }
 void CScnMeshData::deselectAll() {
 	for (int i = 0; i < RenderMesh->getMeshBufferCount(); i++) {
 		RenderMesh->Materials[i]->setUniform("uSelected", 0.0f);
-		RenderMesh->Materials[i]->setUniform4("uSelectedColor", SColor(0, 0, 0, 0));
+		RenderMesh->Materials[i]->setUniform4("uSelectedColor", SColor(255, 0, 0, 0));
 		RenderMesh->Materials[i]->updateShaderParams();
 	}
 }
 void CScnMeshData::hide(int si) {
+	RenderMesh->getMeshBuffer(si)->setHardwareMappingHint(EHM_NEVER);
 	RenderMesh->getMeshBuffer(si)->getVertexBuffer()->set_used(0);
 	RenderMesh->getMeshBuffer(si)->getIndexBuffer()->set_used(0);
 	hiddensurfs.push_back(si);
@@ -402,6 +433,7 @@ void CScnMeshData::show() {
 		for (int j = 0; j < vis_backup[si].indices.size(); j++) {
 			RenderMesh->getMeshBuffer(si)->getIndexBuffer()->setIndex(j, vis_backup[si].indices[j]);
 		}
+		//RenderMesh->getMeshBuffer(si)->setHardwareMappingHint(EHM_STATIC);
 	}
 }
 void CScnMeshData::setTexture(CScn* scn, const char* path, int si) {
@@ -415,7 +447,48 @@ void CScnMeshData::setTexture(CScn* scn, const char* path, int si) {
 	ITexture* texture = convert_image(path);
 	RenderMesh->Materials[si]->setTexture(0, texture);
 }
+
+void CScnMeshData::updatePlane(CScn* scn, int si) {
+	CScnSolid* solid = scn->getSolid(solidindx);
+	IVertexBuffer* vb = RenderMesh->getMeshBuffer(si)->getVertexBuffer();
+	video::S3DVertex2TCoords* vertices = static_cast<video::S3DVertex2TCoords*>(vb->getVertices());
+	IIndexBuffer* ib = RenderMesh->getMeshBuffer(si)->getIndexBuffer();
+	u16* indices = static_cast<u16*>(ib->getIndices());
+	u32 weights = 0;
+	core::vector3df sum = core::vector3df(0, 0, 0);
+	core::vector3df  sumMidpoint = core::vector3df(0, 0, 0);
+	for (u32 i = 0; i < ib->getIndexCount(); i += 3) {
+		core::vector3df vecP1 = vertices[indices[i]].Pos;
+		core::vector3df vecP2 = vertices[indices[i + 1]].Pos;
+		core::vector3df vecP3 = vertices[indices[i + 2]].Pos;
+
+
+		core::vector3df midpoint = (vecP1 + vecP2 + vecP3) / 3;
+
+		core::vector3df vecA = vecP2 - vecP1;
+		core::vector3df vecB = vecP3 - vecP1;
+		core::vector3df dir = vecA.crossProduct(vecB);
+		f32 area = (0.5 * dir.getLength());
+
+		core::vector3df normal = dir.normalize();
+		sum += normal * area;
+		sumMidpoint += midpoint * area;
+		weights += area;
+
+		core::vector3df avg = sum / weights;
+		core::vector3df avgMidpoint = sumMidpoint / weights;
+		f32 d = -((avg.X * avgMidpoint.X) + (avg.Y * avgMidpoint.Y) + (avg.Z * avgMidpoint.Z));
+		scnSurf_t* surfi = &solid->surfs[si];
+		scnPlane_t* planei = &(solid->planes[surfi->planeidx]);
+		planei->a = avg.X;
+		planei->b = avg.Y;
+		planei->c = avg.Z;
+		planei->d = d;
+	}
+}
+
 indexedVec3df_t CScnMeshData::updateVert(CScn* scn, indexedVec3df_t vert, core::vector3df add) {
+	//Update indexed verts, solid verts, and mesh verts.
 	CScnSolid* solid = scn->getSolid(solidindx);
 	vert.pos += add;
 	int si = vert.surfindx;
@@ -426,11 +499,124 @@ indexedVec3df_t CScnMeshData::updateVert(CScn* scn, indexedVec3df_t vert, core::
 	RenderMesh->getMeshBuffer(si)->setHardwareMappingHint(EHM_NEVER);
 	vertices[vert.surf_vertindx].Pos = vert.pos;
 	vis_backup[si].vertices[vert.surf_vertindx] = vertices[vert.surf_vertindx];
+	updatePlane(scn, si);
 	return vert;
 }
 indexedVec3df_t CScnMeshData::resetVert(CScn* scn, indexedVec3df_t vert) {
 	int si = vert.surfindx;
 	video::S3DVertex2TCoords vertex = vert_backup[si].vertices[vert.surf_vertindx];
+	if (vert.pos == vertex.Pos) return vert;
 	vert.pos = vertex.Pos;
-	return updateVert(scn, vert, core::vector3df(0, 0, 0));
+	indexedVec3df_t newvert= updateVert(scn, vert, core::vector3df(0, 0, 0));
+	updatePlane(scn, si);
+	return newvert;
+}
+void CScnMeshData::updateMeshUV(CScn* scn, core::array < int > surf) {
+	CScnSolid* solid = scn->getSolid(solidindx);
+	CScnLightmap* lmap = scn->getLightmap();
+
+	for (u32 i = 0; i < surf.size(); i++) {
+		int si = surf[i];
+		f32* mults = lmap->getMults(solidindx, si);
+
+		scnSurf_t* surfi = &solid->surfs[si];
+		IVertexBuffer* vb = RenderMesh->getMeshBuffer(si)->getVertexBuffer();
+		video::S3DVertex2TCoords* vertices = static_cast<video::S3DVertex2TCoords*>(vb->getVertices());
+		RenderMesh->getMeshBuffer(si)->setHardwareMappingHint(EHM_NEVER);
+		for (u32 v = 0; v < surfi->vertidxlen; v++) {
+			core::vector2df uvs = solid->uvpos[solid->uvidxs[surfi->vertidxstart + v]];
+			vertices[v].TCoords = uvs;
+			video::S3DVertex2TCoords back = vert_backup[si].vertices[v];
+			vertices[v].TCoords2 = back.TCoords;
+			//do some sort of manipulation to the verts.
+			if (mults) {
+				vertices[v].TCoords2.X = vertices[v].TCoords2.X * mults[0] + mults[2];
+				vertices[v].TCoords2.Y = vertices[v].TCoords2.Y * mults[1] + mults[3];
+			}
+			
+		}
+	}
+}
+void CScnMeshData::updateUV(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf,
+	int uvmode, core::vector2df uvShift) {
+	CScnSolid* solid = scn->getSolid(solidindx);
+	core::array<u32> uvidxs = getSurfUVIdxs(scn, selsurf);
+	CScnLightmap* lmap = scn->getLightmap();
+
+
+	float minX = FLT_MAX;
+	float minY = FLT_MAX;
+	float maxX = -FLT_MAX;
+	float maxY = -FLT_MAX;
+	for (int i = 0; i < uvidxs.size(); i++) {
+		u32 uvi = uvidxs[i];
+		minX = min(minX, solid->uvpos[uvi].X);
+		minY = min(minY, solid->uvpos[uvi].Y);
+		maxX = max(maxX, solid->uvpos[uvi].X);
+		maxY = max(maxY, solid->uvpos[uvi].Y);
+	}
+	float avgX = (minX + maxX) / 2.0f;
+	float avgY = (minY + maxY) / 2.0f;
+	
+	//Change uvs for solid
+	for (int i = 0; i < uvidxs.size(); i++) {
+		u32 uvi = uvidxs[i];
+		if (uvmode == 0) {
+			solid->uvpos[uvi] += uvShift;
+		}
+		else if (uvmode == 1) {
+			solid->uvpos[uvi].X *= (1.0f - uvShift.X);
+			solid->uvpos[uvi].Y *= (1.0f - uvShift.Y);
+		}
+		else if (uvmode == 2) {
+			solid->uvpos[uvi].X = (minX + maxX) - solid->uvpos[uvi].X;
+		}
+		else solid->uvpos[uvi].Y = (maxY + minY) - solid->uvpos[uvi].Y;
+	}
+	//Change uvs for lightmap
+	for (u32 i = 0; i < selsurf.size(); i++) {
+		int si = selsurf[i];
+		f32* mults = lmap->getMults(solidindx, si);
+
+		scnSurf_t* surfi = &solid->surfs[si];
+		if (uvmode == 0) {
+			//Fully guess work lol.
+			mults[2] += uvShift.X * mults[0];
+			mults[3] += uvShift.Y * mults[1];
+		}
+		else if (uvmode == 1) {
+			mults[0] -=  uvShift.X/4.0f;
+			mults[1] -=  uvShift.Y/4.0f;
+		}
+		else if (uvmode == 2) {
+			float lightmapRatioX = surfi->width / surfi->lmsize_h;
+			mults[0] = -mults[0]; //ugh linear algbra.
+			mults[2] = 2 * avgX * (-mults[0]) + mults[2];
+		}
+			
+		else {
+			mults[1] = -mults[1];
+			mults[3] = 2 * avgY * (-mults[1]) + mults[3];
+		}
+		
+	}
+
+	updateMeshUV(scn, selsurf);
+	updateMeshUV(scn, sharedsurf);
+}
+void CScnMeshData::resetUV(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf) {
+	CScnSolid* solid = scn->getSolid(solidindx);
+	for (int i = 0; i < selsurf.size(); i++) {
+		int si = selsurf[i];
+		
+		scnSurf_t* surfi = &solid->surfs[si];
+		for (u32 v = 0; v < surfi->vertidxlen; v++) {
+			video::S3DVertex2TCoords vertex = vert_backup[si].vertices[v];
+			u32 uvi = solid->uvidxs[surfi->vertidxstart + v];
+			if (solid->uvpos[uvi] == vertex.TCoords) return;
+			solid->uvpos[uvi] = vertex.TCoords;
+		}
+	}
+	updateMeshUV(scn, selsurf);
+	updateMeshUV(scn, sharedsurf);
 }

@@ -197,6 +197,8 @@ struct indexedVec3df_t
 	u32 solidindx = 0;
 	u32 surfindx = 0;
 	u32 surf_vertindx = 0;
+	bool bShared;
+	core::array<u32> sharesWith;
 };
 
 //Simplify the 3d array type call so I don't nee to refer to it as vector<vectory<vector<u8>>>
@@ -207,19 +209,18 @@ typedef std::vector<std::vector<u8>> u8_2DArr;
 typedef std::pair<u16, u16> u16_pair;
 
 enum KeyAugment {
-	CtrlShift,
+	AnyKey=-1,
+	None,
 	Shift,
+	CtrlShift,
 	Ctrl,
-	None
+	
 };
 struct pair_hash {
 	template <class T1, class T2>
 	std::size_t operator () (const std::pair<T1, T2>& p) const {
 		auto h1 = std::hash<T1>{}(p.first);
 		auto h2 = std::hash<T2>{}(p.second);
-
-		// Mainly for demonstration purposes, i.e. works but is overly simple
-		// In the real world, use sth. like boost.hash_combine
 		return h1 ^ h2;
 	}
 };

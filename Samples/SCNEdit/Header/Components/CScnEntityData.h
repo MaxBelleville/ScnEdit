@@ -23,7 +23,7 @@ public:
 
 	void deselect();
 
-	int getEntityIndx() {
+	inline int getEntityIndx() {
 		return m_indx;
 	}
 

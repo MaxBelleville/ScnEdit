@@ -223,14 +223,21 @@ namespace Skylicht
 			m_timeStep = 1.0f;
 
 		const float maxTimeStep = 1000.0f / 15.0f;
+		const float timeTilWarning = 500.0f; //Bascially if the low fps lasts for more then 1 second warn.
 		if (m_timeStep > maxTimeStep)
 		{
-			char logString[512];
-			std::sprintf(logString, "Warning: Low FPS: %f tpf, %f fps", m_timeStep, 1000.0f / m_timeStep);
-			os::Printer::log(logString, irr::ELL_WARNING);
+			float stableFpsStep = (f32)(now - m_lastStableFps);
+			if (stableFpsStep > timeTilWarning) {
+				char logString[512];
+				std::sprintf(logString, "Warning: Low FPS for %.2f frames: %.3f fps,  %.3f tpf", 1+1000.0/stableFpsStep, 1000.0f / m_timeStep, m_timeStep);
+				//os::Printer::log(logString, irr::ELL_WARNING);
+			}
 			m_timeStep = maxTimeStep;
 		}
-
+		else {
+			m_lastStableFps = m_lastUpdateTime;
+		}
+		
 		m_lastUpdateTime = now;
 
 		// update skylicht timestep

@@ -161,11 +161,10 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/Basic/DirectColor.xml");
 		loadShader("BuiltIn/Shader/Basic/VertexColorAlpha.xml");
 		loadShader("BuiltIn/Shader/Basic/VertexColorAdditive.xml");
-		loadShader("BuiltIn/Shader/Basic/TextureColor.xml");
-		loadShader("BuiltIn/Shader/Basic/TextureColorAlpha.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColorAlphaBGR.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColorAlphaBW.xml");
-
+		loadShader("BuiltIn/Shader/Basic/TextureColor.xml");
+		loadShader("BuiltIn/Shader/Basic/TextureColorAlpha.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColorAdditive.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureColor2LayerAdditive.xml");
 
@@ -273,8 +272,8 @@ namespace Skylicht
 			return NULL;
 		}
 
-		sprintf(log, "Load shader: %s", shaderConfig);
-		os::Printer::log(log);
+		//sprintf(log, "Load shader: %s", shaderConfig);
+		//os::Printer::log(log);
 
 		std::string shaderFolder = CPath::getFolderPath(std::string(shaderConfig));
 		shaderFolder += "/";
@@ -329,11 +328,17 @@ namespace Skylicht
 			if (m_listShaderID.find(shaderName) != m_listShaderID.end())
 			{
 				char log[512];
-				sprintf(log, "!!! Warning: Name '%s' is loaded <-- SKIP", shaderName.c_str());
-				os::Printer::log(log);
+				/*sprintf(log, "!!! Warning: Name '%s' is loaded <-- SKIP", shaderName.c_str());
+				os::Printer::log(log);*/
 
 				return false;
 			}
+			else {
+				char log[512];
+				sprintf(log, "Load shader: %s", shaderName.c_str());
+				os::Printer::log(log);
+			}
+			
 		}
 
 		// build shader

@@ -36,6 +36,7 @@ namespace Skylicht
 	{
 	public:
 		unsigned long m_lastUpdateTime;
+		unsigned long m_lastStableFps;
 		int m_fps;
 
 		unsigned long m_pauseTime;

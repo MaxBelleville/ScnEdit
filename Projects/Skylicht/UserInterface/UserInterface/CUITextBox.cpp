@@ -35,8 +35,11 @@ namespace Skylicht
 			CUIBase(container, element),
 			m_background(NULL),
 			m_text(NULL),
-			m_editable(true),
-			m_maxLength(64)
+			m_completed(false),
+			m_removeable(true),
+			m_addable(true),
+			m_maxLength(64),
+			m_minLength(0)
 		{
 			CCanvas* canvas = getCanvas();
 			if (canvas)
@@ -118,6 +121,7 @@ namespace Skylicht
 				m_text->setCaret(l, c);
 
 				CUIEventManager* eventMgr = CUIEventManager::getInstance();
+				m_completed = false;
 				eventMgr->setFocus(this);
 				eventMgr->setCapture(this);
 			}
@@ -127,8 +131,9 @@ namespace Skylicht
 		{
 			CUIBase::onPointerUp(pointerX, pointerY);
 
-			if (m_text)
+			if (m_text) {
 				CUIEventManager::getInstance()->setCapture(NULL);
+			}
 		}
 
 		void CUITextBox::onPointerMove(float pointerX, float pointerY)
@@ -137,22 +142,35 @@ namespace Skylicht
 			if (m_isPointerDown && m_text)
 			{
 				int l, c;
+				m_completed = false;
 				m_text->getClosestCharacter(pointerX, pointerY, l, c);
 				m_text->setCaret(l, c);
+				
 			}
 		}
 
 		void CUITextBox::onLostFocus()
 		{
 			m_text->showCaret(false);
+			m_completed = true;
+			if (OnTextSet != nullptr)
+				OnTextSet(this);
+
 		}
 
 		void CUITextBox::onKeyEvent(const SEvent& event)
 		{
 			CUIBase::onKeyEvent(event);
-
-			if (!m_text)
+			if (!m_text) {
+				m_completed = false;
 				return;
+			}
+			CUIEventManager* eventMgr = CUIEventManager::getInstance();
+			
+			if (!m_text->hasCaret()) {
+				//m_completed = false;
+				return;
+			}
 
 			if (event.KeyInput.PressedDown)
 			{
@@ -281,20 +299,35 @@ namespace Skylicht
 					*/
 				}
 				break;
+				case irr::KEY_RETURN:
+				if (m_addable)
+				{
+					updateCaret = false;
+					onChar = false;
+	
+					CUIEventManager::getInstance()->setCapture(NULL);
+					CUIEventManager::getInstance()->setFocus(NULL);
+					m_completed = true;
+					if (OnTextSet != nullptr)
+						OnTextSet(this);
+					
+				}
+				break;
 				case irr::KEY_BACK:
-					if (m_editable)
+					if (m_removeable && pos > m_minLength)
 					{
 						m_text->doBackspace();
 
 						updateCaret = false;
 						onChar = false;
-
+						
 						if (OnTextChanged != nullptr)
 							OnTextChanged(this);
+						m_completed = false;
 					}
 					break;
 				case irr::KEY_DELETE:
-					if (m_editable)
+					if (m_removeable && pos > m_minLength)
 					{
 						m_text->doDelete();
 
@@ -303,9 +336,11 @@ namespace Skylicht
 
 						if (OnTextChanged != nullptr)
 							OnTextChanged(this);
+						m_completed = false;
 					}
 					break;
 				default:
+					m_completed = false;
 					updateCaret = false;
 					break;
 				}
@@ -314,19 +349,37 @@ namespace Skylicht
 				{
 					// update new caret position
 					m_text->setCaret(line, pos);
-
 					if (event.KeyInput.Shift)
 					{
 						// update select caret
 					}
-
+					m_completed = false;
 					// auto scroll to caret position
 					// scrollToLine(line, pos);
 				}
 				else if (onChar && event.KeyInput.Char > 0)
 				{
-					if (m_text->getTextLength() < m_maxLength)
-						m_text->insert(event.KeyInput.Char);
+					
+					if (m_text->getTextLength() < m_maxLength && m_addable)
+						//limit characters here.
+						if (m_acceptedKeys.size() == 0) {
+							m_text->insert(event.KeyInput.Char);
+							m_completed = false;
+						}
+						else {
+							bool foundKey = m_acceptedKeys.linear_search(std::make_pair(event.KeyInput.Key, -1)) > -1;
+							if (!foundKey && event.KeyInput.Shift) {
+								foundKey= m_acceptedKeys.linear_search(std::make_pair(event.KeyInput.Key, 1)) > -1;
+							}
+							if (!foundKey && !event.KeyInput.Shift) {
+								foundKey = m_acceptedKeys.linear_search(std::make_pair(event.KeyInput.Key, 0)) > -1;
+							}
+							if (foundKey) {
+								m_text->insert(event.KeyInput.Char);
+								m_completed = false;
+							}
+						}
+						
 				}
 			}
 		}

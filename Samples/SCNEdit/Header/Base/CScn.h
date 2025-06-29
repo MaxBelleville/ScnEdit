@@ -28,12 +28,12 @@ public:
 	scnHeader_t * header;
 	CScnSolid * solids;
 
-	u32 getVersion() const {
+	inline u32 getVersion() const {
 		return header->version;}
 
 	inline static vector<CScnEnt*> cells;
 	inline static vector<CScnEnt*> ambients;
-	CScnEnt* swt_start;
+	inline static CScnEnt* swt_start;
 
 	//get cell by index as defined by cell_index field
 	static CScnEnt * getCell(u32 cell_index);
@@ -44,18 +44,18 @@ public:
 	CScn (std::ifstream *);
 	~CScn ();
 
-	CScnSolid* getAllSolids() const
+	inline CScnSolid* getAllSolids() const
 	{
 		return solids;
 	}
 
-	CScnEnt* getAllEnts()
+	inline CScnEnt* getAllEnts()
 	{
 		return ents;
 	}
 
 	//returns pointer to CScnSolid from index or NULL if none
-	CScnSolid * getSolid(u32 idx)
+	inline CScnSolid * getSolid(u32 idx)
 	{
 		if (idx < header->n_solids)
 			return &solids[idx];
@@ -64,7 +64,7 @@ public:
 	}
 
 	//returns pointer to CScnEnt from index or NULL if none
-	CScnEnt * getEnt(u32 idx)
+	inline CScnEnt * getEnt(u32 idx)
 	{
 		if (idx < header->n_ents)
 			return &ents[idx];
@@ -72,25 +72,30 @@ public:
 			return NULL;
 	}
 
-	CScnLightmap* getLightmap()
+	inline CScnLightmap* getLightmap()
 	{
 		return lmap;
 	}
 
-	u32 getSolidSize(bool bAll) const
+	inline u32 getSolidSize(bool bAll) const
 	{
 		if (!bAll) return 1;
 		return header->n_solids;
 	}
 
-	u32 getTotalEnts() const
+	inline u32 getTotalEnts() const
 	{
 		return header->n_ents;
 	}
 
-	u32 getTotalLights() const
+	inline u32 getTotalLights() const
 	{
 		return header->n_lights;
+	}
+
+	inline u32 getLightmapSize() const
+	{
+		return header->n_extralmaps;
 	}
 
 };

@@ -166,7 +166,10 @@ core::vector2df convert_vec2(const char* pos) {
 
 
 core::vector3df convert_vec3(const char* pos) {
+
+	
 	core::array<std::string> split= str_split(pos," ");
+	
 	if (split.size() == 2) {
 		return core::vector3df(stof(split[0]), stof(split[1]),0);
 	}

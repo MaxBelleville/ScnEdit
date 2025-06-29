@@ -1,4 +1,6 @@
 <shaderConfig name="MobileSGDiffuse" baseShader="SOLID">
+	<instancing vertex="tangents" shader="MobileSGDiffuseInstancing" instancingVertex="tangents_sg"/>
+	<dependent shader="MobileSGDiffuseInstancing.xml"/>
 	<uniforms>
 		<vs>
 			<uniform name="uMvpMatrix" type="WORLD_VIEW_PROJECTION" value="0" float="16" matrix="true"/>

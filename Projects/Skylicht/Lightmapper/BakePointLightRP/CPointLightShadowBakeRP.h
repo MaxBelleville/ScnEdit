@@ -34,6 +34,11 @@ namespace Skylicht
 	{
 	protected:
 		CLight* m_currentLight;
+
+		bool m_bakeInUV0;
+
+		bool m_bakeDetailNormal;
+
 		core::aabbox3df m_cullingBox;
 
 	public:
@@ -53,6 +58,26 @@ namespace Skylicht
 		inline CLight* getCurrentLight()
 		{
 			return m_currentLight;
+		}
+
+		inline void setBakeInUV0(bool b)
+		{
+			m_bakeInUV0 = b;
+		}
+
+		inline bool isBakeInUV0()
+		{
+			return m_bakeInUV0;
+		}
+
+		inline void setBakeDetailNormal(bool b)
+		{
+			m_bakeDetailNormal = b;
+		}
+
+		inline bool isBakeDetailNormal()
+		{
+			return m_bakeDetailNormal;
 		}
 
 		virtual const core::aabbox3df& getFrustumBox();

@@ -38,7 +38,8 @@ namespace Skylicht
 
 	CATEGORY_COMPONENT(CLightProbes, "Light Probes", "Indirect Lighting");
 
-	CLightProbes::CLightProbes()
+	CLightProbes::CLightProbes() :
+		m_intensity(1.0f)
 	{
 	}
 
@@ -75,6 +76,8 @@ namespace Skylicht
 	{
 		CObjectSerializable* object = CComponentSystem::createSerializable();
 
+		object->autoRelease(new CFloatProperty(object, "Intensity", m_intensity, 0.0f, 2.0f));
+
 		CArraySerializable* probes = new CArraySerializable("Probes");
 		object->addProperty(probes);
 		object->autoRelease(probes);
@@ -87,6 +90,9 @@ namespace Skylicht
 
 			CWorldTransformData* world = GET_ENTITY_DATA(m_entities[i], CWorldTransformData);
 			CLightProbeData* light = GET_ENTITY_DATA(m_entities[i], CLightProbeData);
+
+			// save id
+			probeData->Id.set(m_entities[i]->getID());
 
 			// save transform
 			probeData->Transform.set(world->Relative);
@@ -102,6 +108,8 @@ namespace Skylicht
 	void CLightProbes::loadSerializable(CObjectSerializable* object)
 	{
 		CComponentSystem::loadSerializable(object);
+
+		m_intensity = object->get<float>("Intensity", 1.0f);
 
 		CArraySerializable* probes = (CArraySerializable*)object->getProperty("Probes");
 		if (probes == NULL)
@@ -121,12 +129,19 @@ namespace Skylicht
 			CWorldTransformData* world = GET_ENTITY_DATA(entity, CWorldTransformData);
 			CLightProbeData* light = GET_ENTITY_DATA(entity, CLightProbeData);
 
+			// set id
+			if (!shData->Id.get().empty())
+				entity->setID(shData->Id.getString());
+
 			// set transform
 			world->Relative = shData->Transform.get();
 
 			// set sh data
 			for (int j = 0; j < 9; j++)
 				light->SH[j] = shData->SH[j]->get();
+
+			// intensity
+			light->Intensity = m_intensity;
 		}
 	}
 

@@ -1,4 +1,8 @@
 <shaderConfig name="Diffuse" baseShader="SOLID" deferred="true">
+	<instancing vertex="standard" shader="DiffuseInstancing" instancingVertex="standard_sg"/>
+	<instancing vertex="tangents" shader="DiffuseInstancingTangent" instancingVertex="tangents_sg"/>
+	<dependent shader="DiffuseInstancing.xml"/>
+	<dependent shader="DiffuseInstancingTangent.xml"/>
 	<uniforms>
 		<vs>
 			<uniform name="uMvpMatrix" type="WORLD_VIEW_PROJECTION" value="0" float="16" matrix="true"/>
@@ -24,6 +28,6 @@
 			<ui control="UIFloat2" name="uSpecGloss" elementName="Specular;Glossiness" min="0" max="1"/>
 		</ui>
 	</customUI>
-	<shader type="GLSL" vs="GLSL/DiffuseSpecularGlossinessVS.glsl" fs="GLSL/DiffuseFS.glsl"/>
-	<shader type="HLSL" vs="HLSL/DiffuseSpecularGlossinessVS.hlsl" fs="HLSL/DiffuseFS.hlsl"/>
+	<shader type="GLSL" vs="GLSL/SGStandardVS.glsl" fs="GLSL/DiffuseFS.glsl"/>
+	<shader type="HLSL" vs="HLSL/SGStandardVS.hlsl" fs="HLSL/DiffuseFS.hlsl"/>
 </shaderConfig>

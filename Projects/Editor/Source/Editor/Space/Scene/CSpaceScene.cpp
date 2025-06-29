@@ -30,6 +30,8 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "SkySun/CSkySun.h"
 #include "LightProbes/CLightProbes.h"
 #include "ReflectionProbe/CReflectionProbe.h"
+#include "Camera/CEditorMoveCamera.h"
+#include "Graphics2D/CGraphics2D.h"
 
 #include "Editor/CEditor.h"
 #include "Editor/CEditorSetting.h"
@@ -60,6 +62,8 @@ namespace Skylicht
 			m_forwardRP(NULL),
 			m_postProcessor(NULL),
 			m_viewpointRP(NULL),
+			m_lightRP(NULL),
+			m_nullRP(NULL),
 			m_editorCamera(NULL),
 			m_gridPlane(NULL),
 			m_leftMouseDown(false),
@@ -74,10 +78,13 @@ namespace Skylicht
 			m_view(NULL),
 			m_handlesRenderer(NULL),
 			m_gizmosRenderer(NULL),
+			m_selectingRenderer(NULL),
 			m_selectObjectSystem(NULL),
 			m_enableRender(true),
 			m_enableRenderGrid(true),
-			m_enableHandles(true)
+			m_enableHandles(true),
+			m_waitHotKeyRelease(false),
+			m_rp(CSpaceScene::Materials)
 		{
 			CScene* currentScene = CSceneController::getInstance()->getScene();
 			if (currentScene == NULL)
@@ -156,7 +163,19 @@ namespace Skylicht
 
 			getSubjectTransformGizmos().addObserver(this);
 
-			// camera			
+			toolbar->addSpace();
+
+			// pipeline
+			GUI::CComboBox* pipelineDropDown = (GUI::CComboBox*)toolbar->addControl(new GUI::CComboBox(toolbar));
+			pipelineDropDown->setWidth(120.0f);
+			pipelineDropDown->addItem(L"RP: Materials");
+			pipelineDropDown->addItem(L"RP: Lighting");
+			pipelineDropDown->setSelectIndex(0, false);
+			pipelineDropDown->OnChanged = BIND_LISTENER(&CSpaceScene::onToolbarPipeline, this);
+			m_toolbarButton[Pipeline] = pipelineDropDown;
+
+
+			// camera
 			button = toolbar->addButton(L"Ortho", GUI::ESystemIcon::Ortho, true);
 			button->OnPress = BIND_LISTENER(&CSpaceScene::onCameraOrtho, this);
 			m_toolbarButton[ESceneToolBar::Ortho] = button;
@@ -227,7 +246,8 @@ namespace Skylicht
 							fileExt == "obj" ||
 							fileExt == "fbx" ||
 							fileExt == "smesh" ||
-							fileExt == "template")
+							fileExt == "template" ||
+							fileExt == "particle")
 						{
 							return true;
 						}
@@ -265,11 +285,11 @@ namespace Skylicht
 
 							if (fileExt == "template")
 							{
-								targetObject = sceneController->createTemplateObject(path, sceneController->getZone());
+								targetObject = sceneController->createTemplateObject(path, sceneController->getZone(), false);
 							}
 							else
 							{
-								targetObject = sceneController->createEmptyObject(NULL);
+								targetObject = sceneController->createEmptyObject(NULL, false);
 								if (targetObject != NULL)
 									sceneController->createResourceComponent(path, targetObject);
 							}
@@ -284,6 +304,8 @@ namespace Skylicht
 									sceneController->onSelectNode(node, true);
 									sceneController->updateTreeNode(targetObject);
 								}
+
+								sceneController->getHistory()->saveCreateHistory(targetObject);
 							}
 						}
 					}
@@ -321,6 +343,18 @@ namespace Skylicht
 				m_forwardRP = NULL;
 			}
 
+			if (m_lightRP)
+			{
+				delete m_lightRP;
+				m_lightRP = NULL;
+			}
+
+			if (m_nullRP)
+			{
+				delete m_nullRP;
+				m_nullRP = NULL;
+			}
+
 			if (m_postProcessor != NULL)
 			{
 				delete m_postProcessor;
@@ -344,6 +378,8 @@ namespace Skylicht
 
 		void CSpaceScene::initEditorObject(CZone* zone)
 		{
+			zone->setMainZoneInEditor(true);
+
 			// create editor camera
 			CGameObject* camObj = zone->createEmptyObject();
 			camObj->setName(L"EditorCamera");
@@ -363,6 +399,10 @@ namespace Skylicht
 			editorCamera->setMoveSpeed(editorSetting->CameraMoveSpeed.get());
 			editorCamera->setZoomSpeed(editorSetting->CameraZoomSpeed.get());
 			editorCamera->setRotateSpeed(editorSetting->CameraRotateSpeed.get());
+
+			// update for wads move
+			CEditorMoveCamera* editorMove = camObj->addComponent<CEditorMoveCamera>();
+			editorMove->setMoveSpeed(editorSetting->CameraMoveSpeed.get() * 5.0f);
 
 			// position
 			m_editorCamera->setPosition(core::vector3df(-2.0f, 1.5f, -2.0f));
@@ -403,11 +443,19 @@ namespace Skylicht
 			m_viewpointController = new CViewpointController();
 			m_viewpointController->setCamera(m_editorCamera, m_viewpointCamera);
 
+			// set mask
+			m_viewpointZone->updateAddRemoveObject();
+			u32 layer = (1 << 16);
+			core::array<CGameObject*>& allChilds = m_viewpointZone->getArrayChilds(true);
+			for (u32 i = 0, n = allChilds.size(); i < n; i++)
+				allChilds[i]->setCullingLayer(layer);
+			m_viewpointCamera->setCullingMask(layer);
+
 			// add handle renderer
 			CEntityManager* entityMgr = m_scene->getEntityManager();
 
 			m_selectObjectSystem = entityMgr->addSystem<CSelectObjectSystem>();
-
+			m_selectingRenderer = entityMgr->addRenderSystem<CSelectingRenderer>();
 			m_handlesRenderer = entityMgr->addRenderSystem<CHandlesRenderer>();
 			m_gizmosRenderer = entityMgr->addRenderSystem<CGizmosRenderer>();
 
@@ -445,6 +493,7 @@ namespace Skylicht
 
 			CEntityManager* entityMgr = m_scene->getEntityManager();
 			m_selectObjectSystem = entityMgr->getSystem<CSelectObjectSystem>();
+			m_selectingRenderer = entityMgr->getSystem<CSelectingRenderer>();
 			m_handlesRenderer = entityMgr->getSystem<CHandlesRenderer>();
 			m_gizmosRenderer = entityMgr->getSystem<CGizmosRenderer>();
 		}
@@ -592,6 +641,15 @@ namespace Skylicht
 			m_editor->refresh();
 		}
 
+		void CSpaceScene::onToolbarPipeline(GUI::CBase* base)
+		{
+			GUI::CComboBox* btn = (GUI::CComboBox*)base;
+			if (btn->getSelectIndex() == 0)
+				m_rp = CSpaceScene::Materials;
+			else
+				m_rp = CSpaceScene::Lighting;
+		}
+
 		void CSpaceScene::onNotify(ISubject* subject, IObserver* from)
 		{
 			if (from == this)
@@ -647,17 +705,15 @@ namespace Skylicht
 					m_rendering->setNextPipeLine(m_forwardRP);
 
 					// post processor
-					/*
 					m_postProcessor = new CPostProcessorRP();
 					m_postProcessor->enableAutoExposure(false);
-					m_postProcessor->enableBloomEffect(false);
+					m_postProcessor->enableBloomEffect(true);
 					m_postProcessor->enableFXAA(false);
-					m_postProcessor->enableScreenSpaceReflection(true);
+					m_postProcessor->enableScreenSpaceReflection(false);
 					m_postProcessor->initRender(w, h);
 
 					// apply post processor
 					m_rendering->setPostProcessor(m_postProcessor);
-					*/
 
 					m_renderRP = m_shadowMapRendering;
 				}
@@ -687,6 +743,31 @@ namespace Skylicht
 				else
 				{
 					m_viewpointRP->resize(w, h);
+				}
+
+				if (m_nullRP == NULL)
+				{
+					CNullForwarderPipeline* nullRP = new CNullForwarderPipeline();
+					nullRP->initRender(w, h);
+					nullRP->enableUpdateEntity(false);
+					m_nullRP = nullRP;
+				}
+				else
+				{
+					m_nullRP->resize(w, h);
+				}
+
+				if (m_lightRP == NULL)
+				{
+					CDiffuseLightRenderPipeline* lightRP = new CDiffuseLightRenderPipeline();
+					lightRP->initRender(w, h);
+					lightRP->enableUpdateEntity(false);
+					lightRP->setNextPipeLine(m_nullRP);
+					m_lightRP = lightRP;
+				}
+				else
+				{
+					m_lightRP->resize(w, h);
 				}
 
 				// update camera aspect
@@ -744,9 +825,7 @@ namespace Skylicht
 					viewport.LowerRightCorner.set((int)(position.X + base->width()), (int)(position.Y + base->height()));
 					m_sceneRect = viewport;
 
-					// draw scene
-					m_scene->setVisibleAllZone(true);
-					m_viewpointZone->setVisible(false);
+					// DRAW SCENE
 
 					// render handles
 					m_handlesRenderer->setEnable(m_enableHandles);
@@ -757,6 +836,12 @@ namespace Skylicht
 
 					// render gizmos
 					m_gizmosRenderer->setEnable(true);
+					m_selectingRenderer->setEnable(true);
+
+					if (m_rp == CSpaceScene::Materials)
+						m_shadowMapRendering->setNextPipeLine(m_rendering);
+					else
+						m_shadowMapRendering->setNextPipeLine(m_lightRP);
 
 					// render scene
 					m_renderRP->render(NULL, m_editorCamera, m_scene->getEntityManager(), viewport);
@@ -777,17 +862,13 @@ namespace Skylicht
 
 					getVideoDriver()->clearZBuffer();
 
-					// draw viewpoint
-					m_scene->setVisibleAllZone(false);
-					m_viewpointZone->setVisible(true);
+					// DRAW VIEWPOINT
+					m_selectingRenderer->setEnable(false);
 					m_handlesRenderer->setEnable(false);
 					m_gizmosRenderer->setEnable(false);
 
 					m_viewpointRP->render(NULL, m_viewpointCamera, m_scene->getEntityManager(), viewport);
 
-					// disable viewpoint
-					m_scene->setVisibleAllZone(true);
-					m_viewpointZone->setVisible(false);
 					m_handlesRenderer->setEnable(m_enableHandles);
 				}
 
@@ -938,29 +1019,46 @@ namespace Skylicht
 		{
 			CEditorSetting* editorSetting = CEditorSetting::getInstance();
 
-			if (editorSetting->CameraNavigation.get() == 1)
+			CEditorCamera* cameraBehavior = m_editorCamera->getGameObject()->getComponent<CEditorCamera>();
+			if (cameraBehavior->isLeftMousePressed() ||
+				cameraBehavior->isRightMousePressed())
 			{
-				// maya
-				if (hotkey == "W")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Move]);
-				else if (hotkey == "E")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Rotate]);
-				else if (hotkey == "R")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Scale]);
-				else if (hotkey == "Q")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Select]);
+				// skip hotkey (move) when dragging
+				if (hotkey == "W" ||
+					hotkey == "A" ||
+					hotkey == "S" ||
+					hotkey == "D")
+				{
+					m_waitHotKeyRelease = true;
+				}
 			}
-			else
+
+			if (!m_waitHotKeyRelease)
 			{
-				// default & blender
-				if (hotkey == "G")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Move]);
-				else if (hotkey == "R")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Rotate]);
-				else if (hotkey == "S")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Scale]);
-				else if (hotkey == "Q")
-					onToolbarTransform(m_toolbarButton[ESceneToolBar::Select]);
+				if (editorSetting->CameraNavigation.get() == 1)
+				{
+					// maya
+					if (hotkey == "W")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Move]);
+					else if (hotkey == "E")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Rotate]);
+					else if (hotkey == "R")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Scale]);
+					else if (hotkey == "Q")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Select]);
+				}
+				else
+				{
+					// default & blender
+					if (hotkey == "G")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Move]);
+					else if (hotkey == "R")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Rotate]);
+					else if (hotkey == "S")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Scale]);
+					else if (hotkey == "Q")
+						onToolbarTransform(m_toolbarButton[ESceneToolBar::Select]);
+				}
 			}
 
 			if (hotkey == "F")
@@ -1006,20 +1104,18 @@ namespace Skylicht
 
 			if (key == GUI::KEY_DELETE)
 			{
-				if (down == true)
+				if (down)
 					CSceneController::getInstance()->onDelete();
 			}
-		}
 
-		bool CSpaceScene::isEditorObject(CGameObject* object)
-		{
-			if (m_editorCamera->getGameObject() == object ||
-				m_gridPlane == object)
+			if (!down && m_waitHotKeyRelease)
 			{
-				return true;
-			}
+				std::string s;
+				s += toupper(key);
 
-			return false;
+				if (s == "W" || s == "A" || s == "S" || s == "D")
+					m_waitHotKeyRelease = false;
+			}
 		}
 
 		void CSpaceScene::enableRenderGrid(bool b)

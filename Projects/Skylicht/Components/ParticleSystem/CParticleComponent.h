@@ -35,9 +35,11 @@ namespace Skylicht
 		class COMPONENT_API CParticleComponent : public CComponentSystem
 		{
 		protected:
-			CParticleBufferData *m_data;
+			CParticleBufferData* m_data;
 
 			CFactory m_factory;
+
+			std::string m_sourcePath;
 
 		public:
 			CParticleComponent();
@@ -46,7 +48,13 @@ namespace Skylicht
 
 			virtual void initComponent();
 
+			virtual void startComponent();
+
 			virtual void updateComponent();
+
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
 
 		public:
 
@@ -64,7 +72,7 @@ namespace Skylicht
 
 			CGroup* createParticleGroup();
 
-			CSubGroup* createParticleSubGroup(CGroup *group);
+			CSubGroup* createParticleSubGroup(CGroup* group);
 
 			inline u32 getNumOfGroup()
 			{
@@ -78,6 +86,8 @@ namespace Skylicht
 
 			void removeParticleGroup(CGroup* group);
 
+			void updateParticleCountByPercentage(float f, bool includeSubGroup = false);
+
 			void Play();
 
 			void Stop();
@@ -85,6 +95,44 @@ namespace Skylicht
 			bool IsPlaying();
 
 			u32 getTotalParticle();
+
+			inline const char* getSourcePath()
+			{
+				return m_sourcePath.c_str();
+			}
+
+			inline void setSourcePath(const char* path)
+			{
+				m_sourcePath = path;
+			}
+
+			bool load();
+
+			bool save();
+
+			CGroup* duplicateGroup(CGroup* group);
+
+			CEmitter* duplicateEmitter(CGroup* group, CEmitter* emitter);
+
+			DECLARE_GETTYPENAME(CParticleComponent)
+
+		protected:
+
+			void saveGroups(CObjectSerializable* groups);
+
+			void saveGroup(Particle::CGroup* group, CObjectSerializable* object);
+
+			void loadGroup(Particle::CGroup* group, io::IXMLReader* reader);
+
+			void loadGroup(Particle::CGroup* group, CObjectSerializable* object);
+
+			void loadEmitters(Particle::CGroup* group, io::IXMLReader* reader);
+
+			void loadModels(Particle::CGroup* group, io::IXMLReader* reader);
+
+			void loadRenderer(Particle::CGroup* group, io::IXMLReader* reader);
+
+			void loadSubGroups(Particle::CGroup* group, io::IXMLReader* reader);
 		};
 	}
 }

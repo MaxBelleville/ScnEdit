@@ -119,6 +119,27 @@ namespace Skylicht
 		IsSkinnedInstancing = b;
 	}
 
+	void CRenderMeshData::setSkinnedInstancing(bool b, IShaderInstancing* instancingShader)
+	{
+		if (b)
+			MeshInstancing = CMeshManager::getInstance()->createGetInstancingMesh(RenderMesh, instancingShader);
+		else
+			MeshInstancing = NULL;
+
+		IsSkinnedInstancing = b;
+	}
+
+	ArrayMaterial& CRenderMeshData::getMaterials()
+	{
+		CMesh* mesh = RenderMesh;
+		if (SoftwareBlendShapeMesh)
+			mesh = SoftwareBlendShapeMesh;
+		if (SoftwareSkinnedMesh)
+			mesh = SoftwareSkinnedMesh;
+
+		return mesh->Materials;
+	}
+
 	bool CRenderMeshData::setMaterial(CMaterial* material)
 	{
 		bool ret = false;
@@ -201,23 +222,7 @@ namespace Skylicht
 
 			bufferID++;
 		}
-
-		if (MeshInstancing != NULL)
-		{
-			CMesh* instancingMesh = dynamic_cast<CMesh*>(MeshInstancing->InstancingMesh);
-			if (instancingMesh)
-			{
-				for (int i = 0, n = (int)instancingMesh->Materials.size(); i < n; i++)
-				{
-					if (instancingMesh->Materials[i])
-					{
-						instancingMesh->Materials[i]->drop();
-						instancingMesh->Materials[i] = NULL;
-					}
-				}
-			}
-		}
-
+		
 		return ret;
 	}
 

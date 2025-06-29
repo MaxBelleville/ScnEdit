@@ -42,6 +42,7 @@ namespace Skylicht
 		bool m_registerQuery;
 
 	public:
+		bool Enable;
 
 		bool NeedValidate;
 
@@ -55,6 +56,11 @@ namespace Skylicht
 		virtual ~COcclusionQueryData();
 
 		void setAABBox(const core::aabbox3df& box);
+
+		inline const core::aabbox3df& getAABBox()
+		{
+			return m_box;
+		}
 
 		void updateLocalTransform();
 

@@ -10,6 +10,6 @@
 	</uniforms>
 	<customUI>
 	</customUI>
-	<shader type="GLSL" vs="GLSL/BakeFinalVS.glsl" fs="GLSL/BakeFinalFS.glsl"/>
-	<shader type="HLSL" vs="HLSL/BakeFinalVS.hlsl" fs="HLSL/BakeFinalFS.hlsl"/>
+	<shader type="GLSL" vs="GLSL/BakeFinalVS.glsl" fs="GLSL/BakeFinalFS.glsl" fs_source="GLSL/BakeFinalFS.d.glsl" define="COMBINE_DIRECTIONLIGHT"/>
+	<shader type="HLSL" vs="HLSL/BakeFinalVS.hlsl" fs="HLSL/BakeFinalFS.hlsl" fs_source="HLSL/BakeFinalFS.d.hlsl" define="COMBINE_DIRECTIONLIGHT"/>
 </shaderConfig>

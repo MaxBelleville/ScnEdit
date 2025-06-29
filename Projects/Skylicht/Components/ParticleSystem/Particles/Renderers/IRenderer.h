@@ -26,6 +26,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #include "ComponentsConfig.h"
 #include "Material/CMaterial.h"
+#include "ParticleSystem/Particles/CParticleSerializable.h"
 
 namespace Skylicht
 {
@@ -34,17 +35,33 @@ namespace Skylicht
 		enum ERenderer
 		{
 			Quad,
-			BillboardAddtive
+			BillboardAddtive,
+			MeshInstancing
 		};
 
-		class COMPONENT_API IRenderer
+		class COMPONENT_API IRenderer : public CParticleSerializable
 		{
 		protected:
 			ERenderer m_type;
-			CMaterial *m_material;
 
+			CMaterial* m_material;
+			CMaterial* m_customMaterial;
+
+			bool m_useCustomMaterial;
 			bool m_useInstancing;
 			bool m_emission;
+			bool m_ztest;
+			float m_emissionIntensity;
+
+			std::string m_texturePath;
+			ITexture* m_texture;
+
+			u32 m_atlasNx;
+			u32 m_atlasNy;
+
+			std::string m_materialPath;
+
+			bool m_needUpdateMesh;
 
 		public:
 			float SizeX;
@@ -52,32 +69,20 @@ namespace Skylicht
 			float SizeZ;
 
 		public:
-			IRenderer(ERenderer type) :
-				m_type(type),
-				m_material(NULL),
-				SizeX(1.0f),
-				SizeY(1.0f),
-				SizeZ(1.0f),
-				m_useInstancing(true),
-				m_emission(false)
-			{
+			IRenderer(ERenderer type);
 
-			}
-
-			virtual ~IRenderer()
-			{
-
-			}
+			virtual ~IRenderer();
 
 			inline ERenderer getType()
 			{
 				return m_type;
 			}
 
-			inline CMaterial* getMaterial()
-			{
-				return m_material;
-			}
+			CMaterial* getMaterial();
+
+			void setTexturePath(const char* path);
+
+			void setTexture(int slot, ITexture* texture);
 
 			inline void setEmission(bool b)
 			{
@@ -89,16 +94,67 @@ namespace Skylicht
 				return m_emission;
 			}
 
-			bool useInstancing()
+			inline bool useInstancing()
 			{
 				return m_useInstancing;
 			}
 
-			virtual void getParticleBuffer(IMeshBuffer *buffer) = 0;
-
-			virtual u32 getTotalFrames()
+			inline void setEmissionIntensity(float b)
 			{
-				return 1;
+				m_emissionIntensity = b;
+			}
+
+			inline float getEmissionIntensity()
+			{
+				return m_emissionIntensity;
+			}
+
+			inline bool needUpdateMesh()
+			{
+				return m_needUpdateMesh;
+			}
+
+			inline const wchar_t* getName()
+			{
+				if (m_type == Quad)
+					return L"Quad (Instancing)";
+				else if (m_type == MeshInstancing)
+					return L"Mesh (Instancing)";
+				else
+					return L"CPU Billboard";
+			}
+
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
+
+			virtual void getParticleBuffer(IMeshBuffer* buffer) = 0;
+
+			void setAtlas(u32 x, u32 y);
+
+			inline u32 getAtlasX()
+			{
+				return m_atlasNx;
+			}
+
+			inline u32 getAtlasY()
+			{
+				return m_atlasNy;
+			}
+
+			inline u32 getTotalFrames()
+			{
+				return m_atlasNx * m_atlasNy;
+			}
+
+			inline float getFrameWidth()
+			{
+				return 1.0f / m_atlasNx;
+			}
+
+			inline float getFrameHeight()
+			{
+				return 1.0f / m_atlasNy;
 			}
 		};
 	}

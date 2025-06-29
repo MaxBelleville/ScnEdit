@@ -15,7 +15,6 @@ struct PS_INPUT
 	float3 worldTangent: WORLDTANGENT;
 	float3 worldBinormal: WORLDBINORMAL;
 	float tangentw : TANGENTW;
-	float4 viewPosition: VIEWPOSITION;
 };
 cbuffer cbPerFrame
 {
@@ -40,7 +39,7 @@ float3 shAmbient(float3 n)
 		uSHConst[1].xyz * n.y +
 		uSHConst[2].xyz * n.z +
 		uSHConst[3].xyz * n.x;
-	return ambientLighting * 0.9;
+	return ambientLighting * 0.75;
 }
 static const float PI = 3.1415926;
 float4 main(PS_INPUT input) : SV_TARGET
@@ -51,8 +50,7 @@ float4 main(PS_INPUT input) : SV_TARGET
 	float3x3 rotation = float3x3(input.worldTangent, input.worldBinormal, input.worldNormal);
 	float3 localCoords = normalMap * 2.0 - float3(1.0, 1.0, 1.0);
 	localCoords.y *= input.tangentw;
-	float3 n = normalize(mul(localCoords, rotation));
-	n = normalize(n);
+	float3 n = mul(localCoords, rotation);
 	float3 ambientLighting = shAmbient(n);
 	ambientLighting = sRGB(ambientLighting);
 	float3 diffuseColor = sRGB(diffuseMap.rgb);

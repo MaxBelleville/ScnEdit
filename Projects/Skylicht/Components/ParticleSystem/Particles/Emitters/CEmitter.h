@@ -24,6 +24,8 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
+#include "ParticleSystem/Particles/CParticleSerializable.h"
+
 namespace Skylicht
 {
 	namespace Particle
@@ -43,22 +45,32 @@ namespace Skylicht
 
 		struct SBornData
 		{
+			float LifeTime;
+			float FlowLifeTime;
+			float WaitDelay;
 			float Fraction;
 			s32 Tank;
 
 			SBornData()
 			{
+				LifeTime = 0.0f;
+				FlowLifeTime = 0.0f;
+				WaitDelay = 0.0f;
 				Fraction = 0.0f;
 				Tank = 0;
 			}
 		};
 
-		class COMPONENT_API CEmitter
+		class COMPONENT_API CEmitter : public CParticleSerializable
 		{
 		protected:
 			int m_lastTank;
+			int m_defaultTank;
 			int m_tank;
 			float m_flow;
+			float m_lastFlow;
+			float m_defaultFlow;
+			float m_flowLifeTime;
 			float m_forceMin;
 			float m_forceMax;
 			float m_fraction;
@@ -67,6 +79,7 @@ namespace Skylicht
 
 			float m_delay;
 			float m_waitDelay;
+			float m_lifeTime;
 
 			CZone* m_zone;
 
@@ -81,6 +94,15 @@ namespace Skylicht
 			CEmitter(EEmitter type);
 
 			virtual ~CEmitter();
+
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
+
+			virtual bool haveDirection()
+			{
+				return false;
+			}
 
 			inline CZone* setZone(CZone* z)
 			{
@@ -97,6 +119,7 @@ namespace Skylicht
 			{
 				m_tank = 0;
 				m_flow = 0;
+				m_lifeTime = 0.0f;
 			}
 
 			inline void setTank(int tank)
@@ -108,8 +131,9 @@ namespace Skylicht
 			inline void resetTank()
 			{
 				setTank(m_lastTank);
-
+				setFlow(m_lastFlow);
 				m_waitDelay = m_delay;
+				m_lifeTime = 0.0f;
 			}
 
 			inline int getTank()
@@ -117,11 +141,32 @@ namespace Skylicht
 				return m_tank;
 			}
 
+			inline int getLastTank()
+			{
+				return m_lastTank;
+			}
+			
+			inline void setTankValue(int tank)
+			{
+				m_lastTank = tank;
+			}
+
+			inline int getDefaultTank()
+			{
+				return m_defaultTank;
+			}
+
+			inline float getDefaultFlow()
+			{
+				return m_defaultFlow;
+			}
+
 			inline void setFlow(float flow)
 			{
 				m_flow = flow;
 				if (m_flow <= 0)
 					m_flow = 0;
+				m_lastFlow = flow;
 			}
 
 			inline float getFlow()
@@ -184,6 +229,8 @@ namespace Skylicht
 				return m_type;
 			}
 
+			const wchar_t* getName();
+
 			virtual u32 updateNumber(float deltaTime);
 
 			virtual void setBornData(SBornData& data);
@@ -194,6 +241,11 @@ namespace Skylicht
 			}
 
 			virtual u32 updateBornData(SBornData& data, float deltaTime);
+
+			inline void clearBornData()
+			{
+				m_bornData.clear();
+			}
 
 			void generateVelocity(CParticle& particle, CZone* zone, CGroup* group);
 
@@ -206,6 +258,8 @@ namespace Skylicht
 			void swapBornData(int index1, int index2);
 
 			void deleteBornData();
+
+			DECLARE_GETTYPENAME(CEmitter)
 		};
 	}
 }

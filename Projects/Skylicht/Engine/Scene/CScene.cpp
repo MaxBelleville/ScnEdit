@@ -57,54 +57,50 @@ namespace Skylicht
 		return m_namec.c_str();
 	}
 
-	CGameObject* CScene::searchObject(const wchar_t* name)
+	CGameObject* CScene::searchObjectInChild(const wchar_t* name)
 	{
 		for (CZone*& zone : m_zones)
 		{
 			if (CStringImp::comp<const wchar_t>(zone->getName(), name) == 0)
 				return zone;
-		}
-		return NULL;
-	}
 
-	CGameObject* CScene::searchObjectInChild(const wchar_t* name)
-	{
-		CGameObject* obj = searchObject(name);
-		if (obj == NULL)
-		{
-			for (CZone*& zone : m_zones)
-			{
-				obj = zone->searchObjectInChild(name);
-				if (obj != NULL)
-					return obj;
-			}
-		}
-		return obj;
-	}
-
-	CGameObject* CScene::searchObjectByID(const char* id)
-	{
-		for (CZone*& zone : m_zones)
-		{
-			if (zone->getID() == id)
-				return zone;
+			CGameObject* obj = zone->searchObjectInChild(name);
+			if (obj != NULL)
+				return obj;
 		}
 		return NULL;
 	}
 
 	CGameObject* CScene::searchObjectInChildByID(const char* id)
 	{
-		CGameObject* obj = searchObjectByID(id);
-		if (obj == NULL)
+		for (CZone*& zone : m_zones)
 		{
-			for (CZone*& zone : m_zones)
-			{
-				obj = zone->searchObjectInChildByID(id);
-				if (obj != NULL)
-					return obj;
-			}
+			if (zone->getID() == id)
+				return zone;
+
+			CGameObject* obj = zone->searchObjectInChildByID(id);
+			if (obj != NULL)
+				return obj;
 		}
-		return obj;
+		return NULL;
+	}
+
+	CEntity* CScene::searchEntityInChildByID(const char* id)
+	{
+		for (CZone*& zone : m_zones)
+		{
+			CEntity* entity = zone->searchEntityInChildByID(id);
+			if (entity != NULL)
+				return entity;
+		}
+		return NULL;
+	}
+
+	u32 CScene::searchObjectByCullingLayer(ArrayGameObject& result, u32 mask)
+	{
+		for (CZone*& zone : m_zones)
+			zone->searchObjectByCullingLayer(result, mask);
+		return (u32)result.size();
 	}
 
 	void CScene::releaseScene()
@@ -192,6 +188,22 @@ namespace Skylicht
 			++pos;
 
 		m_zones.insert(pos, object);
+	}
+
+	CZone* CScene::getZoneBefore(CZone* object)
+	{
+		ArrayZone zones;
+		for (CZone* z : m_zones)
+		{
+			if (!z->isEditorObject())
+				zones.push_back(z);
+		}
+
+		ArrayZone::iterator pos = std::find(zones.begin(), zones.end(), object);
+		if (pos == zones.begin() || pos == zones.end())
+			return NULL;
+		--pos;
+		return *pos;
 	}
 
 	void CScene::registerEvent(std::string name, IEventReceiver* pEvent)

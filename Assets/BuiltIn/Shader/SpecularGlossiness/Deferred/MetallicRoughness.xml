@@ -1,4 +1,5 @@
-<shaderConfig name="MetallicRoughness" baseShader="SOLID" deferred="true" instancing="MetallicRoughnessInstancing" vertexType="tangents">
+<shaderConfig name="MetallicRoughness" baseShader="SOLID" deferred="true">
+	<instancing vertex="tangents" shader="MetallicRoughnessInstancing" instancingVertex="tangents_sg"/>
 	<dependent shader="MetallicRoughnessInstancing.xml"/>
 	<uniforms>
 		<vs>
@@ -27,6 +28,6 @@
 			<ui control="UIFloat4" name="uUVScale" elementName="UV ScaleX;UV ScaleY;UV OffsetX;UV OffsetY"/>
 		</ui>
 	</customUI>
-	<shader type="GLSL" vs="GLSL/SpecularGlossinessVS.glsl" fs="GLSL/MetallicRoughnessFS.glsl"/>
-	<shader type="HLSL" vs="HLSL/SpecularGlossinessVS.hlsl" fs="HLSL/MetallicRoughnessFS.hlsl"/>
+	<shader type="GLSL" vs="GLSL/SGTangentVS.glsl" fs="GLSL/MetallicRoughnessFS.glsl"/>
+	<shader type="HLSL" vs="HLSL/SGTangentVS.hlsl" fs="HLSL/MetallicRoughnessFS.hlsl"/>
 </shaderConfig>

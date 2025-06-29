@@ -1,5 +1,8 @@
-<shaderConfig name="Color" baseShader="SOLID" deferred="true" instancing="ColorInstancing" vertexType="standard">
+<shaderConfig name="Color" baseShader="SOLID" deferred="true">
+	<instancing vertex="standard" shader="ColorInstancing" instancingVertex="standard_sg"/>
+	<instancing vertex="tangents" shader="ColorInstancingTangent" instancingVertex="tangents_sg"/>
 	<dependent shader="ColorInstancing.xml"/>
+	<dependent shader="ColorInstancingTangent.xml"/>
 	<uniforms>
 		<vs>
 			<uniform name="uMvpMatrix" type="WORLD_VIEW_PROJECTION" value="0" float="16" matrix="true"/>
@@ -20,6 +23,6 @@
 			<ui control="UIFloat2" name="uSpecGloss" elementName="Specular;Glossiness" min="0" max="1"/>
 		</ui>
 	</customUI>
-	<shader type="GLSL" vs="GLSL/DiffuseSpecularGlossinessVS.glsl" fs="GLSL/ColorFS.glsl"/>
-	<shader type="HLSL" vs="HLSL/DiffuseSpecularGlossinessVS.hlsl" fs="HLSL/ColorFS.hlsl"/>
+	<shader type="GLSL" vs="GLSL/SGStandardVS.glsl" fs="GLSL/ColorFS.glsl"/>
+	<shader type="HLSL" vs="HLSL/SGStandardVS.hlsl" fs="HLSL/ColorFS.hlsl"/>
 </shaderConfig>

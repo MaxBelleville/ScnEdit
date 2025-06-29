@@ -35,18 +35,40 @@ namespace Skylicht
 			const core::vector3df& direction,
 			float radius,
 			float length) :
-			CZone(Cylinder),
-			m_position(position),
+			CPositionZone(Cylinder),
 			m_direction(direction),
 			m_radius(radius),
 			m_length(length)
 		{
+			m_position = position;
 			m_direction.normalize();
 		}
 
 		CCylinder::~CCylinder()
 		{
 
+		}
+
+		CObjectSerializable* CCylinder::createSerializable()
+		{
+			CObjectSerializable* object = CZone::createSerializable();
+
+			object->autoRelease(new CVector3Property(object, "position", m_position));
+			object->autoRelease(new CVector3Property(object, "direction", m_direction));
+			object->autoRelease(new CFloatProperty(object, "radius", m_radius, 0.0f));
+			object->autoRelease(new CFloatProperty(object, "length", m_length, 0.0f));
+
+			return object;
+		}
+
+		void CCylinder::loadSerializable(CObjectSerializable* object)
+		{
+			CZone::loadSerializable(object);
+
+			m_position = object->get<core::vector3df>("position", core::vector3df());
+			m_direction = object->get<core::vector3df>("direction", core::vector3df(0.0f, 1.0f, 0.0f));
+			m_radius = object->get<float>("radius", 1.0f);
+			m_length = object->get<float>("length", 1.0f);
 		}
 
 		void CCylinder::generatePosition(CParticle& particle, bool full, CGroup* group)
@@ -57,6 +79,11 @@ namespace Skylicht
 
 			core::vector3df pos = group->getTransformPosition(m_position);
 			core::vector3df dir = group->getTransformVector(m_direction);
+
+			if (dir.getLengthSQ() == 0.0f)
+				dir.set(0.0f, 1.0f, 0.0f);
+			else
+				dir.normalize();
 
 			// We need at least two points to compute a base
 			core::vector3df rPoint = pos + core::vector3df(10.0f, 10.0f, 10.0f);
@@ -92,7 +119,7 @@ namespace Skylicht
 			if (dist <= -m_length * 0.5f)
 				return -dir;
 
-			core::vector3df ext = point - (dir*dist + pos);
+			core::vector3df ext = point - (dir * dist + pos);
 			ext.normalize();
 
 			return ext;

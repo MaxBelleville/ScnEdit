@@ -60,6 +60,8 @@ namespace Skylicht
 		bool m_leftMousePress;
 		bool m_rightMousePress;
 		bool m_midMousePress;
+		bool m_mayaLeftMousePress;
+		bool m_mayaRightMousePress;
 		bool m_invert;
 		bool m_mouseWhell;
 		float m_wheel;
@@ -128,6 +130,16 @@ namespace Skylicht
 		inline EControlStyle getControlStyle()
 		{
 			return m_controlStyle;
+		}
+
+		inline bool isRightMousePressed()
+		{
+			return m_rightMousePress;
+		}
+
+		inline bool isLeftMousePressed()
+		{
+			return m_leftMousePress;
 		}
 
 	protected:

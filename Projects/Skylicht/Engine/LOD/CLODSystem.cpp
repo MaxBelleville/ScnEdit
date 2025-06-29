@@ -80,29 +80,37 @@ namespace Skylicht
 
 		CEntity** entities = m_group->getEntities();
 		u32 numEntity = m_group->getEntityCount();
+		CEntity* entity;
+		CWorldTransformData* transform;
+		CVisibleData* visible;
+		CLODData* lod;
+		const f32* m;
+		float x, z, d;
 
 		for (u32 i = 0; i < numEntity; i++)
 		{
-			CEntity* entity = entities[i];
+			entity = entities[i];
 
-			CWorldTransformData* transform = GET_ENTITY_DATA(entity, CWorldTransformData);
-			CVisibleData* visible = GET_ENTITY_DATA(entity, CVisibleData);
-			CLODData* lod = GET_ENTITY_DATA(entity, CLODData);
+			visible = GET_ENTITY_DATA(entity, CVisibleData);
 
-			const f32* m = transform->World.pointer();
+			if (!visible->Culled)
+			{
+				transform = GET_ENTITY_DATA(entity, CWorldTransformData);
+				lod = GET_ENTITY_DATA(entity, CLODData);
 
-			// distance vector
-			float x = cameraPosition.X - m[12];
-			float z = cameraPosition.Z - m[14];
+				m = transform->World.pointer();
 
-			// length vector
-			float d = x * x + z * z;
+				// distance vector
+				x = cameraPosition.X - m[12];
+				z = cameraPosition.Z - m[14];
 
-			// culling
-			if (d < lod->From || d >= lod->To)
-				visible->Culled = true;
-			else
-				visible->Culled = false;
+				// length vector
+				d = x * x + z * z;
+
+				// culling out side
+				if (d < lod->From || d >= lod->To)
+					visible->Culled = true;
+			}
 		}
 	}
 

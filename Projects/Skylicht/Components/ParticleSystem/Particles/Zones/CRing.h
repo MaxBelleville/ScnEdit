@@ -24,16 +24,15 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
-#include "CZone.h"
+#include "CPositionZone.h"
 
 namespace Skylicht
 {
 	namespace Particle
 	{
-		class COMPONENT_API CRing : public CZone
+		class COMPONENT_API CRing : public CPositionZone
 		{
 		protected:
-			core::vector3df m_position;
 			core::vector3df m_normal;
 			float m_minRadius;
 			float m_maxRadius;
@@ -43,15 +42,9 @@ namespace Skylicht
 
 			virtual ~CRing();
 
-			inline void setPosition(const core::vector3df& pos)
-			{
-				m_position = pos;
-			}
+			virtual CObjectSerializable* createSerializable();
 
-			inline core::vector3df& getPosition()
-			{
-				return m_position;
-			}
+			virtual void loadSerializable(CObjectSerializable* object);
 
 			inline void setNormal(const core::vector3df& d)
 			{
@@ -79,6 +72,8 @@ namespace Skylicht
 			virtual void generatePosition(CParticle& particle, bool full, CGroup* group);
 
 			virtual core::vector3df computeNormal(const core::vector3df& point, CGroup* group);
+
+			DECLARE_GETTYPENAME(CRing)
 		};
 	}
 }

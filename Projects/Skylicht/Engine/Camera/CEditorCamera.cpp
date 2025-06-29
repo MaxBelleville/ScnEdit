@@ -13,6 +13,8 @@ namespace Skylicht
 		m_rotateSpeed(16.0f),
 		m_leftMousePress(false),
 		m_rightMousePress(false),
+		m_mayaLeftMousePress(false),
+		m_mayaRightMousePress(false),
 		m_midMousePress(false),
 		m_mouseWhell(false),
 		m_wheel(0.0f),
@@ -84,7 +86,7 @@ namespace Skylicht
 		{
 			if (m_altKeyDown)
 			{
-				if (m_leftMousePress)
+				if (m_mayaLeftMousePress)
 					updateInputRotate(relativeRotation, timeDiff);
 			}
 
@@ -144,7 +146,7 @@ namespace Skylicht
 
 		if (m_controlStyle == Maya)
 		{
-			if (m_rightMousePress)
+			if (m_mayaRightMousePress)
 				updateInputZoom(timeDiff, pos, movedir);
 		}
 
@@ -247,7 +249,7 @@ namespace Skylicht
 		if (m_controlStyle == Maya && !m_altKeyDown)
 			acceptMouseEvent = false;
 
-		if (m_leftMousePress || m_rightMousePress || m_midMousePress)
+		if (m_mayaLeftMousePress || m_mayaRightMousePress || m_midMousePress)
 		{
 			acceptMouseEvent = true;
 			pointerPress = true;
@@ -278,16 +280,24 @@ namespace Skylicht
 			break;
 
 		case EET_MOUSE_INPUT_EVENT:
+			if (evt.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
+				m_leftMousePress = true;
+			if (evt.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
+				m_leftMousePress = false;
+			if (evt.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN)
+				m_rightMousePress = true;
+			if (evt.MouseInput.Event == EMIE_RMOUSE_LEFT_UP)
+				m_rightMousePress = false;
+
 			if (evt.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN && acceptMouseEvent)
 			{
-				m_leftMousePress = true;
-
+				m_mayaLeftMousePress = true;
 				m_centerCursor = m_cursorControl->getRelativePosition();
 				m_cursorPos = m_centerCursor;
 			}
 			else if (evt.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN && acceptMouseEvent)
 			{
-				m_rightMousePress = true;
+				m_mayaRightMousePress = true;
 				m_centerCursor = m_cursorControl->getRelativePosition();
 				m_cursorPos = m_centerCursor;
 				if (m_controlStyle == FPS&& m_camera->isEnable()) {
@@ -302,11 +312,11 @@ namespace Skylicht
 			}
 			else if (evt.MouseInput.Event == EMIE_LMOUSE_LEFT_UP && acceptMouseEvent)
 			{
-				m_leftMousePress = false;
+				m_mayaLeftMousePress = false;
 			}
 			else if (evt.MouseInput.Event == EMIE_RMOUSE_LEFT_UP && acceptMouseEvent)
 			{
-				m_rightMousePress = false;
+				m_mayaRightMousePress = false;
 			}
 			else if (evt.MouseInput.Event == EMIE_MMOUSE_LEFT_UP)
 			{
@@ -325,13 +335,22 @@ namespace Skylicht
 					}
 					return true;
 				}
-				if (m_leftMousePress || m_rightMousePress || m_midMousePress)
+				if (m_controlStyle == Maya)
 				{
-					m_cursorPos = m_cursorControl->getRelativePosition();
-				
-					return true;
+					if (m_mayaLeftMousePress || m_mayaRightMousePress || m_midMousePress)
+					{
+						m_cursorPos = m_cursorControl->getRelativePosition();
+						return true;
+					}
 				}
-				
+				else {
+					if (m_leftMousePress || m_rightMousePress || m_midMousePress)
+					{
+						m_cursorPos = m_cursorControl->getRelativePosition();
+
+						return true;
+					}
+				}
 			}
 			else if (evt.MouseInput.Event == EMIE_MOUSE_WHEEL)
 			{

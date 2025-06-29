@@ -34,7 +34,8 @@ namespace Skylicht
 		enum ELightType
 		{
 			Realtime = 0,
-			Baked
+			Baked,
+			Mixed
 		};
 
 	protected:
@@ -109,7 +110,7 @@ namespace Skylicht
 			return m_type;
 		}
 
-		inline void setLightType(ELightType type)
+		virtual void setLightType(ELightType type)
 		{
 			m_type = type;
 		}

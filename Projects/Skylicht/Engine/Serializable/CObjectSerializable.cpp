@@ -25,6 +25,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "pch.h"
 #include "CObjectSerializable.h"
 #include "CValueProperty.h"
+#include "CArraySerializable.h"
 #include "Utils/CStringImp.h"
 
 namespace Skylicht
@@ -123,6 +124,13 @@ namespace Skylicht
 		return true;
 	}
 
+	bool CObjectSerializable::saveToFile()
+	{
+		if (!m_savePath.empty())
+			return save(m_savePath.c_str());
+		return false;
+	}
+
 	bool CObjectSerializable::load(const char* file)
 	{
 		io::IXMLReader* reader = getIrrlichtDevice()->getFileSystem()->createXMLReader(file);
@@ -141,10 +149,12 @@ namespace Skylicht
 	{
 		char elementName[512];
 
-		if (!isArray())
-			sprintf(elementName, "node type=\"%s\"", Name.c_str());
-		else
+		if (m_objectType == ObjectArray ||
+			m_objectType == FileArray ||
+			m_objectType == TextureArray)
 			sprintf(elementName, "node type=\"%s\" array=\"true\"", Name.c_str());
+		else
+			sprintf(elementName, "node type=\"%s\"", Name.c_str());
 
 		writer->writeElement(CStringImp::convertUTF8ToUnicode(elementName).c_str(), false);
 		writer->writeLineBreak();
@@ -225,6 +235,26 @@ namespace Skylicht
 				if (nodeName == reader->getNodeName() && attributeName == reader->getAttributeValue(L"type"))
 				{
 					attr->read(reader);
+
+					// try to load Array
+					if (attr->getAttributeCount() > 0 && m_value.size() == 0)
+					{
+						CArraySerializable* arrayData = dynamic_cast<CArraySerializable*>(this);
+						if (arrayData && arrayData->haveCreateElementFunction())
+						{
+							// create null data & deserialize later
+							for (u32 i = 0, n = attr->getAttributeCount(); i < n; i++)
+								arrayData->createElement();
+						}
+						else
+						{
+							char log[1024];
+							std::string name = CStringImp::convertUnicodeToUTF8(attributeName.c_str());
+							sprintf(log, "[CObjectSerializable::load] Can't load array '%s'", name.c_str());
+							os::Printer::log(log);
+						}
+					}
+
 					deserialize(attr);
 					done = true;
 				}
@@ -260,6 +290,28 @@ namespace Skylicht
 			{
 				((CObjectSerializable*)p)->load(reader);
 			}
+		}
+
+		done = false;
+
+		// read to end </node>
+		while (!done && reader->read())
+		{
+			switch (reader->getNodeType())
+			{
+			case io::EXN_ELEMENT_END:
+			{
+				if (nodeName == reader->getNodeName())
+					done = true;
+				break;
+			}
+			default:
+			{
+				os::Printer::log("[CObjectSerializable::load] not found '</node>'");
+				done = true;
+			}
+			break;
+			};
 		}
 
 		attr->drop();

@@ -44,11 +44,10 @@ namespace Skylicht
 		BONE_COUNT,
 		SHADOW_MAP_MATRIX,
 		SHADOW_MAP_DISTANCE,
-		CAMERA_POSITION,
+		SHADOW_BIAS,
 		WORLD_CAMERA_POSITION,
 		LIGHT_COLOR,
 		LIGHT_AMBIENT,
-		LIGHT_DIRECTION,
 		WORLD_LIGHT_DIRECTION,
 		POINT_LIGHT_COLOR,
 		POINT_LIGHT_POSITION,
@@ -64,13 +63,8 @@ namespace Skylicht
 		SHADER_VEC4,
 		SH_CONST,
 		CUSTOM_VALUE,
-		BPCEM_MIN,
-		BPCEM_MAX,
-		BPCEM_POS,
 		TEXTURE_MIPMAP_COUNT,
 		TEXTURE_WIDTH_HEIGHT,
-		FOG_PARAMS,
-		SSAO_KERNEL,
 		DEFERRED_VIEW,
 		DEFERRED_PROJECTION,
 		DEFERRED_VIEW_PROJECTION,
@@ -81,6 +75,8 @@ namespace Skylicht
 		PARTICLE_ORIENTATION_NORMAL,
 		LIGHTMAP_INDEX,
 		TIME,
+		COLOR_INTENSITY,
+		RENDER_TEXTURE_MATRIX,
 		NUM_SHADER_TYPE,
 	};
 
@@ -115,11 +111,12 @@ namespace Skylicht
 			IsMatrix = false;
 			IsNormal = false;
 
-			ValueIndex = 0;
+			ValueIndex = -1;
 			memset(Value, 0, sizeof(float) * 16);
 			UniformShaderID = -1;
 			SizeOfUniform = 0;
 
+			Type = NUM_SHADER_TYPE;
 			Min = -FLT_MAX;
 			Max = FLT_MAX;
 		}
@@ -141,6 +138,12 @@ namespace Skylicht
 		virtual void OnSetConstants(CShader* shader, SUniform* uniform, IMaterialRenderer* matRender, bool vertexShader) = 0;
 	};
 
+	/// @brief The object class describes shader information
+	/// @ingroup Materials
+	/// 
+	/// Please see page
+	/// 
+	/// @ref md__material_2_shader_2_r_e_a_d_m_e "Shader information structure".
 	class SKYLICHT_API CShader : public CBaseShaderCallback
 	{
 	public:
@@ -166,6 +169,15 @@ namespace Skylicht
 			TransformTexture,
 			VertexPositionTexture,
 			VertexNormalTexture,
+			LastFrame,
+			RTT0,
+			RTT1,
+			RTT2,
+			RTT3,
+			RTT4,
+			RTT5,
+			RTT6,
+			RTT7,
 			ResourceCount
 		};
 
@@ -216,6 +228,22 @@ namespace Skylicht
 			std::string FragmentShader;
 		};
 
+		struct SShaderInstancing
+		{
+			video::E_VERTEX_TYPE VertexType;
+			std::string ShaderName;
+			std::string InstancingVertex;
+			IShaderInstancing* Instancing;
+			CShader* InstancingShader;
+
+			SShaderInstancing()
+			{
+				VertexType = video::EVT_UNKNOWN;
+				Instancing = NULL;
+				InstancingShader = NULL;
+			}
+		};
+
 		struct SAttributeMapping
 		{
 			std::string UniformName;
@@ -254,17 +282,13 @@ namespace Skylicht
 		std::string m_softwareSkinningShaderName;
 		CShader* m_softwareSkinningShader;
 
-		IShaderInstancing* m_instancing;
-
-		video::E_VERTEX_TYPE m_vertexType;
-
-		std::string m_instancingShaderName;
 		std::string m_shadowDepthShaderName;
 		std::string m_shadowDistanceShaderName;
 
-		CShader* m_instancingShader;
 		CShader* m_shadowDepthShader;
 		CShader* m_shadowDistanceShader;
+
+		SShaderInstancing* m_shaderInstancing[video::EVT_UNKNOWN + 1];
 
 		std::string m_source;
 
@@ -306,11 +330,6 @@ namespace Skylicht
 			return m_skinning;
 		}
 
-		inline bool isSupportInstancing()
-		{
-			return !m_instancingShaderName.empty();
-		}
-
 		inline bool isCustomShadowDepthWrite()
 		{
 			return !m_shadowDepthShaderName.empty();
@@ -323,16 +342,23 @@ namespace Skylicht
 
 		CShader* getSoftwareSkinningShader();
 
-		CShader* getInstancingShader();
+		CShader* getInstancingShader(video::E_VERTEX_TYPE vtxType);
+
+		std::string getInstancingVertex(video::E_VERTEX_TYPE vtxType);
+
+		bool isSupportInstancing(video::E_VERTEX_TYPE vtxType);
+
+		void setInstancing(video::E_VERTEX_TYPE vtxType, IShaderInstancing* instancing);
+
+		IShaderInstancing* getInstancing(video::E_VERTEX_TYPE vtxType);
+
+		void setShadowDepthWriteShader(const char* name);
+
+		void setShadowDistanceWriteShader(const char* name);
 
 		CShader* getShadowDepthWriteShader();
 
 		CShader* getShadowDistanceWriteShader();
-
-		inline video::E_VERTEX_TYPE getVertexType()
-		{
-			return m_vertexType;
-		}
 
 		inline int getAttributeMappingCount()
 		{
@@ -453,19 +479,6 @@ namespace Skylicht
 		void buildShader();
 
 		void buildUIUniform();
-
-		void setInstancing(IShaderInstancing* instancing)
-		{
-			if (m_instancing)
-				delete m_instancing;
-
-			m_instancing = instancing;
-		}
-
-		inline IShaderInstancing* getInstancing()
-		{
-			return m_instancing;
-		}
 
 		inline bool isDrawDepthShadow()
 		{

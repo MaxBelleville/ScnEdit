@@ -32,16 +32,33 @@ namespace Skylicht
 	namespace Particle
 	{
 		CAABox::CAABox(const core::vector3df& position, const core::vector3df& dimension) :
-			CZone(AABox),
-			m_position(position),
+			CPositionZone(AABox),
 			m_dimension(dimension)
 		{
-
+			m_position = position;
 		}
 
 		CAABox::~CAABox()
 		{
 
+		}
+
+		CObjectSerializable* CAABox::createSerializable()
+		{
+			CObjectSerializable* object = CZone::createSerializable();
+
+			object->autoRelease(new CVector3Property(object, "position", m_position));
+			object->autoRelease(new CVector3Property(object, "dimension", m_dimension));
+
+			return object;
+		}
+
+		void CAABox::loadSerializable(CObjectSerializable* object)
+		{
+			CZone::loadSerializable(object);
+
+			m_position = object->get<core::vector3df>("position", core::vector3df());
+			m_dimension = object->get<core::vector3df>("dimension", core::vector3df(1.0f, 1.0f, 1.0f));
 		}
 
 		void CAABox::generatePosition(CParticle& particle, bool full, CGroup* group)

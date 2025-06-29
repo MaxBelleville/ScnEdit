@@ -28,6 +28,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Utils/CPath.h"
 #include "RenderMesh/CMesh.h"
 #include "TextureManager/CTextureManager.h"
+#include "Shader/ShaderCallback/CShaderMaterial.h"
 
 namespace Skylicht
 {
@@ -93,6 +94,9 @@ namespace Skylicht
 
 		deleteAllParams();
 		deleteExtraParams();
+
+		if (CShaderMaterial::getMaterial() == this)
+			CShaderMaterial::setMaterial(NULL);
 	}
 
 	CMaterial* CMaterial::clone()
@@ -142,6 +146,38 @@ namespace Skylicht
 				mat->m_resourceTexture[i]->grab();
 
 			mat->m_textures[i] = m_textures[i];
+		}
+
+		mat->m_zBuffer = m_zBuffer;
+		mat->m_zWriteEnable = m_zWriteEnable;
+		mat->m_backfaceCulling = m_backfaceCulling;
+		mat->m_frontfaceCulling = m_frontfaceCulling;
+		mat->m_doubleSided = m_doubleSided;
+
+		mat->m_deferred = m_deferred;
+
+		mat->m_castShadow = m_castShadow;
+		mat->m_manualInitMaterial = m_manualInitMaterial;
+	}
+
+	void CMaterial::copyParamsTo(CMaterial* mat)
+	{
+		for (SUniformValue*& uniform : mat->m_uniformParams)
+			delete uniform;
+		mat->m_uniformParams.clear();
+
+		mat->m_shader = m_shader;
+		mat->m_materialName = m_materialName;
+		mat->m_shaderPath = m_shaderPath;
+		mat->m_materialPath = m_materialPath;
+
+		for (int i = 0; i < MAX_SHADERPARAMS; i++)
+			mat->m_shaderParams.setValue(i, m_shaderParams.getParam(i));
+
+		for (SUniformValue*& u : m_uniformParams)
+		{
+			SUniformValue* v = u->clone();
+			mat->m_uniformParams.push_back(v);
 		}
 
 		mat->m_zBuffer = m_zBuffer;
@@ -340,7 +376,8 @@ namespace Skylicht
 				}
 			}
 
-			m_textures[p->TextureSlot] = p->Texture;
+			if (p->TextureSlot >= 0 && p->TextureSlot < MATERIAL_MAX_TEXTURES)
+				m_textures[p->TextureSlot] = p->Texture;
 		}
 	}
 
@@ -348,7 +385,10 @@ namespace Skylicht
 	{
 		SExtraParams* e = new SExtraParams();
 		e->ShaderPath = shaderPath;
-		m_extras.push_back(e);
+
+		// insert at front of list
+		// that priorty to search old params
+		m_extras.insert(m_extras.begin(), e);
 		return e;
 	}
 
@@ -595,7 +635,20 @@ namespace Skylicht
 						}
 						else if (r->Type == CShader::CubeTexture)
 						{
-							// texture = textureManager->getCubeTexture( ... );
+							std::string path = r->Path;
+							CStringImp::replaceAll(path, "_X1.png", "");
+
+							std::string x1 = std::string(path) + "_X1.png";
+							std::string x2 = std::string(path) + "_X2.png";
+							std::string y1 = std::string(path) + "_Y1.png";
+							std::string y2 = std::string(path) + "_Y2.png";
+							std::string z1 = std::string(path) + "_Z1.png";
+							std::string z2 = std::string(path) + "_Z2.png";
+
+							texture = textureManager->getCubeTexture(
+								x1.c_str(), x2.c_str(),
+								y1.c_str(), y2.c_str(),
+								z1.c_str(), z2.c_str());
 						}
 						else
 						{
@@ -706,6 +759,8 @@ namespace Skylicht
 				}
 			}
 		}
+
+		loadDefaultTexture();
 
 		initDefaultValue();
 
@@ -1206,11 +1261,11 @@ namespace Skylicht
 				}
 			}
 
-			if (uniformValue->ValueIndex >= 0)
+			switch (uniformValue->Type)
 			{
-				switch (uniformValue->Type)
-				{
-				case MATERIAL_PARAM:
+			case MATERIAL_PARAM:
+			{
+				if (uniformValue->ValueIndex >= 0 && uniformValue->ValueIndex < MAX_SHADERPARAMS)
 				{
 					SVec4& v = m_shaderParams.getParam(uniformValue->ValueIndex);
 					v.X = uniformValue->FloatValue[0];
@@ -1218,16 +1273,20 @@ namespace Skylicht
 					v.Z = uniformValue->FloatValue[2];
 					v.W = uniformValue->FloatValue[3];
 					uniformValue->ShaderDefaultValue = false;
-					break;
 				}
-				default:
+				else
 				{
 					char log[512];
-					sprintf(log, "[CMaterial] - Warning!!! Fail to apply shader param type != OBJECT_PARAM");
+					sprintf(log, "[CMaterial] - Warning!!! Fail to apply shader param '%s' type:MATERIAL_PARAM", uniformValue->Name.c_str());
 					os::Printer::log(log);
 					break;
 				}
-				}
+				break;
+			}
+			default:
+			{
+				break;
+			}
 			}
 		}
 	}
@@ -1279,6 +1338,22 @@ namespace Skylicht
 		SExtraParams* e = getExtraParams(m_shaderPath.c_str());
 		if (e == NULL)
 			e = newExtra(m_shaderPath.c_str());
+		else
+		{
+			// move extra to front
+			// that priorty to search old params
+			auto it = m_extras.begin();
+			while (it != m_extras.end())
+			{
+				if ((*it) == e)
+				{
+					m_extras.erase(it);
+					break;
+				}
+				++it;
+			}
+			m_extras.insert(m_extras.begin(), e);
+		}
 
 		// clear old params
 		for (SUniformValue*& uniform : e->UniformParams)

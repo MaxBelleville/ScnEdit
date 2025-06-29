@@ -33,60 +33,43 @@ namespace Skylicht
 	{
 		class COMPONENT_API CBillboardAdditiveRenderer : public IRenderer
 		{
-		protected:
-			u32 m_atlasNx;
-			u32 m_atlasNy;
+		public:
+			enum EBillboardType
+			{
+				Billboard,
+				RotateY
+			};
 
+		protected:
 			static const u32 NB_INDICES_PER_QUAD = 6;
 			static const u32 NB_VERTICES_PER_QUAD = 4;
+
+			EBillboardType m_billboardType;
 
 		public:
 			CBillboardAdditiveRenderer();
 
 			virtual ~CBillboardAdditiveRenderer();
 
-			virtual void getParticleBuffer(IMeshBuffer *buffer);
+			virtual void getParticleBuffer(IMeshBuffer* buffer);
 
-			virtual void updateParticleBuffer(IMeshBuffer *buffer, CParticle *particles, int num);
+			virtual void updateParticleBuffer(IMeshBuffer* buffer, CParticle* particles, int num);
 
-			void setAtlas(u32 x, u32 y)
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
+
+			inline EBillboardType getBillboardType()
 			{
-				m_atlasNx = x;
-				m_atlasNy = y;
-
-				if (m_atlasNx < 1)
-					m_atlasNx = 1;
-
-				if (m_atlasNy < 1)
-					m_atlasNy = 1;
+				return m_billboardType;
 			}
 
-			inline u32 getAtlasX()
+			inline void setBillboardType(EBillboardType type)
 			{
-				return m_atlasNx;
+				m_billboardType = type;
 			}
 
-			inline u32 getAtlasY()
-			{
-				return m_atlasNy;
-			}
-
-			void setTexture(int slot, ITexture *texture);
-
-			virtual u32 getTotalFrames()
-			{
-				return m_atlasNx * m_atlasNy;
-			}
-
-			inline float getFrameWidth()
-			{
-				return 1.0f / m_atlasNx;
-			}
-
-			inline float getFrameHeight()
-			{
-				return 1.0f / m_atlasNy;
-			}
+			DECLARE_GETTYPENAME(CBillboardAdditiveRenderer)
 		};
 	}
 }

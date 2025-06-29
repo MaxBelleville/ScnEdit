@@ -129,36 +129,54 @@ namespace Skylicht
 	void CTextureManager::removeTexture(const char* namePackage)
 	{
 		IVideoDriver* driver = getVideoDriver();
+		char log[1024];
+
+		std::map<ITexture*, int> skips;
+
+		int pos = 0;
 		bool needContinue = false;
 		do
 		{
 			needContinue = false;
-
-			std::vector<STexturePackage*>::iterator i = m_textureList.begin(), end = m_textureList.end();
+			std::vector<STexturePackage*>::iterator i = m_textureList.begin() + pos, end = m_textureList.end();
 			while (i != end)
 			{
 				if ((*i)->Package == namePackage)
 				{
 					ITexture* texture = (*i)->Texture;
+					if (texture->getReferenceCount() == 1)
+					{
+						sprintf(log, "Remove Texture: %s - refCount: %d",
+							texture->getName().getPath().c_str(),
+							texture->getReferenceCount() - 1);
+						os::Printer::log(log);
 
-					char log[1024];
-					sprintf(log, "Remove Texture: %s - refCount: %d",
-						texture->getName().getPath().c_str(),
-						texture->getReferenceCount() - 1);
-					os::Printer::log(log);
+						driver->removeTexture(texture);
+						delete (*i);
 
-					driver->removeTexture(texture);
-					delete (*i);
-
-					m_textureList.erase(i);
-					needContinue = true;
-					break;
+						m_textureList.erase(i);
+						needContinue = true;
+						break;
+					}
+					else
+					{
+						skips[texture] = 1;
+					}
 				}
-				i++;
+				++i;
+				++pos;
 			}
 
 		} while (needContinue);
 
+		for (auto i : skips)
+		{
+			ITexture* texture = i.first;
+			sprintf(log, "Skip remove Texture: %s - refCount: %d",
+				texture->getName().getPath().c_str(),
+				texture->getReferenceCount() - 1);
+			os::Printer::log(log);
+		}
 	}
 
 	const char* CTextureManager::getTexturePath(ITexture* tex)
@@ -277,7 +295,6 @@ namespace Skylicht
 		if (driver->getDriverType() == video::EDT_OPENGLES)
 		{
 #if defined(ANDROID)
-			// etc compress
 			CStringImp::replacePathExt(ansiPath, ".etc2");
 #elif defined(IOS)
 #if defined(USE_ETC_TEXTURE)
@@ -374,6 +391,13 @@ namespace Skylicht
 
 		core::array<io::path> paths;
 
+		os::Printer::log("CTextureManager::getTextureArray");
+		if (listTexture.size() == 0)
+		{
+			os::Printer::log("Error: list file is empty");
+			return NULL;
+		}
+
 		for (u32 i = 0, n = (u32)listTexture.size(); i < n; i++)
 		{
 			std::string fixPath = CPath::normalizePath(listTexture[i]);
@@ -396,7 +420,7 @@ namespace Skylicht
 			if (loadImage == true)
 			{
 				char log[1024];
-				sprintf(log, "Load array texture: %s", realPath.c_str());
+				sprintf(log, "getTextureArray texture: %s", realPath.c_str());
 				os::Printer::log(log);
 
 				io::IReadFile* file = fs->createAndOpenFile(realPath.c_str());
@@ -405,6 +429,12 @@ namespace Skylicht
 					image = driver->createImageFromFile(file);
 					file->drop();
 				}
+			}
+			else
+			{
+				char log[1024];
+				sprintf(log, "getTextureArray load image error!");
+				os::Printer::log(log);
 			}
 
 			if (image != NULL)
@@ -425,7 +455,7 @@ namespace Skylicht
 					if (w != imageW || h != imageH)
 					{
 						char errorLog[1024];
-						sprintf(errorLog, "Error: Texture size is not equal %d-%d: %s", w, h, realPath.c_str());
+						sprintf(errorLog, "Texture size is not equal %d-%d: %s", w, h, realPath.c_str());
 						os::Printer::log(errorLog);
 
 						image->drop();
@@ -441,7 +471,13 @@ namespace Skylicht
 
 		ITexture* texture = NULL;
 
-		if (listImage.size() > 0 && listImage[0] == NULL)
+		if (listImage.size() == 0)
+		{
+			char errorLog[512];
+			sprintf(errorLog, "Can not load texture array, size = 0");
+			os::Printer::log(errorLog);
+		}
+		else if (listImage.size() > 0 && listImage[0] == NULL)
 		{
 			char errorLog[512];
 			sprintf(errorLog, "Can not load texture array: %s", paths[0].c_str());
@@ -481,6 +517,18 @@ namespace Skylicht
 		const char* pathZ1,
 		const char* pathZ2)
 	{
+		std::string hash = pathX1;
+		CStringImp::replaceAll(hash, std::string("_X1.png"), std::string(""));
+		hash += ".cube";
+
+		std::vector<STexturePackage*>::iterator i = m_textureList.begin(), end = m_textureList.end();
+		while (i != end)
+		{
+			if ((*i)->Path == hash)
+				return (*i)->Texture;
+			i++;
+		}
+
 		std::vector<std::string> paths;
 		paths.push_back(pathX1);
 		paths.push_back(pathX2);
@@ -513,7 +561,7 @@ namespace Skylicht
 
 		// register the texture
 		if (texture)
-			registerTexture(texture, pathX1);
+			registerTexture(texture, hash.c_str());
 		else
 		{
 			char errorLog[512];

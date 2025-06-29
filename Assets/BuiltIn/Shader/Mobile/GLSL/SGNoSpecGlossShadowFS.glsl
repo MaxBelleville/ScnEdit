@@ -13,7 +13,6 @@ in vec2 vTexCoord0;
 in vec3 vWorldNormal;
 in vec3 vWorldViewDir;
 in vec3 vWorldLightDir;
-in vec4 vViewPosition;
 in vec3 vDepth;
 in vec4 vShadowCoord;
 out vec4 FragColor;
@@ -33,7 +32,7 @@ vec3 shAmbient(vec3 n)
 		uSHConst[1].xyz * n.y +
 		uSHConst[2].xyz * n.z +
 		uSHConst[3].xyz * n.x;
-	return ambientLighting * 0.9;
+	return ambientLighting * 0.75;
 }
 float shadow(const vec4 shadowCoord, const float farDistance)
 {
@@ -52,7 +51,7 @@ const float PI = 3.1415926;
 void main(void)
 {
 	vec4 diffuseMap = texture(uTexDiffuse, vTexCoord0.xy) * uColor;
-	vec3 specMap = vec3(uSpecGloss, 0.0);
+	vec3 specMap = vec3(uSpecGloss, 1.0);
 	vec3 n = vWorldNormal;
 	float depth = length(vDepth);
 	float visibility = shadow(vShadowCoord, depth);

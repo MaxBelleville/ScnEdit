@@ -37,13 +37,11 @@ in vec3 vWorldNormal;
 in vec3 vWorldViewDir;
 in vec3 vWorldLightDir;
 
-#if !defined(NO_NORMAL_MAP) && !defined(NO_TEXTURE)
+#if defined(INSTANCING) || (!defined(NO_NORMAL_MAP) && !defined(NO_TEXTURE))
 in vec3 vWorldTangent;
 in vec3 vWorldBinormal;
 in float vTangentW;
 #endif
-
-in vec4 vViewPosition;
 
 #ifdef SHADOW
 in vec3 vDepth;
@@ -65,12 +63,12 @@ void main(void)
 {
 #ifdef NO_TEXTURE
 	vec4 diffuseMap = uColor;
-	vec3 specMap = vec3(uSpecGloss, 0.0);
+	vec3 specMap = vec3(uSpecGloss, 1.0);
 #else
 	vec4 diffuseMap = texture(uTexDiffuse, vTexCoord0.xy) * uColor;
 
 	#ifdef NO_SPECGLOSS
-	vec3 specMap = vec3(uSpecGloss, 0.0);
+	vec3 specMap = vec3(uSpecGloss, 1.0);
 	#else
 	vec3 specMap = texture(uTexSpecular, vTexCoord0.xy).xyz;
 	#endif
@@ -85,7 +83,6 @@ void main(void)
 	vec3 localCoords = normalMap * 2.0 - vec3(1.0, 1.0, 1.0);
 	localCoords.y *= vTangentW;
 	vec3 n = normalize(rotation * localCoords);
-	n = normalize(n);
 #endif
 	
 #if defined(SHADOW)
@@ -105,9 +102,16 @@ void main(void)
 	float spec = specMap.r;
 	float gloss = specMap.g;
 
+#if defined(AO)
+	float ao = specMap.b;
+#endif
+
 	// Lighting
 	float NdotL = max(dot(n, vWorldLightDir), 0.0);
 	vec3 directionalLight = NdotL * lightColor;
+#if defined(AO)
+	directionalLight *= ao;
+#endif		
 	vec3 color = directionalLight * diffuseColor * 0.3 * uLightMul.y;
 
 	// Specular	
@@ -116,6 +120,10 @@ void main(void)
 	vec3 H = normalize(vWorldLightDir + vWorldViewDir);
 	float NdotE = max(0.0, dot(n, H));
 	float specular = pow(NdotE, 10.0 + 100.0 * gloss) * spec;
+#if defined(AO)
+	specular *= ao;
+	ambientLighting *= ao;
+#endif
 	color += specular * specularColor * uLightMul.x;
 
 #if defined(SHADOW)

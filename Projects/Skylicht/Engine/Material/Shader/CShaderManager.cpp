@@ -29,6 +29,8 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #include "Instancing/CStandardSGInstancing.h"
 #include "Instancing/CTBNSGInstancing.h"
+#include "Instancing/CStandardColorInstancing.h"
+#include "Instancing/C2TCoordColorInstancing.h"
 
 namespace Skylicht
 {
@@ -108,12 +110,12 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/ShadowDepthWrite/ShadowLightDistanceWrite.xml");
 		loadShader("BuiltIn/Shader/ShadowDepthWrite/ShadowLightDistanceWriteSkinMesh.xml");
 
-		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWStandardInstancing.xml");
-		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWTBNInstancing.xml");
+		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWStandardSGInstancing.xml");
+		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWTangentSGInstancing.xml");
 		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWSkinInstancing.xml");
 
-		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWLightDistanceStandardInstancing.xml");
-		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWLightDistanceTBNInstancing.xml");
+		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWDistanceStandardSGInstancing.xml");
+		loadShader("BuiltIn/Shader/ShadowDepthWrite/SDWDistanceTangentSGInstancing.xml");
 
 		loadShader("BuiltIn/Shader/Basic/TextureSRGB.xml");
 		loadShader("BuiltIn/Shader/Basic/TextureLinearRGB.xml");
@@ -152,6 +154,11 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/Particle/ParticleTrailTurbulenceAdditive.xml");
 		loadShader("BuiltIn/Shader/Particle/ParticleTrailTurbulenceAdditiveAlpha.xml");
 
+		loadShader("BuiltIn/Shader/Particle/ParticleMesh.xml");
+		loadShader("BuiltIn/Shader/Particle/ParticleMeshColor.xml");
+		loadShader("BuiltIn/Shader/Particle/ParticleMeshAddtive.xml");
+		loadShader("BuiltIn/Shader/Particle/ParticleMeshTransparent.xml");
+
 		loadShader("BuiltIn/Shader/SkySun/SkySun.xml");
 	}
 
@@ -178,11 +185,6 @@ namespace Skylicht
 
 	void CShaderManager::initSGDeferredShader()
 	{
-		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/ColorInstancing.xml");
-		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/MetallicRoughnessInstancing.xml");
-		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/SpecularGlossinessInstancing.xml");
-		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/DiffuseNormalInstancing.xml");
-
 		loadShader("BuiltIn/Shader/Lightmap/LMStandardSGInstancing.xml");
 		loadShader("BuiltIn/Shader/Lightmap/LMTBNSGInstancing.xml");
 
@@ -204,6 +206,7 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Lighting/SGPointLight.xml");
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Lighting/SGPointLightShadow.xml");
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Lighting/SGSpotLight.xml");
+		loadShader("BuiltIn/Shader/SpecularGlossiness/Lighting/SGSpotLightShadow.xml");
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Forward/SH.xml");
 	}
 
@@ -224,8 +227,11 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/Mobile/MobileSGColor.xml");
 		loadShader("BuiltIn/Shader/Mobile/MobileSGDiffuse.xml");
 		loadShader("BuiltIn/Shader/Mobile/MobileSGNoNormalMap.xml");
+		loadShader("BuiltIn/Shader/Mobile/MobileSGNoNormalMapAO.xml");
 
 		loadShader("BuiltIn/Shader/Mobile/MobileSGShadow.xml");
+		loadShader("BuiltIn/Shader/Mobile/MobileSGShadowAO.xml");
+
 		loadShader("BuiltIn/Shader/Mobile/MobileSGDiffuseShadow.xml");
 
 		loadShader("BuiltIn/Shader/Mobile/MobileSGSkin.xml");
@@ -256,7 +262,6 @@ namespace Skylicht
 	void CShaderManager::initShader()
 	{
 		initBasicShader();
-
 		initSkylichtEngineShader();
 	}
 
@@ -300,26 +305,73 @@ namespace Skylicht
 		// init shader config
 		shader->initShader(xmlReader, source, shaderFolder);
 
-		// init instancing batching
-		IShaderInstancing* instancing = NULL;
-		video::E_VERTEX_TYPE vertexType = shader->getVertexType();
-		if (vertexType != video::EVT_UNKNOWN)
-		{
-			if (vertexType == video::EVT_STANDARD)
-				instancing = new CStandardSGInstancing();
-			else if (vertexType == video::EVT_TANGENTS)
-				instancing = new CTBNSGInstancing();
-		}
-		shader->setInstancing(instancing);
-
 		const std::string& shaderName = shader->getName();
 
-		// warning if it not yet support instancing
-		if (shader->isSupportInstancing() && instancing == NULL)
+		// load dependents shader first
+		std::vector<std::string>& deps = shader->getDependents();
+		for (std::string& p : deps)
 		{
-			char log[512];
-			sprintf(log, "!!! Warning: Name '%s' have support instancing, but xml file missing 'vertexType'", shaderName.c_str());
-			os::Printer::log(log);
+			if (loadShader(p.c_str()) == NULL)
+			{
+				char log[512];
+				sprintf(log, "!!! Warning: Name '%s' fail dependent:'%s'", shaderName.c_str(), p.c_str());
+				os::Printer::log(log);
+			}
+		}
+
+		for (int i = 0; i < video::EVT_UNKNOWN; i++)
+		{
+			video::E_VERTEX_TYPE vtxType = (video::E_VERTEX_TYPE)i;
+
+			CShader* instancingShader = shader->getInstancingShader(vtxType);
+			if (instancingShader == NULL)
+				continue;
+
+			// init instancing batching
+			IShaderInstancing* instancing = NULL;
+			std::string instancingVertex = shader->getInstancingVertex(vtxType);
+			if (!instancingVertex.empty())
+			{
+				if (instancingVertex == "standard_color")
+					instancing = new CStandardColorInstancing();
+				else if (instancingVertex == "2texcoords_color")
+					instancing = new C2TCoordColorInstancing();
+				else if (instancingVertex == "standard_sg")
+				{
+					instancing = new CStandardSGInstancing();
+					if (instancingShader)
+					{
+						instancingShader->setShadowDepthWriteShader("SDWStandardSGInstancing");
+						instancingShader->setShadowDistanceWriteShader("SDWDistanceStandardSGInstancing");
+					}
+				}
+				else if (instancingVertex == "tangents_sg")
+				{
+					instancing = new CTBNSGInstancing();
+					if (instancingShader)
+					{
+						instancingShader->setShadowDepthWriteShader("SDWTangentSGInstancing");
+						instancingShader->setShadowDistanceWriteShader("SDWDistanceTangentSGInstancing");
+					}
+				}
+				else
+				{
+					if (OnCreateInstancingVertex)
+						instancing = OnCreateInstancingVertex(instancingVertex.c_str());
+				}
+			}
+			shader->setInstancing(vtxType, instancing);
+
+			// warning if it not yet support instancing
+			if (shader->isSupportInstancing(vtxType) && instancing == NULL)
+			{
+				char log[512];
+				sprintf(log, "!!! Warning: Name '%s:%s' have support instancing, but xml file missing 'instancingVertex'",
+					shaderName.c_str(),
+					video::sBuiltInVertexTypeNames[vtxType]
+				);
+				os::Printer::log(log);
+			}
 		}
 
 		if (!rebuild)
@@ -327,10 +379,9 @@ namespace Skylicht
 			// if this name it loaded
 			if (m_listShaderID.find(shaderName) != m_listShaderID.end())
 			{
-				char log[512];
-				/*sprintf(log, "!!! Warning: Name '%s' is loaded <-- SKIP", shaderName.c_str());
-				os::Printer::log(log);*/
-
+				// char log[512];
+				// sprintf(log, "!!! Warning: Name '%s' is loaded <-- SKIP", shaderName.c_str());
+				// os::Printer::log(log);
 				return false;
 			}
 			else {
@@ -364,17 +415,6 @@ namespace Skylicht
 			return false;
 		}
 
-		std::vector<std::string>& deps = shader->getDependents();
-		for (std::string& p : deps)
-		{
-			if (loadShader(p.c_str()) == NULL)
-			{
-				char log[512];
-				sprintf(log, "!!! Warning: Name '%s' fail dependent:'%s'", shaderName.c_str(), p.c_str());
-				os::Printer::log(log);
-			}
-		}
-
 		return true;
 	}
 
@@ -390,7 +430,7 @@ namespace Skylicht
 		{
 			sprintf(log, "Reload shader: %s - File not found", shaderConfig);
 			os::Printer::log(log);
-			return NULL;
+			return false;
 		}
 
 		sprintf(log, "Reload shader: %s", shaderConfig);

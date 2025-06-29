@@ -37,17 +37,34 @@ namespace Skylicht
 		{
 		public:
 			core::array<CGroup*> Groups;
+			core::array<CSubGroup*> SubGroups;
+			core::array<CGroup*> AllGroups;
+
+			u32 RequestUpdate;
+			u32 Updated;
 
 		public:
 			CParticleBufferData();
 
 			virtual ~CParticleBufferData();
 
+			void clear();
+
 			CGroup* createGroup();
+
+			CGroup* getGroupByName(const wchar_t* name);
 
 			CSubGroup* createSubGroup(CGroup* group);
 
+			std::vector<CSubGroup*> getSubGroup(CGroup* parent);
+
 			void removeGroup(CGroup* group);
+
+			void removeSubGroup(CSubGroup* group);
+
+			void bringToNext(CGroup* group, CGroup* target, bool behind);
+
+			void updateListGroup();
 		};
 
 		DECLARE_COMPONENT_DATA_TYPE_INDEX(CParticleBufferData);

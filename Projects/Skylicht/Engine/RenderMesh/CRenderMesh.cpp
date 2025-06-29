@@ -32,6 +32,8 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "RenderMesh/CRenderMeshData.h"
 #include "RenderMesh/CJointData.h"
 #include "Culling/CCullingData.h"
+#include "Culling/CVisibleData.h"
+#include "Instancing/CInstancingMaterialData.h"
 
 #include "MeshManager/CMeshManager.h"
 
@@ -47,7 +49,8 @@ namespace Skylicht
 		m_loadTexcoord2(false),
 		m_loadNormal(true),
 		m_fixInverseNormal(true),
-		m_enableInstancing(false)
+		m_enableInstancing(false),
+		m_shadowCasting(true)
 	{
 
 	}
@@ -77,6 +80,7 @@ namespace Skylicht
 		removeAllEntities();
 
 		m_renderers.clear();
+		m_renderTransforms.clear();
 		m_entities.clear();
 	}
 
@@ -99,6 +103,7 @@ namespace Skylicht
 		object->autoRelease(new CBoolProperty(object, "load texcoord2", m_loadTexcoord2));
 		object->autoRelease(new CBoolProperty(object, "optimize", m_optimizeForRender));
 		object->autoRelease(new CBoolProperty(object, "instancing", m_enableInstancing));
+		object->autoRelease(new CBoolProperty(object, "shadowCasting", m_shadowCasting));
 
 		object->autoRelease(new CFilePathProperty(object, "mesh", m_meshFile.c_str(), CMeshManager::getMeshExts()));
 		object->autoRelease(new CFilePathProperty(object, "material", m_materialFile.c_str(), CMaterialManager::getMaterialExts()));
@@ -115,6 +120,7 @@ namespace Skylicht
 
 		bool optimize = object->get<bool>("optimize", false);
 		bool instancing = object->get<bool>("instancing", false);
+		bool shadowCasting = object->get<bool>("shadowCasting", true);
 
 		std::string meshFile = object->get<std::string>("mesh", "");
 		std::string materialFile = object->get<std::string>("material", "");
@@ -152,8 +158,10 @@ namespace Skylicht
 		}
 
 		// enable instancing
-		if (instancing)
-			enableInstancing(true);
+		enableInstancing(instancing);
+
+		// shadow casting
+		setShadowCasting(shadowCasting);
 	}
 
 	void CRenderMesh::refreshModelAndMaterial()
@@ -436,8 +444,10 @@ namespace Skylicht
 		setEntities(entities, numEntities);
 	}
 
-	void CRenderMesh::initFromMeshFile(const char* path)
+	void CRenderMesh::initFromMeshFile(const char* path, bool loadNormalMap, bool loadTexcoord2)
 	{
+		m_loadNormal = loadNormalMap;
+		m_loadTexcoord2 = loadTexcoord2;
 		m_meshFile = path;
 		refreshModelAndMaterial();
 	}
@@ -466,7 +476,10 @@ namespace Skylicht
 				renderer->setMaterial(mat);
 			}
 
-			addMaterial(mat);
+			if (!addMaterial(mat))
+			{
+				mat->drop();
+			}
 		}
 
 		for (CMaterial* m : m_materials)
@@ -475,11 +488,43 @@ namespace Skylicht
 
 	void CRenderMesh::enableInstancing(bool b)
 	{
-		m_enable = b;
+		m_enableInstancing = b;
 		for (CRenderMeshData*& renderer : m_renderers)
 		{
 			if (!renderer->isSkinnedMesh())
+			{
 				renderer->setInstancing(b);
+			}
+		}
+	}
+
+	void CRenderMesh::enableInstancingMaterialForEntity(bool b)
+	{
+		for (CRenderMeshData*& renderer : m_renderers)
+		{
+			if (m_enableInstancing && b)
+			{
+				CInstancingMaterialData* m = GET_ENTITY_DATA(renderer->Entity, CInstancingMaterialData);
+				if (m == NULL)
+					m = renderer->Entity->addData<CInstancingMaterialData>();
+
+				m->initCustomMaterial(renderer->getMeshInstancing());
+			}
+			else
+			{
+				renderer->Entity->removeData<CInstancingMaterialData>();
+			}
+		}
+	}
+
+	void CRenderMesh::setShadowCasting(bool b)
+	{
+		m_shadowCasting = b;
+
+		for (CRenderMeshData* r : m_renderers)
+		{
+			CVisibleData* visible = GET_ENTITY_DATA(r->Entity, CVisibleData);
+			visible->ShadowCasting = b;
 		}
 	}
 
@@ -827,7 +872,9 @@ namespace Skylicht
 			{
 				if (renderer->setMaterial(mat) == true)
 				{
-					addMaterial(mat);
+					if (!addMaterial(mat))
+						mat->drop();
+
 					useMaterial.push_back(mat);
 				}
 			}
@@ -935,13 +982,14 @@ namespace Skylicht
 		return (int)childs.size();
 	}
 
-	void CRenderMesh::addMaterial(CMaterial* material)
+	bool CRenderMesh::addMaterial(CMaterial* material)
 	{
 		for (CMaterial* mat : m_materials)
 		{
 			if (mat == material)
-				return;
+				return false;
 		}
 		m_materials.push_back(material);
+		return true;
 	}
 }

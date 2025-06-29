@@ -6,7 +6,6 @@ struct PS_INPUT
 	float3 worldNormal: WORLDNORMAL;
 	float3 worldViewDir: WORLDVIEWDIR;
 	float3 worldLightDir: WORLDLIGHTDIR;
-	float4 viewPosition: VIEWPOSITION;
 };
 cbuffer cbPerFrame
 {
@@ -32,13 +31,13 @@ float3 shAmbient(float3 n)
 		uSHConst[1].xyz * n.y +
 		uSHConst[2].xyz * n.z +
 		uSHConst[3].xyz * n.x;
-	return ambientLighting * 0.9;
+	return ambientLighting * 0.75;
 }
 static const float PI = 3.1415926;
 float4 main(PS_INPUT input) : SV_TARGET
 {
 	float4 diffuseMap = uColor;
-	float3 specMap = float3(uSpecGloss, 0.0);
+	float3 specMap = float3(uSpecGloss, 1.0);
 	float3 n = input.worldNormal;
 	float3 ambientLighting = shAmbient(n);
 	ambientLighting = sRGB(ambientLighting);

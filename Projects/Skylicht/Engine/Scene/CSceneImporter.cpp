@@ -419,11 +419,13 @@ namespace Skylicht
 		obj->loadSerializable(templateData);
 		obj->startComponent();
 
-		// apply current transform
-		obj->getTransform()->setRelativeTransform(saveTransform);
+		// apply current transform for root template
+		if (obj == obj->getParentTemplate())
+			obj->getTransform()->setRelativeTransform(saveTransform);
 
 		// revert id
 		obj->setID(id.c_str());
+		obj->setTemplateChanged(false);
 
 		// sync in childs object
 		CContainerObject* container = dynamic_cast<CContainerObject*>(obj);
@@ -516,6 +518,10 @@ namespace Skylicht
 				{
 					g_listGameObject.push_back(child);
 				}
+
+				CContainerObject* childContainer = dynamic_cast<CContainerObject*>(child);
+				if (childContainer)
+					stack.push(childContainer);
 			}
 		}
 

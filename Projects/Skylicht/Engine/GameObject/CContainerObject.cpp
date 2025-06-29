@@ -25,10 +25,12 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "pch.h"
 
 #include "CContainerObject.h"
+
 #include "Utils/CStringImp.h"
 #include "Utils/CRandomID.h"
 
 #include "Scene/CScene.h"
+#include "Entity/CEntityHandler.h"
 
 namespace Skylicht
 {
@@ -281,6 +283,22 @@ namespace Skylicht
 		return (int)m_childs.size();
 	}
 
+	CGameObject* CContainerObject::getChildObjectBefore(CGameObject* object)
+	{
+		ArrayGameObject childs;
+		for (CGameObject* obj : m_childs)
+		{
+			if (!obj->isEditorObject())
+				childs.push_back(obj);
+		}
+
+		ArrayGameObject::iterator i = std::find(childs.begin(), childs.end(), object);
+		if (i == childs.begin() || i == childs.end())
+			return NULL;
+		--i;
+		return (*i);
+	}
+
 	void CContainerObject::bringToNext(CGameObject* object, CGameObject* target, bool behind)
 	{
 		if (target->getParent() != this)
@@ -393,6 +411,20 @@ namespace Skylicht
 		}
 	}
 
+	void CContainerObject::setTemplateChanged(bool b)
+	{
+		CGameObject::setTemplateChanged(b);
+
+		if (b == false)
+		{
+			for (u32 i = 0, n = m_arrayChildObjects.size(); i < n; i++)
+			{
+				if (m_templateId == m_arrayChildObjects[i]->getTemplateID())
+					m_arrayChildObjects[i]->setTemplateChanged(b);
+			}
+		}
+	}
+
 	CGameObject* CContainerObject::searchObject(const wchar_t* objectName)
 	{	
 		core::map<std::wstring, CGameObject*>::Node* node = m_objectByName.find(std::wstring(objectName));
@@ -473,9 +505,43 @@ namespace Skylicht
 		return result;
 	}
 
-	CGameObject* CContainerObject::searchObjectInScene(const wchar_t* objectName)
+	CEntity* CContainerObject::searchEntityByID(const char* id)
 	{
-		return m_zone->getScene()->searchObjectInChild(objectName);
+		for (CGameObject*& obj : m_childs)
+		{
+			CEntityHandler* entityHandler = obj->getComponent<CEntityHandler>();
+			if (entityHandler != NULL)
+			{
+				CEntity* result = entityHandler->searchEntityByID(id);
+				if (result != NULL)
+					return result;
+			}
+		}
+		return NULL;
+	}
+
+	CEntity* CContainerObject::searchEntityInChildByID(const char* id)
+	{
+		for (CGameObject*& obj : m_childs)
+		{
+			CEntityHandler* entityHandler = obj->getComponent<CEntityHandler>();
+			if (entityHandler != NULL)
+			{
+				CEntity* result = entityHandler->searchEntityByID(id);
+				if (result != NULL)
+					return result;
+			}
+
+			CContainerObject* container = dynamic_cast<CContainerObject*>(obj);
+			if (container != NULL)
+			{
+				CEntity* result = container->searchEntityByID(id);
+				if (result != NULL)
+					return result;
+			}
+		}
+
+		return NULL;
 	}
 
 	CGameObject* CContainerObject::searchObjectInChildByTemplateObjId(const char* id)
@@ -497,6 +563,43 @@ namespace Skylicht
 		}
 
 		return NULL;
+	}
+
+	u32 CContainerObject::searchObjectByCullingLayer(ArrayGameObject& result, u32 mask)
+	{
+		for (CGameObject*& obj : m_childs)
+		{
+			if (obj->getCullingLayer() & mask)
+				result.push_back(obj);
+
+			CContainerObject* container = dynamic_cast<CContainerObject*>(obj);
+			if (container != NULL)
+				container->searchObjectByCullingLayer(result, mask);
+		}
+
+		return (u32)result.size();
+	}
+
+	void CContainerObject::setCullingLayerForChild(u32 mask)
+	{
+		for (CGameObject*& obj : m_childs)
+		{
+			obj->setCullingLayer(mask);
+			CContainerObject* container = dynamic_cast<CContainerObject*>(obj);
+			if (container != NULL)
+				container->setCullingLayerForChild(mask);
+		}
+	}
+
+	void CContainerObject::setCullingOnOffForChild(u32 value, bool on)
+	{
+		for (CGameObject*& obj : m_childs)
+		{
+			obj->setCullingLayerOnOff(value, on);
+			CContainerObject* container = dynamic_cast<CContainerObject*>(obj);
+			if (container != NULL)
+				container->setCullingOnOffForChild(value, on);
+		}
 	}
 
 	bool CContainerObject::testConflictName(const wchar_t* objectName)

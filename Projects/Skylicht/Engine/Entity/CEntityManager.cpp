@@ -43,6 +43,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "ReflectionProbe/CReflectionProbeSystem.h"
 #include "IndirectLighting/CIndirectLightingSystem.h"
 #include "Debug/CDebugRenderer.h"
+#include "TextBillboard/CTextBillboardRenderer.h"
 
 namespace Skylicht
 {
@@ -52,8 +53,9 @@ namespace Skylicht
 		m_systemChanged(true),
 		m_needSortEntities(true)
 	{
+		addCustomGroup(new CGroupVisible());
+
 		// core engine systems
-		addSystem<CVisibleSystem>();
 		addSystem<CComponentTransformSystem>();
 		addSystem<CWorldTransformSystem>();
 		addSystem<CWorldInverseTransformSystem>();
@@ -65,6 +67,7 @@ namespace Skylicht
 		addSystem<CIndirectLightingSystem>();
 
 		// culling system
+		addRenderSystem<CVisibleSystem>();
 		addRenderSystem<CLODSystem>();
 		addRenderSystem<CCullingSystem>();
 		addRenderSystem<CLightCullingSystem>();
@@ -74,6 +77,7 @@ namespace Skylicht
 		addRenderSystem<CSkinnedMeshRenderer>();
 		addRenderSystem<CMeshRendererInstancing>();
 		addRenderSystem<COcclusionQueryRenderer>();
+		addRenderSystem<CTextBillboardRenderer>();
 		addRenderSystem<CDebugRenderer>();
 	}
 
@@ -95,6 +99,7 @@ namespace Skylicht
 
 		m_entities.set_used(0);
 		m_unused.set_used(0);
+		m_delayRemove.set_used(0);
 
 		notifyUpdateSortEntities();
 	}
@@ -226,20 +231,37 @@ namespace Skylicht
 	void CEntityManager::removeEntity(int index)
 	{
 		CEntity* entity = m_entities[index];
-		entity->setAlive(false);
-		entity->removeAllData();
-		m_unused.push_back(entity);
-
-		notifyUpdateSortEntities();
+		if (entity->isAlive())
+		{
+			entity->setAlive(false);
+			m_delayRemove.push_back(entity);
+		}
 	}
 
 	void CEntityManager::removeEntity(CEntity* entity)
 	{
-		entity->setAlive(false);
-		entity->removeAllData();
-		m_unused.push_back(entity);
+		if (entity->isAlive())
+		{
+			entity->setAlive(false);
+			m_delayRemove.push_back(entity);
+		}
+	}
 
-		notifyUpdateSortEntities();
+	void CEntityManager::updateRemoveEntity()
+	{
+		u32 n = m_delayRemove.size();
+		for (u32 i = 0; i < n; i++)
+		{
+			CEntity* entity = m_delayRemove[i];
+			entity->removeAllData();
+			m_unused.push_back(entity);
+		}
+
+		if (n > 0)
+		{
+			notifyUpdateSortEntities();
+			m_delayRemove.set_used(0);
+		}
 	}
 
 	int CEntityManager::getDepth(CWorldTransformData* t)
@@ -352,18 +374,18 @@ namespace Skylicht
 
 	void CEntityManager::update()
 	{
+		updateRemoveEntity();
+
 		if (m_systemChanged == true)
-		{
 			sortSystem();
-		}
+
+		if (m_needSortEntities)
+			sortAliveEntities();
 
 		for (IEntitySystem*& s : m_sortUpdate)
 		{
 			s->beginQuery(this);
 		}
-
-		if (m_needSortEntities)
-			sortAliveEntities();
 
 		CEntity** entities = m_alives.pointer();
 		int numEntity = (int)m_alives.size();

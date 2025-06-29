@@ -27,6 +27,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "DataTypeIndex.h"
 #include "Entity/IEntityData.h"
 #include "Material/CMaterial.h"
+#include "Instancing/SPrimitiveMeshInstancing.h"
 
 namespace Skylicht
 {
@@ -39,7 +40,6 @@ namespace Skylicht
 			Cube,
 			Sphere,
 			Plane,
-			Capsule,
 			Count
 		};
 
@@ -56,7 +56,23 @@ namespace Skylicht
 		bool NormalMap;
 
 		int RootEntity;
+
+		SPrimitiveMeshInstancing* InstancingMesh;
+
+		core::array<CPrimiviteData*>* InstancingGroup;
 	};
 
 	DECLARE_COMPONENT_DATA_TYPE_INDEX(CPrimiviteData);
+
+	struct SPrimitiveGroup
+	{
+		core::array<CPrimiviteData*> Array;
+
+		SInstancingVertexBuffer* Buffer;
+
+		SPrimitiveGroup()
+		{
+			Buffer = NULL;
+		}
+	};
 }

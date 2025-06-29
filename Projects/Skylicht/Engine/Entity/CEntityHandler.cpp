@@ -35,7 +35,8 @@ https://github.com/skylicht-lab/skylicht-engine
 
 namespace Skylicht
 {
-	CEntityHandler::CEntityHandler()
+	CEntityHandler::CEntityHandler() :
+		m_shadowCasting(true)
 	{
 
 	}
@@ -55,6 +56,25 @@ namespace Skylicht
 
 	}
 
+	void CEntityHandler::onUpdateCullingLayer(u32 mask)
+	{
+		for (u32 i = 0, n = m_entities.size(); i < n; i++)
+		{
+			CVisibleData* visible = GET_ENTITY_DATA(m_entities[i], CVisibleData);
+			visible->CullingLayer = mask;
+		}
+	}
+
+	CEntity* CEntityHandler::searchEntityByID(const char* id)
+	{
+		for (u32 i = 0, n = m_entities.size(); i < n; i++)
+		{
+			if (m_entities[i]->getID() == id)
+				return m_entities[i];
+		}
+		return NULL;
+	}
+
 	CEntity* CEntityHandler::createEntity()
 	{
 		CEntityManager* entityManager = m_gameObject->getEntityManager();
@@ -62,9 +82,11 @@ namespace Skylicht
 		CEntity* entity = entityManager->createEntity();
 		CWorldTransformData* transformData = entity->addData<CWorldTransformData>();
 
+		int namePosition = (int)m_entities.size();
+
 		// name
 		char name[512];
-		sprintf(name, "#%d", entity->getIndex());
+		sprintf(name, "#%d", namePosition);
 
 		// id
 		std::string id = CRandomID::generate();
@@ -127,10 +149,12 @@ namespace Skylicht
 		{
 			if (m_entities[i] == entity)
 			{
-				removeChilds(entity);
-
+				if (entity->isAlive())
+				{
+					removeChilds(entity);
+					entityManager->removeEntity(entity);
+				}
 				m_entities.erase(i);
-				entityManager->removeEntity(entity);
 			}
 		}
 	}
@@ -147,9 +171,11 @@ namespace Skylicht
 		for (int i = (int)m_entities.size() - 1; i >= 0; i--)
 		{
 			CEntity* entity = m_entities[i];
-
-			removeChilds(entity);
-			entityManager->removeEntity(entity);
+			if (entity->isAlive())
+			{
+				removeChilds(entity);
+				entityManager->removeEntity(entity);
+			}
 		}
 
 		m_entities.clear();
@@ -158,8 +184,28 @@ namespace Skylicht
 	void CEntityHandler::removeChilds(CEntity* entity)
 	{
 		CEntityManager* entityManager = m_gameObject->getEntityManager();
-		CEntityChildsData* childs = GET_ENTITY_DATA(entity, CEntityChildsData);
 
+		CEntityChildsData* childs = NULL;
+		CWorldTransformData* transformData = entity->getData<CWorldTransformData>();
+		if (transformData->ParentIndex >= 0)
+		{
+			CEntity* parent = entityManager->getEntity(transformData->ParentIndex);
+			childs = GET_ENTITY_DATA(parent, CEntityChildsData);
+			if (childs)
+			{
+				u32 childCount = childs->Childs.size();
+				for (u32 i = 0; i < childCount; i++)
+				{
+					if (childs->Childs[i] == entity)
+					{
+						childs->Childs.erase(i);
+						break;
+					}
+				}
+			}
+		}
+
+		childs = GET_ENTITY_DATA(entity, CEntityChildsData);
 		if (childs)
 		{
 			u32 childCount = childs->Childs.size();
@@ -206,5 +252,20 @@ namespace Skylicht
 			CWorldTransformData* transformData = GET_ENTITY_DATA(entity, CWorldTransformData);
 			result[i] = transformData->Relative;
 		}
+	}
+
+	void CEntityHandler::setShadowCasting(bool b)
+	{
+		u32 n = m_entities.size();
+
+		for (u32 i = 0; i < n; i++)
+		{
+			CEntity* entity = m_entities[i];
+
+			CVisibleData* visible = GET_ENTITY_DATA(entity, CVisibleData);
+			visible->ShadowCasting = b;
+		}
+
+		m_shadowCasting = b;
 	}
 }

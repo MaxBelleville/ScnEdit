@@ -33,6 +33,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "RenderMesh/CMesh.h"
 #include "Material/Shader/CShaderManager.h"
 #include "Material/Shader/ShaderCallback/CShaderShadow.h"
+#include "Material/Shader/ShaderCallback/CShaderLighting.h"
 #include "Material/CMaterial.h"
 
 #include "CPointLightShadowBakeRP.h"
@@ -41,11 +42,19 @@ namespace Skylicht
 {
 	CPointLightBakeRP::CPointLightBakeRP() :
 		m_renderMesh(NULL),
-		m_renderSubmesh(NULL),
+		m_normalMap(NULL),
+		m_submesh(NULL),
 		m_renderTarget(NULL),
 		m_numTarget(0),
 		m_currentTarget(0),
-		m_bakePointLightMaterialID(0)
+		m_bakePointLight(0),
+		m_bakeSpotLight(0),
+		m_bakePointLightUV0(0),
+		m_bakeSpotLightUV0(0),
+		m_bakePointLightNormal(0),
+		m_bakeSpotLightNormal(0),
+		m_bakePointLightUV0Normal(0),
+		m_bakeSpotLightUV0Normal(0)
 	{
 		m_type = Deferred;
 	}
@@ -59,8 +68,24 @@ namespace Skylicht
 	{
 		CShaderManager* shaderMgr = CShaderManager::getInstance();
 		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakePointLight.xml");
+		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakeSpotLight.xml");
+		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakePointLightUV0.xml");
+		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakeSpotLightUV0.xml");
 
-		m_bakePointLightMaterialID = shaderMgr->getShaderIDByName("BakePointLight");
+		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakePointLightNormal.xml");
+		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakeSpotLightNormal.xml");
+		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakePointLightUV0Normal.xml");
+		shaderMgr->loadShader("BuiltIn/Shader/BakeDirectional/BakeSpotLightUV0Normal.xml");
+
+		m_bakePointLight = shaderMgr->getShaderIDByName("BakePointLight");
+		m_bakeSpotLight = shaderMgr->getShaderIDByName("BakeSpotLight");
+		m_bakePointLightUV0 = shaderMgr->getShaderIDByName("BakePointLightUV0");
+		m_bakeSpotLightUV0 = shaderMgr->getShaderIDByName("BakeSpotLightUV0");
+
+		m_bakePointLightNormal = shaderMgr->getShaderIDByName("BakePointLightNormal");
+		m_bakeSpotLightNormal = shaderMgr->getShaderIDByName("BakeSpotLightNormal");
+		m_bakePointLightUV0Normal = shaderMgr->getShaderIDByName("BakePointLightUV0Normal");
+		m_bakeSpotLightUV0Normal = shaderMgr->getShaderIDByName("BakeSpotLightUV0Normal");
 	}
 
 	void CPointLightBakeRP::resize(int w, int h)
@@ -95,7 +120,7 @@ namespace Skylicht
 
 		for (int i = 0; i < m_numTarget; i++)
 		{
-			if (m_renderTarget[i] == NULL || m_renderSubmesh[i] == NULL)
+			if (m_renderTarget[i] == NULL || m_submesh[i] == NULL)
 				continue;
 
 			driver->setRenderTarget(m_renderTarget[i], false, false);
@@ -126,32 +151,82 @@ namespace Skylicht
 
 		IVideoDriver* driver = getVideoDriver();
 
+		// shadow
+		CPointLightShadowBakeRP* shadowRP = dynamic_cast<CPointLightShadowBakeRP*>(CShaderShadow::getShadowMapRP());
+		if (shadowRP == NULL)
+			return;
+
+		// check uv2
+		video::E_VERTEX_TYPE vtxType = m_submesh[m_currentTarget]->getVertexType();
+		bool haveLM = vtxType == video::EVT_2TCOORDS || vtxType == video::EVT_2TCOORDS_TANGENTS;
+		if (!shadowRP->isBakeInUV0() && !haveLM)
+			return;
+
+		// check detail normal
+		bool haveDetailNormal = false;
+		bool haveTangent = vtxType == EVT_TANGENTS || vtxType == video::EVT_2TCOORDS_TANGENTS;
+		if (shadowRP->isBakeDetailNormal() && haveTangent && m_normalMap)
+			haveDetailNormal = true;
+
+		CLight* currentLight = shadowRP->getCurrentLight();
+		CPointLight* pl = dynamic_cast<CPointLight*>(currentLight);
+		if (pl == NULL)
+			return;
+
+		CSpotLight* sl = dynamic_cast<CSpotLight*>(currentLight);
+		if (sl)
+			CShaderLighting::setSpotLight(sl);
+		else
+			CShaderLighting::setPointLight(pl);
+
 		// render mesh with light bake shader
 		video::SMaterial irrMaterial;
-		irrMaterial.MaterialType = m_bakePointLightMaterialID;
+
 		irrMaterial.ZBuffer = video::ECFN_DISABLED;
 		irrMaterial.ZWriteEnable = false;
 		irrMaterial.BackfaceCulling = false;
 		irrMaterial.FrontfaceCulling = false;
 
-		// shadow
-		CShadowMapRP* shadowRP = CShaderShadow::getShadowMapRP();
-		if (shadowRP != NULL)
-		{
-			ITexture* depthTexture = shadowRP->getDepthTexture();
+		ITexture* depthTexture = shadowRP->getDepthTexture();
+		if (depthTexture)
 			depthTexture->regenerateMipMapLevels();
 
-			irrMaterial.TextureLayer[0].Texture = depthTexture;
-			irrMaterial.TextureLayer[0].BilinearFilter = false;
-			irrMaterial.TextureLayer[0].TrilinearFilter = false;
-			irrMaterial.TextureLayer[0].AnisotropicFilter = 0;
+		irrMaterial.TextureLayer[0].Texture = depthTexture;
+		irrMaterial.TextureLayer[0].BilinearFilter = false;
+		irrMaterial.TextureLayer[0].TrilinearFilter = false;
+		irrMaterial.TextureLayer[0].AnisotropicFilter = 0;
+
+		if (haveDetailNormal)
+		{
+			irrMaterial.TextureLayer[1].Texture = m_normalMap;
+			irrMaterial.TextureLayer[1].BilinearFilter = false;
+			irrMaterial.TextureLayer[1].TrilinearFilter = false;
+			irrMaterial.TextureLayer[1].AnisotropicFilter = 8;
+
+			if (shadowRP->isBakeInUV0())
+				irrMaterial.MaterialType = sl != NULL ? m_bakeSpotLightUV0Normal : m_bakePointLightUV0Normal;
+			else
+				irrMaterial.MaterialType = sl != NULL ? m_bakeSpotLightNormal : m_bakePointLightNormal;
 		}
+		else
+		{
+			if (shadowRP->isBakeInUV0())
+				irrMaterial.MaterialType = sl != NULL ? m_bakeSpotLightUV0 : m_bakePointLightUV0;
+			else
+				irrMaterial.MaterialType = sl != NULL ? m_bakeSpotLight : m_bakePointLight;
+		}
+
+		if (irrMaterial.MaterialType <= 0)
+			return;
 
 		// set irrlicht material
 		driver->setMaterial(irrMaterial);
 
 		// draw mesh buffer
-		driver->drawMeshBuffer(m_renderSubmesh[m_currentTarget]);
+		driver->drawMeshBuffer(m_submesh[m_currentTarget]);
+
+		CShaderLighting::setSpotLight(NULL);
+		CShaderLighting::setPointLight(NULL);
 	}
 
 	void CPointLightBakeRP::drawInstancingMeshBuffer(CMesh* mesh, int bufferID, int materialRenderID, CEntityManager* entityMgr, int entityID, bool skinnedMesh)
@@ -161,7 +236,9 @@ namespace Skylicht
 
 	bool CPointLightBakeRP::canRenderMaterial(CMaterial* material)
 	{
-		if (material->isDeferred() == true)
+		if (material &&
+			material->getShader() &&
+			material->getShader()->isOpaque() == true)
 			return true;
 
 		return false;
@@ -169,7 +246,7 @@ namespace Skylicht
 
 	bool CPointLightBakeRP::canRenderShader(CShader* shader)
 	{
-		if (shader->isDeferred() == true)
+		if (shader && shader->isOpaque() == true)
 			return true;
 
 		return false;

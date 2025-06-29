@@ -32,6 +32,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Material/Shader/ShaderCallback/CShaderMaterial.h"
 #include "Material/Shader/ShaderCallback/CShaderShadow.h"
 #include "Material/Shader/ShaderCallback/CShaderTransformTexture.h"
+#include "Material/Shader/ShaderCallback/CShaderRTT.h"
 
 #include "IndirectLighting/CIndirectLightingData.h"
 #include "RenderPipeline/CShadowMapRP.h"
@@ -123,6 +124,9 @@ namespace Skylicht
 
 	void CBaseRP::onNext(ITexture* target, CCamera* camera, CEntityManager* entity, const core::recti& viewport, int cubeFaceId)
 	{
+		if (OnFinish != nullptr)
+			OnFinish(this);
+
 		if (m_next != NULL)
 			m_next->render(target, camera, entity, viewport, cubeFaceId, this);
 	}
@@ -234,14 +238,45 @@ namespace Skylicht
 					irrMaterial.TextureLayer[textureID].AnisotropicFilter = 0;
 				}
 			}
+			else if (res->Type == CShader::LastFrame)
+			{
+				SUniform* uniform = shader->getFSUniform(res->Name.c_str());
+				if (uniform != NULL)
+				{
+					u32 textureID = (u32)uniform->Value[0];
+					irrMaterial.setTexture(textureID, CShaderRTT::getLastFrameTexture());
+
+					irrMaterial.TextureLayer[textureID].TextureWrapU = 0;
+					irrMaterial.TextureLayer[textureID].TextureWrapV = 0;
+
+					irrMaterial.TextureLayer[textureID].BilinearFilter = false;
+					irrMaterial.TextureLayer[textureID].TrilinearFilter = false;
+					irrMaterial.TextureLayer[textureID].AnisotropicFilter = 2;
+				}
+			}
+			else if (res->Type >= CShader::RTT0 && res->Type <= CShader::RTT7)
+			{
+				SUniform* uniform = shader->getFSUniform(res->Name.c_str());
+				if (uniform != NULL)
+				{
+					int rttId = (int)(res->Type - CShader::RTT0);
+
+					u32 textureID = (u32)uniform->Value[0];
+					irrMaterial.setTexture(textureID, CShaderRTT::getRTTTexture(rttId));
+
+					irrMaterial.TextureLayer[textureID].TextureWrapU = 0;
+					irrMaterial.TextureLayer[textureID].TextureWrapV = 0;
+
+					irrMaterial.TextureLayer[textureID].BilinearFilter = false;
+					irrMaterial.TextureLayer[textureID].TrilinearFilter = false;
+					irrMaterial.TextureLayer[textureID].AnisotropicFilter = 2;
+				}
+			}
 		}
 
 		// transparent (disable zwrite)
 		if (shader->isOpaque() == false)
-		{
 			irrMaterial.ZWriteEnable = false;
-			irrMaterial.BackfaceCulling = false;
-		}
 	}
 
 	void CBaseRP::drawMeshBuffer(CMesh* mesh, int bufferID, CEntityManager* entity, int entityID, bool skinnedMesh)
@@ -266,6 +301,9 @@ namespace Skylicht
 
 	void CBaseRP::drawInstancingMeshBuffer(CMesh* mesh, int bufferID, CShader* instancingShader, CEntityManager* entity, int entityID, bool skinnedMesh)
 	{
+		if (!instancingShader)
+			return;
+
 		updateTextureResource(mesh, bufferID, entity, entityID, skinnedMesh);
 
 		IMeshBuffer* mb = mesh->getMeshBuffer(bufferID);
@@ -817,7 +855,7 @@ namespace Skylicht
 		if (allPipeline)
 			render(target, camera, entityMgr, core::recti());
 		else
-			entityMgr->render();
+			entityMgr->cullingAndRender();
 	}
 
 	void CBaseRP::drawSceneToCubeTexture(ITexture* target, CCamera* camera, video::E_CUBEMAP_FACE faceID, CEntityManager* entityMgr, bool allPipeline)
@@ -837,6 +875,6 @@ namespace Skylicht
 		if (allPipeline)
 			render(target, camera, entityMgr, core::recti(), (int)faceID);
 		else
-			entityMgr->render();
+			entityMgr->cullingAndRender();
 	}
 }

@@ -24,22 +24,30 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
-#include "CZone.h"
+#include "CPositionZone.h"
 
 namespace Skylicht
 {
 	namespace Particle
 	{
-		class COMPONENT_API CPoint : public CZone
+		class COMPONENT_API CPoint : public CPositionZone
 		{
+		protected:
+
 		public:
 			CPoint();
 
 			virtual ~CPoint();
 
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
+
 			virtual void generatePosition(CParticle& particle, bool full, CGroup* group);
 
 			virtual core::vector3df computeNormal(const core::vector3df& point, CGroup* group);
+
+			DECLARE_GETTYPENAME(CPoint)
 		};
 	}
 }

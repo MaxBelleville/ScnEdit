@@ -27,6 +27,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "CSceneController.h"
 #include "CPropertyController.h"
 #include "CAssetCreateController.h"
+#include "CParticleController.h"
 
 #include "Selection/CSelection.h"
 
@@ -70,6 +71,7 @@ namespace Skylicht
 		{
 			m_transformGizmos = new CTransformGizmos();
 			m_worldTransformDataGizmos = new CWorldTransformDataGizmos();
+			m_particleGizmos = new CParticleGizmos();
 
 			CAssetManager::getInstance()->registerFileLoader("scene", this);
 		}
@@ -80,6 +82,7 @@ namespace Skylicht
 
 			delete m_transformGizmos;
 			delete m_worldTransformDataGizmos;
+			delete m_particleGizmos;
 
 			if (m_history)
 				delete m_history;
@@ -265,10 +268,6 @@ namespace Skylicht
 			// create new scene
 			m_scene = m_spaceScene->initNullScene();
 
-			// set scene name
-			std::string sceneName = CPath::getFileName(path);
-			m_scene->setName(sceneName.c_str());
-
 			m_spaceScene->enableRender(false);
 			m_spaceScene->getEditor()->initLoadSceneGUI(path.c_str());
 
@@ -278,6 +277,12 @@ namespace Skylicht
 
 		void CSceneController::doFinishLoadScene()
 		{
+			if (!m_scenePath.empty())
+			{
+				std::string sceneName = CPath::getFileName(m_scenePath);
+				m_scene->setName(sceneName.c_str());
+			}
+
 			CZone* zone = m_scene->getZone(0);
 
 			if (zone != NULL && !zone->isEditorObject())
@@ -639,6 +644,8 @@ namespace Skylicht
 			if (m_gizmos)
 				m_gizmos->refresh();
 
+			CHandles::getInstance()->reset();
+
 			// Set property & event
 			CPropertyController* propertyController = CPropertyController::getInstance();
 
@@ -668,84 +675,120 @@ namespace Skylicht
 			if (m_scene == NULL || m_zone == NULL)
 				return;
 
+			CContainerObject* parent = NULL;
+			CSelectObject* selectedObject = CSelection::getInstance()->getLastSelected();
+			if (selectedObject)
+			{
+				if (selectedObject->getType() == CSelectObject::GameObject)
+				{
+					CGameObject* obj = m_scene->searchObjectInChildByID(selectedObject->getID().c_str());
+					if (obj != NULL)
+					{
+						parent = dynamic_cast<CContainerObject*>(obj);
+						if (parent == NULL)
+							parent = dynamic_cast<CContainerObject*>(obj->getParent());
+					}
+				}
+			}
+
 			if (objectType == L"Zone")
 			{
 				createZone();
 			}
 			if (objectType == L"Empty Object")
 			{
-				createEmptyObject(NULL);
+				createEmptyObject(parent);
 			}
 			else if (objectType == L"Container Object")
 			{
-				createContainerObject(NULL);
+				createContainerObject(parent);
 			}
 			else if (objectType == L"Skydome")
 			{
 				std::vector<std::string> components = { "CSkyDome" };
-				createComponentObject("Skydome", components, NULL);
+				createComponentObject("Skydome", components, parent);
 			}
 			else if (objectType == L"Skybox")
 			{
 				std::vector<std::string> components = { "CSkyBox" };
-				createComponentObject("Skybox", components, NULL);
+				createComponentObject("Skybox", components, parent);
 			}
 			else if (objectType == L"Sky")
 			{
 				std::vector<std::string> components = { "CSkySun" };
-				createComponentObject("Sky", components, NULL);
+				createComponentObject("Sky", components, parent);
 			}
 			else if (objectType == L"Mesh")
 			{
 				std::vector<std::string> components = { "CRenderMesh", "CIndirectLighting" };
-				createComponentObject("Mesh", components, NULL);
+				createComponentObject("Mesh", components, parent);
 			}
 			else if (objectType == L"Mesh Instancing")
 			{
 				std::vector<std::string> components = { "CRenderMeshInstancing", "CIndirectLighting" };
-				createComponentObject("Mesh Instancing", components, NULL);
+				createComponentObject("Mesh Instancing", components, parent);
 			}
 			else if (objectType == L"Direction Light")
 			{
 				std::vector<std::string> components = { "CDirectionalLight" };
-				CGameObject* go = createComponentObject("Direction Light", components, NULL);
+				CGameObject* go = createComponentObject("Direction Light", components, parent);
 				go->getTransformEuler()->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
 			}
 			else if (objectType == L"Point Light")
 			{
 				std::vector<std::string> components = { "CPointLight" };
-				createComponentObject("Point Light", components, NULL);
+				createComponentObject("Point Light", components, parent);
 			}
 			else if (objectType == L"Spot Light")
 			{
 				std::vector<std::string> components = { "CSpotLight" };
-				CGameObject* go = createComponentObject("Spotlight", components, NULL);
+				CGameObject* go = createComponentObject("Spotlight", components, parent);
 				go->getTransformEuler()->setRotation(core::vector3df(90.0f, 0.0f, 0.0f));
 			}
 			else if (objectType == L"Reflection Probe")
 			{
 				std::vector<std::string> components = { "CReflectionProbe" };
-				createComponentObject("Reflection Probe", components, NULL);
+				createComponentObject("Reflection Probe", components, parent);
 			}
 			else if (objectType == L"Light Probes")
 			{
 				std::vector<std::string> components = { "CLightProbes" };
-				createComponentObject("Light Probes", components, NULL);
+				createComponentObject("Light Probes", components, parent);
 			}
 			else if (objectType == L"Cube")
 			{
 				std::vector<std::string> components = { "CCube" };
-				createComponentObject("Cube", components, NULL);
+				createComponentObject("Cube", components, parent);
 			}
 			else if (objectType == L"Sphere")
 			{
 				std::vector<std::string> components = { "CSphere" };
-				createComponentObject("Sphere", components, NULL);
+				createComponentObject("Sphere", components, parent);
 			}
 			else if (objectType == L"Plane")
 			{
 				std::vector<std::string> components = { "CPlane" };
-				createComponentObject("Plane", components, NULL);
+				createComponentObject("Plane", components, parent);
+			}
+			else if (objectType == L"Plane")
+			{
+				std::vector<std::string> components = { "CPlane" };
+				createComponentObject("Plane", components, parent);
+			}
+			else if (objectType == L"Capsule")
+			{
+				std::vector<std::string> components = { "CCapsule", "CIndirectLighting" };
+				createComponentObject("Capsule", components, parent);
+			}
+			else if (objectType == L"Cylinder")
+			{
+				std::vector<std::string> components = { "CCylinder", "CIndirectLighting" };
+				createComponentObject("Cylinder", components, parent);
+			}
+			else if (objectType == L"Particle")
+			{
+				std::vector<std::string> components = { "CParticleComponent" };
+				createComponentObject("Particle", components, parent);
 			}
 		}
 
@@ -795,7 +838,7 @@ namespace Skylicht
 			gameObject->remove();
 		}
 
-		CZone* CSceneController::createZoneObject(CObjectSerializable* data, bool saveHistory)
+		CZone* CSceneController::createZoneObject(CObjectSerializable* data, CGameObject* before, bool saveHistory)
 		{
 			CZone* newObject = m_scene->createZone();
 
@@ -803,22 +846,11 @@ namespace Skylicht
 			newObject->loadSerializable(data);
 			newObject->startComponent();
 
-			// create child data
-			CObjectSerializable* childs = data->getProperty<CObjectSerializable>("Childs");
-			if (childs != NULL)
-			{
-				for (int i = 0, n = childs->getNumProperty(); i < n; i++)
-				{
-					CObjectSerializable* childData = (CObjectSerializable*)childs->getPropertyID(i);
-					newObject->createObject(childData, false);
-				}
-				newObject->updateAddRemoveObject();
-			}
-
+			CHierachyNode* node = NULL;
 			CHierachyNode* parentNode = m_hierachyNode;
 			if (parentNode != NULL)
 			{
-				CHierachyNode* node = parentNode->addChild();
+				node = parentNode->addChild();
 				node->setName(newObject->getName());
 				node->setIcon(GUI::ESystemIcon::Folder);
 				node->setTagData(newObject, CHierachyNode::Container);
@@ -827,6 +859,20 @@ namespace Skylicht
 
 				if (m_spaceHierarchy != NULL)
 					m_spaceHierarchy->addToTreeNode(node);
+			}
+
+			if (before)
+			{
+				CHierachyNode* beforeNode = m_hierachyNode->getNodeByTag(before);
+				if (beforeNode && node)
+				{
+					CHierachyNode* parentNode = node->getParent();
+					parentNode->bringToNext(node, beforeNode, true);
+
+					if (node->getGUINode())
+						node->getGUINode()->bringNextToControl(beforeNode ? beforeNode->getGUINode() : NULL, true);
+				}
+				m_scene->bringToNext(newObject, (CZone*)before, true);
 			}
 
 			if (saveHistory)
@@ -838,7 +884,7 @@ namespace Skylicht
 			return newObject;
 		}
 
-		CGameObject* CSceneController::createGameObject(CContainerObject* parent, CObjectSerializable* data, bool saveHistory)
+		CGameObject* CSceneController::createGameObject(CContainerObject* parent, CGameObject* before, CObjectSerializable* data, bool saveHistory)
 		{
 			CContainerObject* p = parent == NULL ? m_zone : parent;
 			if (p == NULL)
@@ -849,27 +895,42 @@ namespace Skylicht
 			p->getZone()->updateAddRemoveObject();
 			p->getZone()->updateIndexSearchObject();
 
+			CHierachyNode* node = NULL;
 			CHierachyNode* parentNode = m_hierachyNode->getNodeByTag(p);
 			if (parentNode != NULL)
 			{
-				CHierachyNode* node = parentNode->addChild();
-				node->setName(newObject->getName());
-
-				if (data->Name == "CZone" || data->Name == "CContainerObject")
-				{
-					node->setIcon(GUI::ESystemIcon::Folder);
-					node->setTagData(newObject, CHierachyNode::Container);
-				}
-				else
-				{
-					node->setIcon(GUI::ESystemIcon::Res3D);
-					node->setTagData(newObject, CHierachyNode::GameObject);
-				}
-
-				setNodeEvent(node);
-
+				node = buildHierarchyData(newObject, parentNode);
 				if (m_spaceHierarchy != NULL)
 					m_spaceHierarchy->addToTreeNode(node);
+			}
+
+			bool behind = true;
+			if (before == NULL && p->getChilds()->size() > 0)
+			{
+				// insert at first
+				ArrayGameObject* childs = p->getChilds();
+				for (CGameObject* obj : *childs)
+				{
+					if (!obj->isEditorObject())
+					{
+						before = obj;
+						behind = false;
+						break;
+					}
+				}
+			}
+
+			if (before)
+			{
+				CHierachyNode* beforeNode = m_hierachyNode->getNodeByTag(before);
+				if (beforeNode && node)
+				{
+					CHierachyNode* parentNode = node->getParent();
+					parentNode->bringToNext(node, beforeNode, behind);
+					if (node->getGUINode())
+						node->getGUINode()->bringNextToControl(beforeNode ? beforeNode->getGUINode() : NULL, behind);
+				}
+				p->bringToNext(newObject, before, behind);
 			}
 
 			if (saveHistory)
@@ -996,6 +1057,8 @@ namespace Skylicht
 			{
 				std::string defaultMaterial;
 				std::string meta = path + ".meta";
+				bool useNormalMap = true;
+				bool useUV2 = false;
 
 				if (fileExt == "dae" ||
 					fileExt == "obj" ||
@@ -1003,12 +1066,16 @@ namespace Skylicht
 				{
 					MeshExportSettings* setting = new MeshExportSettings();
 					if (setting->load(meta.c_str()))
+					{
 						defaultMaterial = setting->DefaultMaterial.get();
+						useNormalMap = setting->UseNormalMap.get();
+						useUV2 = setting->UseUV2.get();
+					}
 					delete setting;
 				}
 
 				CRenderMesh* renderMesh = gameObject->addComponent<CRenderMesh>();
-				renderMesh->initFromMeshFile(shortPath.c_str());
+				renderMesh->initFromMeshFile(shortPath.c_str(), useNormalMap, useUV2);
 
 				if (!defaultMaterial.empty())
 					renderMesh->initMaterialFromFile(defaultMaterial.c_str());
@@ -1017,14 +1084,21 @@ namespace Skylicht
 				indirectLighting->setAutoSH(true);
 				indirectLighting->setIndirectLightingType(CIndirectLighting::SH9);
 			}
+			else if (fileExt == "particle")
+			{
+				Particle::CParticleComponent* particle = gameObject->addComponent<Particle::CParticleComponent>();
+				particle->setSourcePath(shortPath.c_str());
+				particle->load();
+			}
 		}
 
-		CGameObject* CSceneController::createTemplateObject(const std::string& path, CContainerObject* container)
+		CGameObject* CSceneController::createTemplateObject(const std::string& path, CContainerObject* container, bool saveHistory)
 		{
 			CGameObject* result = CSceneImporter::importTemplate(container, path.c_str());
 
 			if (result)
 			{
+				result->getTransform()->setWorldMatrix(core::IdentityMatrix);
 				result->getZone()->updateAddRemoveObject();
 				result->getZone()->updateIndexSearchObject();
 
@@ -1037,60 +1111,68 @@ namespace Skylicht
 						m_spaceHierarchy->addToTreeNode(node);
 				}
 
-				m_history->saveCreateHistory(result);
+				if (saveHistory)
+					m_history->saveCreateHistory(result);
 			}
 
 			return result;
 		}
 
-		void CSceneController::deselectAllOnHierachy()
+		void CSceneController::deselectAllOnHierachy(bool callEvent)
 		{
 			if (m_spaceHierarchy)
-				m_spaceHierarchy->deselectAll();
+				m_spaceHierarchy->deselectAll(callEvent);
 		}
 
-		CHierachyNode* CSceneController::deselectOnHierachy(CGameObject* gameObject)
+		CHierachyNode* CSceneController::deselectOnHierachy(CGameObject* gameObject, bool callEvent)
 		{
 			CHierachyNode* node = m_hierachyNode->getNodeByTag(gameObject);
 			if (node != NULL)
 			{
 				GUI::CTreeNode* treeNode = node->getGUINode();
-				treeNode->setSelected(false);
+				treeNode->setSelected(false, callEvent);
 			}
 			return node;
 		}
 
-		CHierachyNode* CSceneController::deselectOnHierachy(CEntity* entity)
+		CHierachyNode* CSceneController::deselectOnHierachy(CEntity* entity, bool callEvent)
 		{
 			CHierachyNode* node = m_hierachyNode->getNodeByTag(entity);
 			if (node != NULL)
 			{
 				GUI::CTreeNode* treeNode = node->getGUINode();
-				treeNode->setSelected(false);
+				if (treeNode)
+					treeNode->setSelected(false, callEvent);
 			}
 			return node;
 		}
 
-		CHierachyNode* CSceneController::selectOnHierachy(CGameObject* gameObject)
+		CHierachyNode* CSceneController::selectOnHierachy(CGameObject* gameObject, bool callEvent)
 		{
 			CHierachyNode* node = m_hierachyNode->getNodeByTag(gameObject);
 			if (node != NULL)
 			{
 				GUI::CTreeNode* treeNode = node->getGUINode();
-				treeNode->setSelected(true);
-				m_spaceHierarchy->scrollToNode(treeNode);
+				if (treeNode)
+				{
+					treeNode->setSelected(true, callEvent);
+					m_spaceHierarchy->scrollToNode(treeNode);
+				}
 			}
 			return node;
 		}
 
-		CHierachyNode* CSceneController::selectOnHierachy(CEntity* entity)
+		CHierachyNode* CSceneController::selectOnHierachy(CEntity* entity, bool callEvent)
 		{
 			CHierachyNode* node = m_hierachyNode->getNodeByTag(entity);
 			if (node != NULL)
 			{
 				GUI::CTreeNode* treeNode = node->getGUINode();
-				treeNode->setSelected(true);
-				m_spaceHierarchy->scrollToNode(treeNode);
+				if (treeNode)
+				{
+					treeNode->setSelected(true, callEvent);
+					m_spaceHierarchy->scrollToNode(treeNode);
+				}
 			}
 			return node;
 		}
@@ -1135,44 +1217,40 @@ namespace Skylicht
 			{
 				CGameObject* obj = (CGameObject*)node->getTagData();
 
-				// remove last observer
-				CSelectObject* selectedObject = selection->getLastSelected();
-				if (selectedObject != NULL)
-					selectedObject->removeAllObserver();
-
 				// Set property & event
 				CPropertyController* propertyController = CPropertyController::getInstance();
 				if (selected)
 				{
-					selectedObject = selection->addSelect(obj);
-					propertyController->setProperty(selectedObject);
-
 					// add gizmos
 					setGizmos(m_transformGizmos);
 
+					CSelectObject* selectedObject = selection->addSelect(obj);
+					propertyController->setProperty(selectedObject);
+
 					// add new observer
 					selectedObject->addObserver(this);
+
+					// add select history
+					m_history->addSelectHistory();
 				}
 				else
 				{
 					propertyController->setProperty(NULL);
 					selection->unSelect(obj);
 				}
+
+				// particle controller
+				CParticleController::getInstance()->setGameObject(obj);
 			}
 			else if (node->isTagEntity())
 			{
 				CEntity* entity = (CEntity*)node->getTagData();
 
-				// remove last observer
-				CSelectObject* selectedObject = selection->getLastSelected();
-				if (selectedObject != NULL)
-					selectedObject->removeAllObserver();
-
 				// Set property & event
 				CPropertyController* propertyController = CPropertyController::getInstance();
 				if (selected)
 				{
-					selectedObject = selection->addSelect(entity);
+					CSelectObject* selectedObject = selection->addSelect(entity);
 					propertyController->setProperty(selectedObject);
 
 					// add gizmos
@@ -1180,19 +1258,15 @@ namespace Skylicht
 
 					// add new observer
 					selectedObject->addObserver(this);
+
+					// add select history
+					m_history->addSelectHistory();
 				}
 				else
 				{
 					selection->unSelect(entity);
 					propertyController->setProperty(NULL);
 				}
-			}
-			else
-			{
-				// remove last observer
-				CSelectObject* selectedObject = selection->getLastSelected();
-				if (selectedObject != NULL)
-					selectedObject->removeAllObserver();
 			}
 		}
 
@@ -1245,7 +1319,7 @@ namespace Skylicht
 
 			if (node != NULL && m_spaceHierarchy != NULL)
 			{
-				m_spaceHierarchy->getController()->updateObjectToUI(object, node);
+				CHierarchyController::updateObjectToUI(object, node);
 			}
 		}
 
@@ -1255,6 +1329,109 @@ namespace Skylicht
 				m_spaceHierarchy->getController()->updateTreeNode(object);
 		}
 
+		void CSceneController::onMoveStructure(CGameObject* object, CContainerObject* toContainer, CGameObject* before)
+		{
+			bool behind = true;
+			if (before == NULL && toContainer->getChilds()->size() > 0)
+			{
+				// insert at first
+				ArrayGameObject* childs = toContainer->getChilds();
+				for (CGameObject* obj : *childs)
+				{
+					if (!obj->isEditorObject())
+					{
+						before = obj;
+						behind = false;
+						break;
+					}
+				}
+			}
+
+			if (before)
+			{
+				CHierachyNode* containerNode = m_hierachyNode->getNodeByTag(toContainer);
+				CHierachyNode* beforeNode = m_hierachyNode->getNodeByTag(before);
+				CHierachyNode* node = m_hierachyNode->getNodeByTag(object);
+				if (containerNode && node)
+				{
+					node->removeGUI();
+					node->nullGUI();
+
+					containerNode->bringToNext(node, beforeNode, behind);
+
+					if (m_spaceHierarchy)
+					{
+						m_spaceHierarchy->addToTreeNode(node);
+						node->getGUINode()->bringNextToControl(beforeNode ? beforeNode->getGUINode() : NULL, behind);
+					}
+				}
+				toContainer->bringToNext(object, before, behind);
+			}
+			else
+			{
+				CHierachyNode* container = m_hierachyNode->getNodeByTag(toContainer);
+				CHierachyNode* node = m_hierachyNode->getNodeByTag(object);
+				if (node)
+				{
+					node->removeGUI();
+					node->nullGUI();
+
+					if (container)
+						container->bringToChild(node);
+
+					if (m_spaceHierarchy != NULL)
+						m_spaceHierarchy->addToTreeNode(node);
+
+				}
+				toContainer->bringToChild(object);
+			}
+
+			m_scene->updateAddRemoveObject();
+			m_scene->updateIndexSearchObject();
+		}
+
+		void CSceneController::onMoveStructure(CZone* object, CZone* before)
+		{
+			bool behind = true;
+			if (before == NULL && m_scene->getAllZone()->size() > 0)
+			{
+				// insert at first
+				ArrayZone* zones = m_scene->getAllZone();
+				for (CZone* obj : *zones)
+				{
+					if (!obj->isEditorObject())
+					{
+						before = obj;
+						behind = false;
+						break;
+					}
+				}
+			}
+
+			if (before)
+			{
+				CHierachyNode* beforeNode = m_hierachyNode->getNodeByTag(before);
+				CHierachyNode* node = m_hierachyNode->getNodeByTag(object);
+				if (node)
+				{
+					node->removeGUI();
+					node->nullGUI();
+
+					m_hierachyNode->bringToNext(node, beforeNode, behind);
+
+					if (m_spaceHierarchy != NULL)
+					{
+						m_spaceHierarchy->addToTreeNode(node);
+						node->getGUINode()->bringNextToControl(beforeNode ? beforeNode->getGUINode() : NULL, behind);
+					}
+				}
+				m_scene->bringToNext(object, before, behind);
+			}
+
+			m_scene->updateAddRemoveObject();
+			m_scene->updateIndexSearchObject();
+		}
+
 		void CSceneController::onDeleteObject(CGameObject* object)
 		{
 			if (CSelection::getInstance()->unSelect(object))
@@ -1262,6 +1439,9 @@ namespace Skylicht
 				// clear property this object
 				CPropertyController::getInstance()->setProperty(NULL);
 			}
+
+			// clear particle
+			CParticleController::getInstance()->setGameObject(NULL);
 
 			if (m_zone == object)
 			{
@@ -1276,7 +1456,7 @@ namespace Skylicht
 		void CSceneController::onDelete()
 		{
 			CSelection* selection = CSelection::getInstance();
-			std::vector<CSelectObject*>& selected = selection->getAllSelected();
+			std::vector<CSelectObject*> selected = selection->getAllSelected();
 
 			// need save delete history first
 			{
@@ -1388,7 +1568,7 @@ namespace Skylicht
 				if (zone == NULL)
 					return;
 
-				CCopyPaste::getInstance()->paste(zone);
+				newObjects = CCopyPaste::getInstance()->paste(zone);
 				m_spaceHierarchy->getController()->updateTreeNode(zone);
 			}
 			else
@@ -1433,6 +1613,8 @@ namespace Skylicht
 
 			selection->clear();
 			selection->addSelect(newObjects);
+
+			m_history->saveCreateHistory(newObjects);
 		}
 
 		void CSceneController::onDuplicate()
@@ -1441,6 +1623,7 @@ namespace Skylicht
 			CSelection* selection = CSelection::getInstance();
 			std::vector<CSelectObject*>& selected = selection->getAllSelected();
 			std::vector<CEntity*> newEntities;
+			std::vector<CGameObject*> updateObjects;
 
 			// Duplicate entities
 			for (CSelectObject* selectObject : selected)
@@ -1457,6 +1640,7 @@ namespace Skylicht
 						if (data != NULL)
 						{
 							CEntityHandler* handler = data->Handler;
+							CGameObject* handlerObj = handler->getGameObject();
 
 							// spawn new entity
 							CEntity* spawnNewEntity = handler->spawn();
@@ -1467,9 +1651,22 @@ namespace Skylicht
 
 								newEntities.push_back(spawnNewEntity);
 
+								// add to list to update history
+								bool addObjToList = true;
+								for (CGameObject* obj : updateObjects)
+								{
+									if (obj == handlerObj)
+									{
+										addObjToList = false;
+										break;
+									}
+								}
+								if (addObjToList)
+									updateObjects.push_back(handlerObj);
+
 								// remove gui hierachy
 								if (m_spaceHierarchy != NULL)
-									m_spaceHierarchy->getController()->updateTreeNode(handler->getGameObject());
+									m_spaceHierarchy->getController()->updateTreeNode(handlerObj);
 							}
 						}
 					}
@@ -1480,11 +1677,15 @@ namespace Skylicht
 			{
 				// change selection
 				selection->clear();
+
 				for (CEntity* e : newEntities)
 				{
 					selection->addSelect(e);
 					selectOnHierachy(e);
 				}
+
+				// add history
+				m_history->saveModifyHistory(updateObjects);
 				return;
 			}
 
@@ -1526,6 +1727,14 @@ namespace Skylicht
 		void CSceneController::onCreateTemplate(CGameObject* object)
 		{
 			CAssetCreateController::getInstance()->createTemplate(object);
+
+			if (m_spaceHierarchy)
+				m_spaceHierarchy->getController()->updateTreeNode(object);
+		}
+
+		void CSceneController::onCreateTemplate(CGameObject* object, const char* folder)
+		{
+			CAssetCreateController::getInstance()->createTemplate(object, folder);
 
 			if (m_spaceHierarchy)
 				m_spaceHierarchy->getController()->updateTreeNode(object);
@@ -1610,6 +1819,44 @@ namespace Skylicht
 
 			core::vector3df newPosition = objectPosition + look * d;
 			camera->lookAt(newPosition, objectPosition, Transform::Oy);
+		}
+
+		void CSceneController::applySelected(std::vector<CSelectObject*> ids)
+		{
+			m_scene->updateAddRemoveObject();
+			m_scene->updateIndexSearchObject();
+
+			std::vector<CSelectObject*> listIds;
+
+			for (CSelectObject* id : ids)
+			{
+				if (id->getType() == CSelectObject::GameObject)
+				{
+					CGameObject* go = m_scene->searchObjectInChildByID(id->getID().c_str());
+					if (go)
+					{
+						selectOnHierachy(go, false);
+						listIds.push_back(id);
+
+						m_history->beginSaveHistory(go);
+					}
+				}
+				else if (id->getType() == CSelectObject::Entity)
+				{
+					CEntity* entity = m_scene->searchEntityInChildByID(id->getID().c_str());
+					if (entity)
+					{
+						selectOnHierachy(entity, false);
+						listIds.push_back(id);
+
+						CEntityHandleData* data = GET_ENTITY_DATA(entity, CEntityHandleData);
+						if (data && data->Handler)
+							m_history->beginSaveHistory(data->Handler->getGameObject());
+					}
+				}
+			}
+
+			CSelection::getInstance()->applySelected(listIds);
 		}
 	}
 }

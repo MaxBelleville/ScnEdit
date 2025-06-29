@@ -34,6 +34,8 @@ namespace Skylicht
 	protected:
 		core::array<CEntity*> m_entities;
 
+		bool m_shadowCasting;
+
 	public:
 		CEntityHandler();
 
@@ -42,6 +44,10 @@ namespace Skylicht
 		virtual void initComponent();
 
 		virtual void updateComponent();
+
+		virtual void onUpdateCullingLayer(u32 mask);
+
+		CEntity* searchEntityByID(const char* id);
 
 		CEntity* createEntity();
 
@@ -70,6 +76,12 @@ namespace Skylicht
 
 		void setEntities(CEntity** entities, u32 count);
 
+		void setShadowCasting(bool b);
+
+		inline bool isShadowCasting()
+		{
+			return m_shadowCasting;
+		}
 
 	protected:
 

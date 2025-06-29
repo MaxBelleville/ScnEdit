@@ -26,6 +26,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "CPrimitive.h"
 #include "CPrimitiveRenderer.h"
 #include "CPrimitiveRendererInstancing.h"
+#include "CPrimitiveSerializable.h"
 #include "GameObject/CGameObject.h"
 #include "Entity/CEntityManager.h"
 #include "Transform/CWorldTransformData.h"
@@ -42,7 +43,7 @@ namespace Skylicht
 		m_instancing(false),
 		m_useCustomMaterial(false),
 		m_useNormalMap(false),
-		m_color(255, 180, 180, 180),
+		m_color(255, 150, 150, 150),
 		m_material(NULL),
 		m_customMaterial(NULL)
 	{
@@ -83,6 +84,8 @@ namespace Skylicht
 
 		object->autoRelease(new CBoolProperty(object, "instancing", m_instancing));
 
+		object->autoRelease(new CBoolProperty(object, "shadow casting", m_shadowCasting));
+
 		CBoolProperty* useCustom = new CBoolProperty(object, "custom material", m_useCustomMaterial);
 		object->autoRelease(useCustom);
 
@@ -104,12 +107,15 @@ namespace Skylicht
 		int numPrimities = (int)m_entities.size();
 		for (int i = 0; i < numPrimities; i++)
 		{
-			CMatrixProperty* transformData = new CMatrixProperty(primitives, "transform");
-			primitives->autoRelease(transformData);
+			CPrimitiveSerializable* p = new CPrimitiveSerializable(primitives);
+			primitives->autoRelease(p);
 
-			// get world transform data
+			// id
+			p->Id.set(m_entities[i]->getID());
+
+			// transform
 			CWorldTransformData* world = GET_ENTITY_DATA(m_entities[i], CWorldTransformData);
-			transformData->set(world->Relative);
+			p->Transform.set(world->Relative);
 		}
 
 		return object;
@@ -124,6 +130,7 @@ namespace Skylicht
 		bool useCustom = m_useCustomMaterial;
 
 		m_instancing = object->get<bool>("instancing", false);
+		m_shadowCasting = object->get<bool>("shadow casting", true);
 		m_useCustomMaterial = object->get<bool>("custom material", false);
 		m_useNormalMap = object->get<bool>("normal map", false);
 		m_color = object->get<SColor>("color", SColor(255, 180, 180, 180));
@@ -151,13 +158,6 @@ namespace Skylicht
 		m_material->setUniform4("uColor", m_color);
 		m_material->updateShaderParams();
 
-		if (m_customMaterial)
-		{
-			m_customMaterial->setUniform4("uColor", m_color);
-			m_customMaterial->updateShaderParams();
-		}
-
-
 		CArraySerializable* primitives = (CArraySerializable*)object->getProperty("Primitives");
 		if (primitives == NULL)
 			return;
@@ -168,20 +168,43 @@ namespace Skylicht
 
 		for (int i = 0; i < numPrimities; i++)
 		{
-			CMatrixProperty* transformData = (CMatrixProperty*)primitives->getElement(i);
-			if (transformData == NULL)
-				return;
+			CPrimitiveSerializable* primitiveData = dynamic_cast<CPrimitiveSerializable*>(primitives->getElement(i));
+			if (primitiveData)
+			{
+				CEntity* entity = addPrimitive(
+					core::vector3df(),
+					core::vector3df(),
+					core::vector3df(1.0f, 1.0f, 1.0f)
+				);
 
-			CEntity* entity = addPrimitive(
-				core::vector3df(),
-				core::vector3df(),
-				core::vector3df(1.0f, 1.0f, 1.0f)
-			);
+				// set id
+				if (!primitiveData->Id.get().empty())
+					entity->setID(primitiveData->Id.getString());
 
-			// set transform
-			CWorldTransformData* world = GET_ENTITY_DATA(entity, CWorldTransformData);
-			world->Relative = transformData->get();
+				// set transform
+				CWorldTransformData* world = GET_ENTITY_DATA(entity, CWorldTransformData);
+				world->Relative = primitiveData->Transform.get();
+			}
+			else
+			{
+				// fix for old version
+				CMatrixProperty* worldMatrix = dynamic_cast<CMatrixProperty*>(primitives->getElement(i));
+				if (worldMatrix)
+				{
+					CEntity* entity = addPrimitive(
+						core::vector3df(),
+						core::vector3df(),
+						core::vector3df(1.0f, 1.0f, 1.0f)
+					);
+
+					// set transform
+					CWorldTransformData* world = GET_ENTITY_DATA(entity, CWorldTransformData);
+					world->Relative = worldMatrix->get();
+				}
+			}
 		}
+
+		setShadowCasting(m_shadowCasting);
 	}
 
 	CEntity* CPrimitive::spawn()
@@ -264,6 +287,17 @@ namespace Skylicht
 		{
 			m_useCustomMaterial = false;
 		}
+
+		for (u32 i = 0, n = m_entities.size(); i < n; i++)
+		{
+			CPrimiviteData* data = GET_ENTITY_DATA(m_entities[i], CPrimiviteData);
+			if (data)
+			{
+				data->Material = m_useCustomMaterial && m_customMaterial ? m_customMaterial : m_material;
+				data->InstancingMesh = NULL;
+				data->InstancingGroup = NULL;
+			}
+		}
 	}
 
 	void CPrimitive::setInstancing(bool b)
@@ -273,7 +307,11 @@ namespace Skylicht
 		{
 			CPrimiviteData* data = GET_ENTITY_DATA(m_entities[i], CPrimiviteData);
 			if (data)
+			{
 				data->Instancing = b;
+				data->InstancingMesh = NULL;
+				data->InstancingGroup = NULL;
+			}
 		}
 	}
 
@@ -283,11 +321,5 @@ namespace Skylicht
 
 		m_material->setUniform4("uColor", m_color);
 		m_material->updateShaderParams();
-
-		if (m_customMaterial)
-		{
-			m_customMaterial->setUniform4("uColor", m_color);
-			m_customMaterial->updateShaderParams();
-		}
 	}
 }

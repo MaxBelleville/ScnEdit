@@ -16,7 +16,7 @@ cbuffer cbPerObject
 {
 	float4x4 uMvpMatrix;
 	float4x4 uWorld;
-	float3 uNoiseParam;
+	float4 uNoiseParam;
 };
 float hash(float3 p)
 {
@@ -31,12 +31,12 @@ float noise(in float3 x)
 	f = f * f*(3.0 - 2.0*f);
 	return lerp(
 		lerp(
-			lerp(hash(i + float3(0, 0, 0)), hash(i + float3(1, 0, 0)), f.x),
-			lerp(hash(i + float3(0, 1, 0)), hash(i + float3(1, 1, 0)), f.x), f.y
+			lerp(hash(i + float3(0.0, 0.0, 0.0)), hash(i + float3(1.0, 0.0, 0.0)), f.x),
+			lerp(hash(i + float3(0.0, 1.0, 0.0)), hash(i + float3(1.0, 1.0, 0.0)), f.x), f.y
 		),
 		lerp(
-			lerp(hash(i + float3(0, 0, 1)), hash(i + float3(1, 0, 1)), f.x),
-			lerp(hash(i + float3(0, 1, 1)), hash(i + float3(1, 1, 1)), f.x), f.y
+			lerp(hash(i + float3(0.0, 0.0, 1.0)), hash(i + float3(1.0, 0.0, 1.0)), f.x),
+			lerp(hash(i + float3(0.0, 1.0, 1.0)), hash(i + float3(1.0, 1.0, 1.0)), f.x), f.y
 		),
 		f.z);
 }

@@ -27,6 +27,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "CGroup.h"
 
 #include "Systems/CParticleSystem.h"
+#include "Utils/CStringImp.h"
 
 namespace Skylicht
 {
@@ -38,8 +39,11 @@ namespace Skylicht
 			Friction(0.0f),
 			LifeMin(1.0f),
 			LifeMax(2.0f),
+			GravityValue(0.0f),
 			OrientationNormal(1.0f, 0.0f, 0.0f),
-			OrientationUp(0.0f, 1.0f, 0.0f)
+			OrientationUp(0.0f, 1.0f, 0.0f),
+			Name(L"Group"),
+			Visible(true)
 		{
 			m_particleSystem = new CParticleSystem();
 
@@ -72,13 +76,75 @@ namespace Skylicht
 			delete m_cpuBuffer;
 		}
 
+		CObjectSerializable* CGroup::createSerializable()
+		{
+			CObjectSerializable* object = CParticleSerializable::createSerializable();
+			object->autoRelease(new CStringProperty(object, "name", CStringImp::convertUnicodeToUTF8(Name.c_str()).c_str()));
+			object->autoRelease(new CBoolProperty(object, "visible", Visible));
+			object->autoRelease(new CFloatProperty(object, "friction", Friction, 0.0f));
+			object->autoRelease(new CFloatProperty(object, "lifeMin", LifeMin, 0.0f));
+			object->autoRelease(new CFloatProperty(object, "lifeMax", LifeMax, 0.0f));
+			object->autoRelease(new CFloatProperty(object, "gravityValue", GravityValue));
+			object->autoRelease(new CVector3Property(object, "gravityRotation", GravityRotation * core::RADTODEG));
+			object->autoRelease(new CVector3Property(object, "particleRotation", ParticleRotation * core::RADTODEG));
+
+			return object;
+		}
+
+		void CGroup::loadSerializable(CObjectSerializable* object)
+		{
+			CParticleSerializable::loadSerializable(object);
+
+			Name = CStringImp::convertUTF8ToUnicode(object->get("name", std::string()).c_str());
+			Visible = object->get("visible", true);
+			Friction = object->get("friction", 0.0f);
+			LifeMin = object->get("lifeMin", 1.0f);
+			LifeMax = object->get("lifeMax", 2.0f);
+			GravityValue = object->get("gravityValue", 1.0f);
+
+			core::vector3df g = object->get("gravityRotation", core::vector3df());
+			core::vector3df r = object->get("particleRotation", core::vector3df());
+
+			setGravityRotation(g * core::DEGTORAD);
+			setParticleRotation(r * core::DEGTORAD);
+		}
+
+		void CGroup::setGravityRotation(const core::vector3df& euler)
+		{
+			core::quaternion r(euler);
+			GravityRotation = euler;
+			Gravity.set(0.0f, -1.0f, 0.0f);
+
+			Gravity = r * Gravity;
+			Gravity.normalize();
+			Gravity *= GravityValue;
+		}
+
+		void CGroup::setParticleRotation(const core::vector3df& euler)
+		{
+			core::quaternion r(euler);
+			ParticleRotation = euler;
+
+			OrientationNormal.set(1.0f, 0.0f, 0.0f);
+			OrientationUp.set(0.0f, 1.0f, 0.0f);
+
+			OrientationNormal = r * OrientationNormal;
+			OrientationNormal.normalize();
+
+			OrientationUp = r * OrientationUp;
+			OrientationUp.normalize();
+		}
+
 		IRenderer* CGroup::setRenderer(IRenderer* r)
 		{
 			m_renderer = r;
-			if (m_renderer->useInstancing() == true)
-				m_renderer->getParticleBuffer(m_instancing->getMeshBuffer());
-			else
-				m_renderer->getParticleBuffer(m_cpuBuffer->getMeshBuffer());
+			if (m_renderer)
+			{
+				if (m_renderer->useInstancing() == true)
+					m_renderer->getParticleBuffer(m_instancing->getMeshBuffer());
+				else
+					m_renderer->getParticleBuffer(m_cpuBuffer->getMeshBuffer());
+			}
 			return r;
 		}
 
@@ -92,12 +158,15 @@ namespace Skylicht
 		core::vector3df CGroup::getTransformVector(const core::vector3df& vec)
 		{
 			core::vector3df p = vec;
+			m_parentWorld.rotateVect(p);
 			m_world.rotateVect(p);
 			return p;
 		}
 
 		void CGroup::update(bool visible)
 		{
+			visible = visible && Visible;
+
 			float dt = getTimeStep();
 
 			updateLaunchEmitter();
@@ -147,9 +216,20 @@ namespace Skylicht
 				}
 			}
 
-			// update instancing buffer		
+			particles = m_particles.pointer();
+			numParticles = m_particles.size();
+
+			// update instancing buffer
 			if (visible == true && m_renderer != NULL)
 			{
+				if (m_renderer->needUpdateMesh())
+				{
+					if (m_renderer->useInstancing() == true)
+						m_renderer->getParticleBuffer(m_instancing->getMeshBuffer());
+					else
+						m_renderer->getParticleBuffer(m_cpuBuffer->getMeshBuffer());
+				}
+
 				if (m_renderer->useInstancing() == true)
 					m_instancingSystem->update(particles, numParticles, this, dt);
 				else
@@ -220,15 +300,22 @@ namespace Skylicht
 			{
 				EParticleParams t = m->getType();
 
-				if (m->haveStart() == true)
+				if (m->isRandomStart() == true)
 					p.StartValue[t] = m->getRandomStart();
 				else
-					p.StartValue[t] = 0.0f;
+					p.StartValue[t] = m->getStartValue1();
 
-				if (m->haveEnd() == true)
-					p.EndValue[t] = m->getRandomEnd();
+				if (m->isEnableEndValue())
+				{
+					if (m->isRandomEnd() == true)
+						p.EndValue[t] = m->getRandomEnd();
+					else
+						p.EndValue[t] = m->getEndValue1();
+				}
 				else
+				{
 					p.EndValue[t] = p.StartValue[t];
+				}
 
 				if (t == Particle::RotateSpeedX ||
 					t == Particle::RotateSpeedY ||
@@ -242,6 +329,15 @@ namespace Skylicht
 					p.Rotation.Y = p.StartValue[t];
 				else if (t == Particle::RotateZ)
 					p.Rotation.Z = p.StartValue[t];
+				else if (t == Particle::FrameIndex)
+				{
+					if (!m->isRandomEnd())
+					{
+						p.EndValue[t] = p.StartValue[t];
+					}
+				}
+
+				p.Params[t] = p.StartValue[t];
 			}
 
 			for (IParticleCallback* cb : m_callback)
@@ -260,6 +356,7 @@ namespace Skylicht
 
 				initParticleModel(*p);
 
+				p->LastPosition = position;
 				p->Position = position;
 				p->SubEmitterDirection = subEmitterDirection;
 			}
@@ -279,6 +376,7 @@ namespace Skylicht
 
 				initParticleModel(*p);
 
+				p->LastPosition = position;
 				p->Position = position;
 				p->Velocity = velocity;
 			}
@@ -302,7 +400,7 @@ namespace Skylicht
 			if (index >= total)
 				return;
 
-			if (index != total - 1)
+			if (total >= 2)
 			{
 				for (IParticleCallback* cb : m_callback)
 					cb->OnSwapParticleData(m_particles[index], m_particles.getLast());
@@ -316,13 +414,57 @@ namespace Skylicht
 			m_particles.set_used(total - 1);
 		}
 
+		CModel* CGroup::createModel(const std::wstring& attributeName)
+		{
+			EParticleParams createParam = EParticleParams::NumParams;
+
+			if (attributeName == L"Scale")
+				createParam = EParticleParams::Scale;
+			else if (attributeName == L"ScaleX")
+				createParam = EParticleParams::ScaleX;
+			else if (attributeName == L"ScaleY")
+				createParam = EParticleParams::ScaleY;
+			else if (attributeName == L"ScaleZ")
+				createParam = EParticleParams::ScaleZ;
+			else if (attributeName == L"RotateX")
+				createParam = EParticleParams::RotateX;
+			else if (attributeName == L"RotateY")
+				createParam = EParticleParams::RotateY;
+			else if (attributeName == L"RotateZ")
+				createParam = EParticleParams::RotateZ;
+			else if (attributeName == L"ColorR")
+				createParam = EParticleParams::ColorR;
+			else if (attributeName == L"ColorG")
+				createParam = EParticleParams::ColorG;
+			else if (attributeName == L"ColorB")
+				createParam = EParticleParams::ColorB;
+			else if (attributeName == L"ColorA")
+				createParam = EParticleParams::ColorA;
+			else if (attributeName == L"Mass")
+				createParam = EParticleParams::Mass;
+			else if (attributeName == L"FrameIndex")
+				createParam = EParticleParams::FrameIndex;
+			else if (attributeName == L"RotateSpeedX")
+				createParam = EParticleParams::RotateSpeedX;
+			else if (attributeName == L"RotateSpeedY")
+				createParam = EParticleParams::RotateSpeedY;
+			else if (attributeName == L"RotateSpeedZ")
+				createParam = EParticleParams::RotateSpeedZ;
+
+			CModel* model = NULL;
+			if (createParam != EParticleParams::NumParams)
+				model = createModel(createParam);
+
+			return model;
+		}
+
 		CModel* CGroup::createModel(EParticleParams param)
 		{
 			CModel* m = getModel(param);
 
 			if (m == NULL)
 			{
-				m = new CModel(param);
+				m = new CModel(this, param);
 				m_models.push_back(m);
 			}
 

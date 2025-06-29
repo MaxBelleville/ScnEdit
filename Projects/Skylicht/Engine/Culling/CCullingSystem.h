@@ -40,7 +40,8 @@ namespace Skylicht
 
 		CCullingData* Culling;
 
-		// Local BBox to check culling
+		CWorldTransformData* Transform;
+
 		core::aabbox3df* BBox;
 
 		// Material to check render pipeline cull
@@ -48,8 +49,11 @@ namespace Skylicht
 
 		SBBoxAndMaterial()
 		{
+			Entity = NULL;
+			BBox = NULL;
 			Culling = NULL;
 			Materials = NULL;
+			Transform = NULL;
 		}
 	};
 

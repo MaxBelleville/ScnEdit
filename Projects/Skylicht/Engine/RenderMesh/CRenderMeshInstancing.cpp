@@ -331,8 +331,10 @@ namespace Skylicht
 		}
 	}
 
-	void CRenderMeshInstancing::initFromMeshFile(const char* path)
+	void CRenderMeshInstancing::initFromMeshFile(const char* path, bool loadNormalMap, bool loadTexcoord2)
 	{
+		m_loadNormal = loadNormalMap;
+		m_loadTexcoord2 = loadTexcoord2;
 		m_meshFile = path;
 		refreshModelAndMaterial();
 	}
@@ -480,7 +482,6 @@ namespace Skylicht
 		CIndirectLightingData* indirect = entity->addData<CIndirectLightingData>();
 		indirect->initSH();
 
-		// entity->addData<CWorldInverseTransformData>();
 		entity->addData<CCullingData>();
 		entity->addData<CVisibleData>();
 
@@ -503,6 +504,11 @@ namespace Skylicht
 		CWorldTransformData* transform = entity->getData<CWorldTransformData>();
 		transform->Relative = baseTransform->Relative;
 		transform->HasChanged = true;
+
+		// add custom material for entity
+		CInstancingMaterialData* customMaterial = entity->addData<CInstancingMaterialData>();
+		customMaterial->initCustomMaterial(renderMesh->getMeshInstancing());
+		customMaterial->Enable = true;
 	}
 
 	void CRenderMeshInstancing::addMaterial(CMaterial* material)

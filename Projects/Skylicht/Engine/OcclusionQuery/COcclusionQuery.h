@@ -43,9 +43,20 @@ namespace Skylicht
 
 		virtual void updateComponent();
 
+		virtual void onEnable(bool b);
+
+		virtual CObjectSerializable* createSerializable();
+
+		virtual void loadSerializable(CObjectSerializable* object);
+
 		inline void setAABBox(const core::aabbox3df& box)
 		{
 			m_queryData->setAABBox(box);
+		}
+
+		inline const core::aabbox3df& getAABBox()
+		{
+			return m_queryData->getAABBox();
 		}
 
 		inline u32 getResult()

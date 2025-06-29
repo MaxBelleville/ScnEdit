@@ -50,6 +50,7 @@ namespace Skylicht
 
 				bool m_expand;
 				bool m_selected;
+				bool m_doPress;
 
 				bool m_alwayShowExpandButton;
 
@@ -188,6 +189,8 @@ namespace Skylicht
 				void onDoubleClick(CBase* base);
 
 				void onDown(CBase* base);
+
+				void onPress(CBase* base);
 
 				virtual void onNodeClick(CBase* base);
 			};

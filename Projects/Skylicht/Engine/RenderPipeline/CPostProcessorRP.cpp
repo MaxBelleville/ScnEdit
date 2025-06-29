@@ -27,6 +27,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Material/Shader/CShaderManager.h"
 #include "Material/Shader/CShaderParams.h"
 #include "Material/Shader/ShaderCallback/CShaderMaterial.h"
+#include "Material/Shader/ShaderCallback/CShaderRTT.h"
 
 namespace Skylicht
 {
@@ -38,6 +39,7 @@ namespace Skylicht
 		m_bloomEffect(true),
 		m_fxaa(false),
 		m_screenSpaceReflection(false),
+		m_enableLastFrameTexture(false),
 		m_brightFilter(NULL),
 		m_blurFilter(NULL),
 		m_blurUpFilter(NULL),
@@ -101,20 +103,20 @@ namespace Skylicht
 			{
 				m_numTarget = 2;
 				core::dimension2du s = m_size;
-				do
-				{
-					s = s / 2;
+				// do
+				// {
+				s = s / 2;
 
-					// round for 4
-					s.Width = (s.Width / 4) * 4;
-					s.Height = (s.Height / 4) * 4;
+				// round for 4
+				s.Width = (s.Width / 4) * 4;
+				s.Height = (s.Height / 4) * 4;
 
-					m_rtt[m_numTarget++] = driver->addRenderTargetTexture(s, "rtt", ECF_A16B16G16R16F);
-				} while (s.Height > 512 && m_numTarget < 8);
+				m_rtt[m_numTarget++] = driver->addRenderTargetTexture(s, "rtt", ECF_A16B16G16R16F);
+				// } while (s.Height > 512 && m_numTarget < 4);
 			}
 		}
 
-		if (m_screenSpaceReflection)
+		if (m_screenSpaceReflection || m_enableLastFrameTexture)
 		{
 			m_lastFrameBuffer = driver->addRenderTargetTexture(m_size, "last_frame", ECF_A8R8G8B8);
 
@@ -268,16 +270,32 @@ namespace Skylicht
 		ITexture* colorBuffer = color;
 
 		// BLOOM
-		if (m_bloomEffect)
+		if (m_bloomEffect && emission)
 		{
 			brightFilter(color, m_rtt[1], emission);
+
 			blurDown(1, 2);
 
-			for (int i = 2; i < m_numTarget - 1; i++)
-				blurDown(i, i + 1);
-
-			for (int i = m_numTarget - 1; i > 2; i--)
-				blurUp(i, i - 1);
+			/*
+			if (m_numTarget > 4)
+			{
+				blurDown(2, 3);
+				blurDown(3, 4);
+				blurUp(4, 3);
+				blurUp(3, 2);
+				blurUp(2, 1);
+			}
+			else if (m_numTarget > 3)
+			{
+				blurDown(2, 3);
+				blurUp(3, 2);
+				blurUp(2, 1);
+			}
+			else
+			{
+				blurUp(2, 1);
+			}
+			*/
 
 			// bloom
 			m_bloomFilter->setTexture(0, color);
@@ -300,7 +318,7 @@ namespace Skylicht
 		// END BLOOM
 
 		// SCREEN SPACE REFLECTION (save buffer for deferred rendering)
-		if (m_screenSpaceReflection == true && m_lastFrameBuffer)
+		if ((m_screenSpaceReflection || m_enableLastFrameTexture) && m_lastFrameBuffer)
 		{
 			driver->setRenderTarget(m_lastFrameBuffer, true, false);
 
@@ -313,7 +331,12 @@ namespace Skylicht
 			if (viewport.getWidth() > 0 && viewport.getHeight() > 0)
 				driver->setViewPort(viewport);
 
-			m_lastFrameBuffer->regenerateMipMapLevels();
+			// SSR use textureLod in shader
+			if (m_screenSpaceReflection)
+				m_lastFrameBuffer->regenerateMipMapLevels();
+
+			// last frame texture
+			CShaderRTT::setLastFrameTexture(m_lastFrameBuffer);
 		}
 		// END SCREEN SPACE REFLECTION
 
@@ -385,7 +408,7 @@ namespace Skylicht
 			beginRender2D(renderW, renderH);
 			renderBufferToTarget(0.0f, 0.0f, renderW, renderH, m_effectPass);
 		}
-		// END FXAA		
+		// END FXAA
 
 		// test to target
 		/*
@@ -416,6 +439,7 @@ namespace Skylicht
 
 		material->setTexture(0, fromTarget);
 		material->applyMaterial(m_effectPass);
+		material->updateShaderParams();
 
 		for (int i = 0; i < 2; i++)
 		{

@@ -35,9 +35,10 @@ namespace Skylicht
 {
 	ACTIVATOR_REGISTER(CLightmap);
 
-	CATEGORY_COMPONENT(CLightmap, "Lightmap", "Lightmap");
+	CATEGORY_COMPONENT(CLightmap, "Lightmap", "Lightmapper");
 
 	CLightmap::CLightmap() :
+		m_autoLoadLightmap(true),
 		m_internalLightmap(false),
 		m_lightmap(NULL),
 		m_lightmapBeginIndex(0)
@@ -106,12 +107,70 @@ namespace Skylicht
 	CObjectSerializable* CLightmap::createSerializable()
 	{
 		CObjectSerializable* object = CComponentSystem::createSerializable();
+
+		object->autoRelease(new CBoolProperty(object, "autoLoadLightmap", m_autoLoadLightmap));
+		object->autoRelease(new CIntProperty(object, "lightmapIndex", m_lightmapBeginIndex, 0, 32));
+
+		CArrayTypeSerializable<CFilePathProperty>* textureArray = new CArrayTypeSerializable<CFilePathProperty>("lightmap", object);
+		textureArray->OnCreateElement = [](CValueProperty* p)
+			{
+				CFilePathProperty* filePath = (CFilePathProperty*)p;
+				filePath->Exts = CTextureManager::getTextureExts();
+			};
+		for (std::string& path : m_lightmapPaths)
+			textureArray->autoRelease(new CFilePathProperty(textureArray, "texture", path.c_str(), CTextureManager::getTextureExts()));
+		object->autoRelease(textureArray);
+
+
+		CArrayTypeSerializable<CFilePathProperty>* lightDataArray = new CArrayTypeSerializable<CFilePathProperty>("lightDataExternal", object);
+		lightDataArray->OnCreateElement = [](CValueProperty* p)
+			{
+				CFilePathProperty* filePath = (CFilePathProperty*)p;
+				filePath->Exts.push_back("texarray");
+			};
+		for (std::string& path : m_lightDataExternal)
+			lightDataArray->autoRelease(new CFilePathProperty(lightDataArray, "texture", path.c_str(), "texarray"));
+		object->autoRelease(lightDataArray);
+
 		return object;
 	}
 
 	void CLightmap::loadSerializable(CObjectSerializable* object)
 	{
 		CComponentSystem::loadSerializable(object);
+
+		m_autoLoadLightmap = object->get<bool>("autoLoadLightmap", true);
+		m_lightmapBeginIndex = object->get<int>("lightmapIndex", 0);
+
+		bool haveLightmap = false;
+		CArraySerializable* textureArray = (CArraySerializable*)object->getProperty("lightmap");
+		if (textureArray)
+		{
+			int numTextures = textureArray->getElementCount();
+			haveLightmap = numTextures > 0;
+
+			m_lightmapPaths.clear();
+			for (int i = 0; i < numTextures; i++)
+			{
+				CFilePathProperty* file = (CFilePathProperty*)textureArray->getElement(i);
+				m_lightmapPaths.push_back(file->get());
+			}
+		}
+
+		CArraySerializable* lightData = (CArraySerializable*)object->getProperty("lightDataExternal");
+		if (lightData)
+		{
+			int numTextures = lightData->getElementCount();
+
+			m_lightDataExternal.clear();
+			for (int i = 0; i < numTextures; i++)
+			{
+				CFilePathProperty* file = (CFilePathProperty*)lightData->getElement(i);
+				m_lightDataExternal.push_back(file->get());
+			}
+		}
+
+		updateLightmap(m_autoLoadLightmap);
 	}
 
 	bool CLightmap::isLightmapEmpty()

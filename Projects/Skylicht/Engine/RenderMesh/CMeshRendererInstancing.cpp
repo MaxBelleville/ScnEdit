@@ -68,20 +68,25 @@ namespace Skylicht
 		numEntity = m_groupMesh->getNumInstancingMesh();
 		entities = m_groupMesh->getInstancingMeshes();
 
+		CEntity* entity;
+		CRenderMeshData* meshData;
+		SMeshInstancing* data;
+		bool cullingVisible;
+		CCullingData* cullingData;
+
 		for (int i = 0; i < numEntity; i++)
 		{
-			CEntity* entity = entities[i];
+			entity = entities[i];
 
-			CRenderMeshData* meshData = GET_ENTITY_DATA(entity, CRenderMeshData);
-
-			SMeshInstancing* data = meshData->getMeshInstancing();
+			meshData = GET_ENTITY_DATA(entity, CRenderMeshData);
+			data = meshData->getMeshInstancing();
 			if (data == NULL)
 				continue;
 
-			bool cullingVisible = true;
+			cullingVisible = true;
 
 			// get culling result from CCullingSystem
-			CCullingData* cullingData = GET_ENTITY_DATA(entity, CCullingData);
+			cullingData = GET_ENTITY_DATA(entity, CCullingData);
 			if (cullingData != NULL)
 				cullingVisible = cullingData->Visible;
 
@@ -108,6 +113,7 @@ namespace Skylicht
 	void CMeshRendererInstancing::update(CEntityManager* entityManager)
 	{
 		u32 numEntity = m_meshs.size();
+
 		CRenderMeshData** renderData = m_meshs.pointer();
 
 		CEntity** allEntities = entityManager->getEntities();
@@ -141,6 +147,8 @@ namespace Skylicht
 			if (count == 0)
 				continue;
 
+			CEntity** entities = group->Entities.pointer();
+
 			for (u32 i = 0, n = data->RenderMeshBuffers.size(); i < n; i++)
 			{
 				group->Materials.reset();
@@ -158,7 +166,13 @@ namespace Skylicht
 				if (batchMaterial)
 				{
 					for (u32 j = 0; j < count; j++)
-						group->Materials.push(data->Materials[i]);
+					{
+						CInstancingMaterialData* m = GET_ENTITY_DATA(entities[j], CInstancingMaterialData);
+						if (m && m->Enable)
+							group->Materials.push(m->Materials[i]);
+						else
+							group->Materials.push(data->Materials[i]);
+					}
 
 					// batching transform & material data to buffer
 					data->InstancingShader[i]->batchIntancing(
@@ -200,10 +214,67 @@ namespace Skylicht
 
 		driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 
-		for (auto& it : m_groups)
+		core::array<SInstancingGroup> instancings;
+		sortBeforeRender(instancings);
+
+		m_transparents.set_used(0);
+
+		for (u32 i = 0, n = instancings.size(); i < n; i++)
 		{
-			SMeshInstancing* data = it.first;
-			SMeshInstancingGroup* group = it.second;
+			SMeshInstancing* data = instancings[i].Instancing;
+			SMeshInstancingGroup* group = instancings[i].Group;
+
+			int count = group->Entities.count();
+			if (count == 0)
+				continue;
+
+			bool haveTransparent = false;
+			u32 numMeshBuffer = data->RenderMeshBuffers.size();
+			for (u32 i = 0; i < numMeshBuffer; i++)
+			{
+				if (data->Materials[i] == NULL)
+					continue;
+
+				CShader* shader = data->Materials[i]->getShader();
+
+				if (!rp->canRenderShader(shader))
+					continue;
+
+				if (shader->isOpaque())
+				{
+					CShaderMaterial::setMaterial(data->Materials[i]);
+
+					rp->drawInstancingMeshBuffer(
+						(CMesh*)data->InstancingMesh,
+						i,
+						shader->getInstancingShader(data->BaseVertexType),
+						entityManager,
+						group->RootEntityIndex,
+						false
+					);
+				}
+				else
+				{
+					haveTransparent = true;
+				}
+			}
+
+			if (haveTransparent)
+				m_transparents.push_back(instancings[i]);
+		}
+	}
+
+	void CMeshRendererInstancing::renderTransparent(CEntityManager* entityManager)
+	{
+		IVideoDriver* driver = getVideoDriver();
+		IRenderPipeline* rp = entityManager->getRenderPipeline();
+
+		driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
+
+		for (u32 i = 0, n = m_transparents.size(); i < n; i++)
+		{
+			SMeshInstancing* data = m_transparents[i].Instancing;
+			SMeshInstancingGroup* group = m_transparents[i].Group;
 
 			int count = group->Entities.count();
 			if (count == 0)
@@ -220,16 +291,119 @@ namespace Skylicht
 				if (!rp->canRenderShader(shader))
 					continue;
 
-				CShaderMaterial::setMaterial(data->Materials[i]);
+				if (!shader->isOpaque())
+				{
+					CShaderMaterial::setMaterial(data->Materials[i]);
 
-				rp->drawInstancingMeshBuffer(
-					(CMesh*)data->InstancingMesh,
-					i,
-					shader->getInstancingShader(),
-					entityManager,
-					group->RootEntityIndex,
-					false
-				);
+					rp->drawInstancingMeshBuffer(
+						(CMesh*)data->InstancingMesh,
+						i,
+						shader->getInstancingShader(data->BaseVertexType),
+						entityManager,
+						group->RootEntityIndex,
+						false
+					);
+				}
+			}
+		}
+	}
+
+	int cmpMaterialsFunc(SMeshInstancing* meshA, SMeshInstancing* meshB)
+	{
+		core::array<CMaterial*>& materialsA = meshA->Materials;
+		core::array<CMaterial*>& materialsB = meshB->Materials;
+
+		// no material, compare by mesh
+		if (materialsA.size() == 0 || materialsA.size() == 0)
+		{
+			if (meshA == meshB)
+				return 0;
+
+			return meshA < meshB ? -1 : 1;
+		}
+
+		CMaterial* materialA = materialsA[0];
+		CMaterial* materialB = materialsB[0];
+
+		// compare by mesh
+		if (materialA == NULL || materialB == NULL)
+		{
+			IMeshBuffer* mbA = meshA->MeshBuffers[0];
+			IMeshBuffer* mbB = meshB->MeshBuffers[0];
+
+			if (mbA == mbB)
+				return 0;
+
+			return mbA < mbB ? -1 : 1;
+		}
+
+		// comprate by texture
+		ITexture* textureA = materialA->getTexture(0);
+		ITexture* textureB = materialB->getTexture(0);
+
+		// if no texture
+		if (textureA == NULL || textureB == NULL)
+		{
+			if (materialA == materialB)
+			{
+				// compare mesh
+				IMeshBuffer* mbA = meshA->MeshBuffers[0];
+				IMeshBuffer* mbB = meshB->MeshBuffers[0];
+
+				if (mbA == mbB)
+					return 0;
+			}
+
+			return materialA < materialB ? -1 : 1;
+		}
+
+		// sort by texture 0
+		if (textureA == textureB)
+		{
+			// compare mesh
+			IMeshBuffer* mbA = meshA->MeshBuffers[0];
+			IMeshBuffer* mbB = meshB->MeshBuffers[0];
+
+			if (mbA == mbB)
+				return 0;
+
+			return mbA < mbB ? -1 : 1;
+		}
+
+		return textureA < textureB ? -1 : 1;
+	}
+
+	void CMeshRendererInstancing::sortBeforeRender(core::array<SInstancingGroup>& instancing)
+	{
+		instancing.set_used(0);
+
+		for (auto& it : m_groups)
+		{
+			SMeshInstancing* data = it.first;
+			SMeshInstancingGroup* group = it.second;
+
+			int count = group->Entities.count();
+			if (count == 0)
+				continue;
+
+			// insert sort
+			bool insert = false;
+
+			for (u32 i = 0, n = instancing.size(); i < n; i++)
+			{
+				if (cmpMaterialsFunc(instancing[i].Instancing, data) > 0)
+				{
+					SInstancingGroup g{ data, group };
+					instancing.insert(g, i);
+					insert = true;
+					break;
+				}
+			}
+
+			if (!insert)
+			{
+				SInstancingGroup g{ data, group };
+				instancing.push_back(g);
 			}
 		}
 	}

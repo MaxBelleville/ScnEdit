@@ -28,6 +28,9 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Material/Shader/ShaderCallback/CShaderParticle.h"
 #include "Material/Shader/ShaderCallback/CShaderMaterial.h"
 
+#include "Material/Shader/ShaderCallback/CShaderSH.h"
+#include "Material/Shader/ShaderCallback/CShaderLighting.h"
+
 namespace Skylicht
 {
 	namespace Particle
@@ -67,8 +70,8 @@ namespace Skylicht
 				// use last frame data
 				CCullingBBoxData* box = GET_ENTITY_DATA(entity, CCullingBBoxData);
 
-				CGroup** groups = particleData->Groups.pointer();
-				for (u32 i = 0, n = particleData->Groups.size(); i < n; i++)
+				CGroup** groups = particleData->AllGroups.pointer();
+				for (u32 i = 0, n = particleData->AllGroups.size(); i < n; i++)
 				{
 					CGroup* g = groups[i];
 					if (i == 0)
@@ -76,6 +79,8 @@ namespace Skylicht
 					else
 						box->BBox.addInternalBox(g->getBBox());
 				}
+
+				box->NeedValidate = true;
 			}
 		}
 
@@ -86,6 +91,9 @@ namespace Skylicht
 
 		void CParticleRenderer::update(CEntityManager* entityManager)
 		{
+			if (entityManager->getRenderPipeline()->getType() == IRenderPipeline::ShadowMap)
+				return;
+
 			if (m_group->getEntityCount() == 0)
 				return;
 
@@ -105,11 +113,43 @@ namespace Skylicht
 
 			CShaderParticle::setViewUp(up);
 			CShaderParticle::setViewLook(look);
+
+			CEntity** entities = m_group->getEntities();
+			int numEntity = m_group->getEntityCount();
+
+			for (int i = 0; i < numEntity; i++)
+			{
+				CEntity* entity = entities[i];
+
+				CParticleBufferData* data = GET_ENTITY_DATA(entity, CParticleBufferData);
+				CWorldTransformData* transform = GET_ENTITY_DATA(entity, CWorldTransformData);
+
+				if (data->Updated != data->RequestUpdate)
+				{
+					// todo: fix pause particle if the code don't call CParticleComponent::update function
+					data->Updated = data->RequestUpdate;
+
+					// update group before render
+					for (u32 j = 0, m = data->AllGroups.size(); j < m; j++)
+					{
+						data->AllGroups[j]->setParentWorldMatrix(transform->World);
+						data->AllGroups[j]->update(true);
+					}
+				}
+			}
 		}
 
 		void CParticleRenderer::render(CEntityManager* entityManager)
 		{
 
+		}
+
+		const core::matrix4& CParticleRenderer::getTransformNoRotate(const core::matrix4& world)
+		{
+			m_transform.makeIdentity();
+			m_transform.setTranslation(world.getTranslation());
+			m_transform.setScale(world.getScale());
+			return m_transform;
 		}
 
 		void CParticleRenderer::renderTransparent(CEntityManager* entityManager)
@@ -126,17 +166,16 @@ namespace Skylicht
 
 				CParticleBufferData* data = GET_ENTITY_DATA(entity, CParticleBufferData);
 				CCullingData* culling = GET_ENTITY_DATA(entity, CCullingData);
-				CWorldTransformData* transform = GET_ENTITY_DATA(entity, CWorldTransformData);
 
-				// update group before render
-				for (u32 j = 0, m = data->Groups.size(); j < m; j++)
-				{
-					data->Groups[j]->update(culling->Visible);
-				}
-
-				// render
 				if (culling->Visible == true)
-					renderParticleGroup(data, transform->World);
+				{
+					CIndirectLightingData* lightingData = GET_ENTITY_DATA(entity, CIndirectLightingData);
+					if (lightingData != NULL)
+						lightingData->applyShader();
+
+					CWorldTransformData* transform = GET_ENTITY_DATA(entity, CWorldTransformData);
+					renderParticleGroup(data, getTransformNoRotate(transform->World));
+				}
 			}
 		}
 
@@ -154,11 +193,16 @@ namespace Skylicht
 
 				CParticleBufferData* data = GET_ENTITY_DATA(entity, CParticleBufferData);
 				CCullingData* culling = GET_ENTITY_DATA(entity, CCullingData);
-				CWorldTransformData* transform = GET_ENTITY_DATA(entity, CWorldTransformData);
 
-				// render
 				if (culling->Visible == true)
-					renderParticleGroupEmission(data, transform->World);
+				{
+					CIndirectLightingData* lightingData = GET_ENTITY_DATA(entity, CIndirectLightingData);
+					if (lightingData != NULL)
+						lightingData->applyShader();
+
+					CWorldTransformData* transform = GET_ENTITY_DATA(entity, CWorldTransformData);
+					renderParticleGroupEmission(data, getTransformNoRotate(transform->World));
+				}
 			}
 		}
 
@@ -167,11 +211,11 @@ namespace Skylicht
 			IVideoDriver* driver = getVideoDriver();
 			driver->setTransform(video::ETS_WORLD, world);
 
-			CGroup** groups = data->Groups.pointer();
-			for (u32 i = 0, n = data->Groups.size(); i < n; i++)
+			CGroup** groups = data->AllGroups.pointer();
+			for (u32 i = 0, n = data->AllGroups.size(); i < n; i++)
 			{
 				CGroup* g = groups[i];
-				if (g->getCurrentParticleCount() > 0)
+				if (g->getCurrentParticleCount() > 0 && g->Visible)
 				{
 					IRenderer* renderer = g->getRenderer();
 					if (renderer != NULL)
@@ -187,16 +231,23 @@ namespace Skylicht
 			IVideoDriver* driver = getVideoDriver();
 			driver->setTransform(video::ETS_WORLD, world);
 
-			CGroup** groups = data->Groups.pointer();
-			for (u32 i = 0, n = data->Groups.size(); i < n; i++)
+			CGroup** groups = data->AllGroups.pointer();
+			for (u32 i = 0, n = data->AllGroups.size(); i < n; i++)
 			{
 				CGroup* g = groups[i];
-				if (g->getCurrentParticleCount() > 0)
+				if (g->getCurrentParticleCount() > 0 && g->Visible)
 				{
 					IRenderer* renderer = g->getRenderer();
 					if (renderer != NULL && renderer->isEmission())
 					{
+						SColorf color = CShaderMaterial::getColorIntensity();
+
+						float intensity = renderer->getEmissionIntensity();
+						CShaderMaterial::setColorIntensity(SColorf(intensity, intensity, intensity));
+
 						renderGroup(driver, g);
+
+						CShaderMaterial::setColorIntensity(color);
 					}
 				}
 			}
@@ -211,7 +262,7 @@ namespace Skylicht
 			{
 				CParticleInstancing* instancing = group->getIntancing();
 				if (instancing->getInstanceBuffer() &&
-					instancing->getInstanceBuffer()->getVertexCount() > 1)
+					instancing->getInstanceBuffer()->getVertexCount() > 0)
 				{
 					buffer = group->getIntancing()->getMeshBuffer();
 				}
@@ -221,7 +272,7 @@ namespace Skylicht
 				buffer = group->getParticleBuffer()->getMeshBuffer();
 			}
 
-			if (buffer)
+			if (buffer && buffer->getIndexBuffer()->getIndexCount() > 0)
 			{
 				CShaderParticle::setOrientationUp(group->OrientationUp);
 				CShaderParticle::setOrientationNormal(group->OrientationNormal);

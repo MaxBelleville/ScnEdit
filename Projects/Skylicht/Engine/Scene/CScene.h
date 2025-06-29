@@ -73,13 +73,13 @@ namespace Skylicht
 
 		void updateIndexSearchObject();
 
-		virtual CGameObject* searchObject(const wchar_t* name);
-
 		virtual CGameObject* searchObjectInChild(const wchar_t* name);
 
-		virtual CGameObject* searchObjectByID(const char* id);
-
 		virtual CGameObject* searchObjectInChildByID(const char* id);
+
+		virtual CEntity* searchEntityInChildByID(const char* id);
+
+		u32 searchObjectByCullingLayer(ArrayGameObject& result, u32 mask);
 
 		virtual CZone* createZone();
 
@@ -106,6 +106,8 @@ namespace Skylicht
 		}
 
 		void bringToNext(CZone* object, CZone* target, bool behind);
+
+		CZone* getZoneBefore(CZone* object);
 
 		void registerEvent(std::string name, IEventReceiver* pEvent);
 

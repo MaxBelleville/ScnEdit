@@ -41,7 +41,9 @@ namespace Skylicht
 		m_type(SH9),
 		m_autoSH(true),
 		m_internalIndirectLM(false),
-		m_indirectLM(NULL)
+		m_indirectLM(NULL),
+		m_intensity(1.0f),
+		m_ambientColor(255, 60, 60, 60)
 	{
 
 	}
@@ -108,6 +110,7 @@ namespace Skylicht
 		data->Type = (CIndirectLightingData::EType)m_type;
 		data->SH = m_sh;
 		data->AutoSH = &m_autoSH;
+		data->Intensity = &m_intensity;
 		data->ReleaseSH = false;
 
 		if (std::find(m_data.begin(), m_data.end(), data) == m_data.end())
@@ -138,7 +141,19 @@ namespace Skylicht
 		object->autoRelease(enumType);
 
 		// ambient color
-		object->autoRelease(new CColorProperty(object, "Ambient Color", m_ambientColor));
+		object->autoRelease(new CColorProperty(object, "ambientColor", m_ambientColor));
+
+		// lightmap
+		CArrayTypeSerializable<CFilePathProperty>* textureArray = new CArrayTypeSerializable<CFilePathProperty>("lightmap", object);
+		textureArray->OnCreateElement = [](CValueProperty* p)
+			{
+				CFilePathProperty* filePath = (CFilePathProperty*)p;
+				filePath->Exts = CTextureManager::getTextureExts();
+			};
+
+		for (std::string& path : m_indirectLMPaths)
+			textureArray->autoRelease(new CFilePathProperty(textureArray, "texture", path.c_str(), CTextureManager::getTextureExts()));
+		object->autoRelease(textureArray);
 
 		return object;
 	}
@@ -149,9 +164,24 @@ namespace Skylicht
 
 		EIndirectType type = object->get<EIndirectType>("type", EIndirectType::SH9);
 
-		m_ambientColor = object->get<SColor>("Ambient Color", SColor(255, 60, 60, 60));
+		m_ambientColor = object->get<SColor>("ambientColor", SColor(255, 60, 60, 60));
 
-		setIndirectLightingType(type, false);
+		bool haveLightmap = false;
+		CArraySerializable* textureArray = (CArraySerializable*)object->getProperty("lightmap");
+		if (textureArray)
+		{
+			int numTextures = textureArray->getElementCount();
+			haveLightmap = numTextures > 0;
+
+			m_indirectLMPaths.clear();
+			for (int i = 0; i < numTextures; i++)
+			{
+				CFilePathProperty* file = (CFilePathProperty*)textureArray->getElement(i);
+				m_indirectLMPaths.push_back(file->get());
+			}
+		}
+
+		setIndirectLightingType(type, haveLightmap);
 	}
 
 	bool CIndirectLighting::isLightmapEmpty()

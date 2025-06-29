@@ -63,9 +63,6 @@ namespace Skylicht
 			const u32 type[] = { DATA_TYPE_INDEX(CCullingData) };
 			m_group = entityManager->createGroup(type, 1);
 		}
-
-		if (g_useCacheCulling)
-			return;
 	}
 
 	void CCullingSystem::onQuery(CEntityManager* entityManager, CEntity** entities, int numEntity)
@@ -78,14 +75,25 @@ namespace Skylicht
 
 		m_bboxAndMaterials.reset();
 
+		CEntity* entity;
+		CCullingData* culling;
+		CVisibleData* visible;
+
+		CRenderMeshData* mesh;
+		CMesh* meshObj;
+		SBBoxAndMaterial* m;
+		CCullingBBoxData* bbox;
+		CWorldTransformData* transform;
+
 		for (int i = 0; i < numEntity; i++)
 		{
-			CEntity* entity = entities[i];
+			entity = entities[i];
 
-			CCullingData* culling = GET_ENTITY_DATA(entity, CCullingData);
-			CVisibleData* visible = GET_ENTITY_DATA(entity, CVisibleData);
+			culling = GET_ENTITY_DATA(entity, CCullingData);
+			visible = GET_ENTITY_DATA(entity, CVisibleData);
 
 			culling->CullingLayer = visible->CullingLayer;
+			culling->ShadowCasting = visible->ShadowCasting;
 
 			if (visible->Culled || !visible->Visible)
 			{
@@ -93,27 +101,35 @@ namespace Skylicht
 			}
 			else
 			{
-				CRenderMeshData* mesh = GET_ENTITY_DATA(entity, CRenderMeshData);
+				transform = GET_ENTITY_DATA(entity, CWorldTransformData);
+				mesh = GET_ENTITY_DATA(entity, CRenderMeshData);
 				if (mesh != NULL)
 				{
-					CMesh* meshObj = mesh->getMesh();
+					meshObj = mesh->getMesh();
 
-					SBBoxAndMaterial* m = m_bboxAndMaterials.getPush();
+					m = m_bboxAndMaterials.getPush();
 					m->Entity = entity;
 					m->Culling = culling;
+					m->Transform = transform;
 					m->BBox = meshObj->getBoundingBoxPtr();
-					m->Materials = &meshObj->Materials;
+					m->Materials = &mesh->getMaterials();
+
+					m->Culling->NeedValidate |= transform->NeedValidate;
 				}
 				else
 				{
-					CCullingBBoxData* bbox = GET_ENTITY_DATA(entity, CCullingBBoxData);
+					bbox = GET_ENTITY_DATA(entity, CCullingBBoxData);
 					if (bbox != NULL)
 					{
-						SBBoxAndMaterial* m = m_bboxAndMaterials.getPush();
+						m = m_bboxAndMaterials.getPush();
 						m->Entity = entity;
 						m->Culling = culling;
+						m->Transform = transform;
 						m->BBox = &bbox->BBox;
 						m->Materials = &bbox->Materials;
+
+						m->Culling->NeedValidate |= (bbox->NeedValidate || transform->NeedValidate);
+						bbox->NeedValidate = false;
 					}
 				}
 			}
@@ -135,18 +151,24 @@ namespace Skylicht
 
 		// camera
 		CCamera* camera = entityManager->getCamera();
-		u32 cameraCullingMask = camera->getCullingMask();
 		const core::aabbox3df& cameraBox = camera->getViewFrustum().getBoundingBox();
 
 		int count = m_bboxAndMaterials.count();
-		SBBoxAndMaterial* bboxMats = m_bboxAndMaterials.pointer();
+
+		SBBoxAndMaterial* bbBoxMats = m_bboxAndMaterials.pointer();
+		SBBoxAndMaterial* bbBoxMat;
+		CEntity* entity;
+		CCullingData* culling;
+		CMaterial** materials;
+		CMaterial* m;
+		int materialCount;
 
 		for (int i = 0; i < count; i++)
 		{
-			SBBoxAndMaterial* bbBoxMat = &bboxMats[i];
+			bbBoxMat = &bbBoxMats[i];
 
-			CEntity* entity = bbBoxMat->Entity;
-			CCullingData* culling = bbBoxMat->Culling;
+			entity = bbBoxMat->Entity;
+			culling = bbBoxMat->Culling;
 
 			if (g_useCacheCulling)
 			{
@@ -161,23 +183,15 @@ namespace Skylicht
 
 			culling->Visible = true;
 
-			// check camera mask culling
-			u32 test = cameraCullingMask & culling->CullingLayer;
-			if (test == 0)
-			{
-				culling->Visible = false;
-				continue;
-			}
-
 			// check material first
 			if (bbBoxMat->Materials != NULL)
 			{
-				CMaterial** materials = bbBoxMat->Materials->data();
-				int materialCount = (int)bbBoxMat->Materials->size();
+				materials = bbBoxMat->Materials->data();
+				materialCount = (int)bbBoxMat->Materials->size();
 
 				for (int j = 0; j < materialCount; j++)
 				{
-					CMaterial* m = materials[j];
+					m = materials[j];
 					if (m != NULL && rp->canRenderMaterial(m) == false)
 					{
 						culling->Visible = false;
@@ -189,14 +203,22 @@ namespace Skylicht
 			if (culling->Visible == false)
 				continue;
 
+			if (rp->getType() == IRenderPipeline::ShadowMap && !culling->ShadowCasting)
+			{
+				culling->Visible = false;
+				continue;
+			}
+
 			if (g_useCacheCulling)
 				continue;
 
-			// transform world bbox
-			culling->BBox = *bbBoxMat->BBox;
-
-			CWorldTransformData* transform = GET_ENTITY_DATA(entity, CWorldTransformData);
-			transform->World.transformBoxEx(culling->BBox);
+			// update bbox
+			if (culling->NeedValidate)
+			{
+				culling->BBox = *bbBoxMat->BBox;
+				bbBoxMat->Transform->World.transformBoxEx(culling->BBox);
+				culling->NeedValidate = false;
+			}
 
 			// 1. Detect by bounding box
 			if (rp->getType() == IRenderPipeline::ShadowMap)

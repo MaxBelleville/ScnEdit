@@ -17,7 +17,6 @@ struct PS_INPUT
 	float3 worldTangent: WORLDTANGENT;
 	float3 worldBinormal: WORLDBINORMAL;
 	float tangentw : TANGENTW;
-	float4 viewPosition: VIEWPOSITION;
 	float3 depth: DEPTH;
 	float4 shadowCoord: SHADOWCOORD;
 };
@@ -44,7 +43,7 @@ float3 shAmbient(float3 n)
 		uSHConst[1].xyz * n.y +
 		uSHConst[2].xyz * n.z +
 		uSHConst[3].xyz * n.x;
-	return ambientLighting * 0.9;
+	return ambientLighting * 0.75;
 }
 float shadow(const float4 shadowCoord, const float farDistance)
 {
@@ -68,8 +67,7 @@ float4 main(PS_INPUT input) : SV_TARGET
 	float3x3 rotation = float3x3(input.worldTangent, input.worldBinormal, input.worldNormal);
 	float3 localCoords = normalMap * 2.0 - float3(1.0, 1.0, 1.0);
 	localCoords.y *= input.tangentw;
-	float3 n = normalize(mul(localCoords, rotation));
-	n = normalize(n);
+	float3 n = mul(localCoords, rotation);
 	float depth = length(input.depth);
 	float visibility = shadow(input.shadowCoord, depth);
 	float3 ambientLighting = shAmbient(n);

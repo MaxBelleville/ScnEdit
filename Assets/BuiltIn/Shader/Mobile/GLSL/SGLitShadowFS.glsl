@@ -17,7 +17,6 @@ in vec3 vWorldLightDir;
 in vec3 vWorldTangent;
 in vec3 vWorldBinormal;
 in float vTangentW;
-in vec4 vViewPosition;
 in vec3 vDepth;
 in vec4 vShadowCoord;
 out vec4 FragColor;
@@ -37,7 +36,7 @@ vec3 shAmbient(vec3 n)
 		uSHConst[1].xyz * n.y +
 		uSHConst[2].xyz * n.z +
 		uSHConst[3].xyz * n.x;
-	return ambientLighting * 0.9;
+	return ambientLighting * 0.75;
 }
 float shadow(const vec4 shadowCoord, const float farDistance)
 {
@@ -62,7 +61,6 @@ void main(void)
 	vec3 localCoords = normalMap * 2.0 - vec3(1.0, 1.0, 1.0);
 	localCoords.y *= vTangentW;
 	vec3 n = normalize(rotation * localCoords);
-	n = normalize(n);
 	float depth = length(vDepth);
 	float visibility = shadow(vShadowCoord, depth);
 	vec3 ambientLighting = shAmbient(n);

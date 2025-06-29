@@ -30,6 +30,13 @@ https://github.com/skylicht-lab/skylicht-engine
 
 namespace Skylicht
 {
+	/// @brief The object class supports material management
+	/// @ingroup Materials
+	/// 
+	/// @code
+	/// std::vector<std::string> textureFolders;
+	/// ArrayMaterial material = CMaterialManager::getInstance()->loadMaterial("SampleAnimations/HeroArtwork/Hero.mat", true, textureFolders);
+	/// @endcode
 	class SKYLICHT_API CMaterialManager
 	{
 	public:
@@ -39,6 +46,7 @@ namespace Skylicht
 		std::map<std::string, ArrayMaterial> m_materials;
 
 		ArrayMaterial m_listGenerateMaterials;
+
 	public:
 		CMaterialManager();
 
@@ -51,6 +59,8 @@ namespace Skylicht
 		bool isMaterialLoaded(const char* filename);
 
 		void releaseAllMaterials();
+
+		void releaseAllMaterials(const char* package);
 
 		ArrayMaterial& loadMaterial(const char* filename, bool loadTexture, const std::vector<std::string>& textureFolders);
 

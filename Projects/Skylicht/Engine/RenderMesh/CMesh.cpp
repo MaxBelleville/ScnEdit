@@ -167,6 +167,7 @@ namespace Skylicht
 				Materials[i]->drop();
 		}
 		Materials.clear();
+		MaterialName.clear();
 
 		for (u32 i = 0, n = BlendShape.size(); i < n; i++)
 			BlendShape[i]->drop();
@@ -195,11 +196,31 @@ namespace Skylicht
 		}
 	}
 
+	void CMesh::removeHWBuffer()
+	{
+		for (u32 i = 0; i < MeshBuffers.size(); i++)
+		{
+			IMeshBuffer* mb = MeshBuffers[i];
+			for (u32 j = 0, m = mb->getVertexBufferCount(); j < m; j++)
+				mb->getVertexBuffer(j)->setHardwareBuffer(NULL);
+			mb->getIndexBuffer()->setHardwareBuffer(NULL);
+		}
+	}
+
 	void CMesh::replaceMeshBuffer(int i, IMeshBuffer* buf)
 	{
 		MeshBuffers[i]->drop();
 		MeshBuffers[i] = buf;
 		buf->grab();
+	}
+
+	video::E_VERTEX_TYPE CMesh::getVertexType()
+	{
+		if (MeshBuffers.size() > 0)
+		{
+			return MeshBuffers[0]->getVertexType();
+		}
+		return video::EVT_UNKNOWN;
 	}
 
 	IMeshBuffer* CMesh::getBufferByMaterialID(int materialID)

@@ -36,6 +36,25 @@ namespace Skylicht
 	class CCamera;
 	class CCanvas;
 
+	/// @brief The object class supports 2D drawing on the screen.
+	/// @ingroup Graphics2D
+	/// 
+	/// @code
+	/// CGraphics2D *g = CGraphics2D::getInstance();
+	/// 
+	/// // setup 2d projection
+	/// float w = 800.0f;
+	/// float h = 600.0f;
+	/// 
+	/// core::matrix4 projection, view;
+	/// projection.buildProjectionMatrixOrthoLH(w, -h, -1.0f, 1.0f);
+	/// view.setTranslation(core::vector3df(-w * 0.5f, -h * 0.5f, 0.0f));
+	/// 
+	/// g->beginRenderGUI(projection, view);
+	/// ... draw code
+	/// g->endRenderGUI();
+	/// 
+	/// @endcode
 	class SKYLICHT_API CGraphics2D
 	{
 	public:
@@ -143,7 +162,11 @@ namespace Skylicht
 
 		void addFrameBatch(SFrame* frame, const SColor& color, const core::matrix4& absoluteMatrix, int materialID, CMaterial* material = NULL);
 
+		void addFrameBatch(const core::rectf& pos, SFrame* frame, const SColor& color, const core::matrix4& absoluteMatrix, int materialID, CMaterial* material = NULL);
+
 		void addRectangleBatch(const core::rectf& pos, const core::rectf& uv, const SColor& color, const core::matrix4& absoluteTransform, int shaderID, CMaterial* material = NULL);
+
+		void addEclipseBatch(const core::rectf& pos, const core::rectf& uv, const SColor& color, const core::matrix4& absoluteTransform, int shaderID, float a = 0.0f, float b = 360.0f, CMaterial* material = NULL);
 
 		void beginDrawDepth();
 
@@ -177,11 +200,11 @@ namespace Skylicht
 
 		void draw2DRectangleOutline(const core::vector3df& upleft, const core::vector3df& lowerright, const SColor& color);
 
-		void drawText(const core::position2df& pos, CGlyphFont* font, const SColor& color, const std::wstring& string, int materialID, CMaterial* material = NULL);
+		void drawText(const core::position2df& pos, IFont* font, const SColor& color, const std::wstring& string, int materialID, CMaterial* material = NULL);
 
-		float measureCharWidth(CGlyphFont* font, wchar_t c);
+		float measureCharWidth(IFont* font, wchar_t c);
 
-		core::dimension2df measureText(CGlyphFont* font, const std::wstring& string);
+		core::dimension2df measureText(IFont* font, const std::wstring& string);
 
 		video::SMaterial& getMaterial()
 		{

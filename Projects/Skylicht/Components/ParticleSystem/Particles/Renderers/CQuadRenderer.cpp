@@ -31,8 +31,6 @@ namespace Skylicht
 	{
 		CQuadRenderer::CQuadRenderer() :
 			IRenderer(Quad),
-			m_atlasNx(1),
-			m_atlasNy(1),
 			m_billboardType(Camera),
 			m_baseShaderType(Additive)
 		{
@@ -40,18 +38,14 @@ namespace Skylicht
 			m_material->setBackfaceCulling(false);
 			m_material->setZWrite(false);
 
+			setTexturePath("BuiltIn/Textures/NullTexture.png");
+
 			setMaterialType(m_baseShaderType, m_billboardType);
 		}
 
 		CQuadRenderer::~CQuadRenderer()
 		{
 			m_material->drop();
-		}
-
-		void CQuadRenderer::setTexture(int slot, ITexture* texture)
-		{
-			m_material->setTexture(slot, texture);
-			m_material->setManualInitTexture(true);
 		}
 
 		void CQuadRenderer::setMaterialType(EBaseShaderType shader, EBillboardType billboard)
@@ -91,10 +85,6 @@ namespace Skylicht
 					m_material->changeShader("BuiltIn/Shader/Particle/ParticleVelocityTransparentAlpha.xml");
 				else if (billboard == FixOrientation)
 					m_material->changeShader("BuiltIn/Shader/Particle/ParticleOrientationTransparentAlpha.xml");
-			}
-			else
-			{
-
 			}
 
 			m_billboardType = billboard;
@@ -170,7 +160,41 @@ namespace Skylicht
 				0.0f);
 			vertices[3].Color = white;
 
+			m_needUpdateMesh = false;
 			m_material->applyMaterial();
+
+			buffer->setDirty();
+		}
+
+		CObjectSerializable* CQuadRenderer::createSerializable()
+		{
+			CObjectSerializable* object = IRenderer::createSerializable();
+
+			CEnumProperty<EBaseShaderType>* shaderType = new CEnumProperty<EBaseShaderType>(object, "shaderType", m_baseShaderType);
+			shaderType->setUIHeader("Default Material");
+			shaderType->addEnumString("Additive", EBaseShaderType::Additive);
+			shaderType->addEnumString("Transparent", EBaseShaderType::Transparent);
+			shaderType->addEnumString("Additive Alpha", EBaseShaderType::AdditiveAlpha);
+			shaderType->addEnumString("Transparent Alpha", EBaseShaderType::TransparentAlpha);
+			object->autoRelease(shaderType);
+
+			CEnumProperty<EBillboardType>* billboardType = new CEnumProperty<EBillboardType>(object, "billboardType", m_billboardType);
+			billboardType->addEnumString("Camera", EBillboardType::Camera);
+			billboardType->addEnumString("Velocity", EBillboardType::Velocity);
+			billboardType->addEnumString("FixOrientation", EBillboardType::FixOrientation);
+			object->autoRelease(billboardType);
+
+			return object;
+		}
+
+		void CQuadRenderer::loadSerializable(CObjectSerializable* object)
+		{
+			IRenderer::loadSerializable(object);
+
+			EBaseShaderType shaderType = object->get<EBaseShaderType>("shaderType", EBaseShaderType::Additive);
+			EBillboardType billboardType = object->get<EBillboardType>("billboardType", EBillboardType::Camera);
+
+			setMaterialType(shaderType, billboardType);
 		}
 	}
 }

@@ -44,7 +44,21 @@ namespace Skylicht
 
 			virtual ~CPolyLine();
 
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
+
 			void setLine(const core::array<core::vector3df>& point);
+
+			core::array<core::vector3df>& getPoints()
+			{
+				return m_point;
+			}
+
+			u32 getNumPoint()
+			{
+				return m_point.size();
+			}
 
 			inline void setNormal(const core::vector3df& normal)
 			{
@@ -54,6 +68,8 @@ namespace Skylicht
 			virtual void generatePosition(CParticle& particle, bool full, CGroup* group);
 
 			virtual core::vector3df computeNormal(const core::vector3df& point, CGroup* group);
+
+			DECLARE_GETTYPENAME(CPolyLine)
 		};
 	}
 }

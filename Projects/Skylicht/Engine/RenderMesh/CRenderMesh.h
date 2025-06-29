@@ -53,6 +53,8 @@ namespace Skylicht
 		bool m_fixInverseNormal;
 		bool m_enableInstancing;
 
+		bool m_shadowCasting;
+
 	public:
 		CRenderMesh();
 
@@ -72,7 +74,7 @@ namespace Skylicht
 
 		void initFromPrefab(CEntityPrefab* prefab);
 
-		void initFromMeshFile(const char* path);
+		void initFromMeshFile(const char* path, bool loadNormalMap = true, bool loadTexcoord2 = false);
 
 		void initMaterialFromFile(const char* material);
 
@@ -84,6 +86,15 @@ namespace Skylicht
 		}
 
 		void enableInstancing(bool b);
+
+		void enableInstancingMaterialForEntity(bool b);
+
+		void setShadowCasting(bool b);
+
+		inline bool isShadowCasting()
+		{
+			return m_shadowCasting;
+		}
 
 		void removeRenderMeshName(const char* name);
 
@@ -150,6 +161,6 @@ namespace Skylicht
 
 		void releaseEntities();
 
-		void addMaterial(CMaterial* material);
+		bool addMaterial(CMaterial* material);
 	};
 }

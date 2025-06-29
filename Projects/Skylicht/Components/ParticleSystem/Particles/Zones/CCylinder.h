@@ -24,16 +24,15 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
-#include "CZone.h"
+#include "CPositionZone.h"
 
 namespace Skylicht
 {
 	namespace Particle
 	{
-		class COMPONENT_API CCylinder : public CZone
+		class COMPONENT_API CCylinder : public CPositionZone
 		{
 		protected:
-			core::vector3df m_position;
 			core::vector3df m_direction;
 			float m_radius;
 			float m_length;
@@ -46,10 +45,9 @@ namespace Skylicht
 
 			virtual ~CCylinder();
 
-			inline void setPosition(const core::vector3df& pos)
-			{
-				m_position = pos;
-			}
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
 
 			inline void setDirection(const core::vector3df& direction)
 			{
@@ -65,11 +63,6 @@ namespace Skylicht
 			inline void setLength(float l)
 			{
 				m_length = l;
-			}
-
-			inline const core::vector3df& getPosition()
-			{
-				return m_position;
 			}
 
 			inline const core::vector3df& getDirection()
@@ -90,6 +83,8 @@ namespace Skylicht
 			virtual void generatePosition(CParticle& particle, bool full, CGroup* group);
 
 			virtual core::vector3df computeNormal(const core::vector3df& point, CGroup* group);
+
+			DECLARE_GETTYPENAME(CCylinder)
 		};
 	}
 }

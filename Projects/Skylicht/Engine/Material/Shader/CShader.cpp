@@ -36,6 +36,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "ShaderCallback/CShaderParticle.h"
 #include "ShaderCallback/CShaderDeferred.h"
 #include "ShaderCallback/CShaderTransformTexture.h"
+#include "ShaderCallback/CShaderRTT.h"
 
 namespace Skylicht
 {
@@ -45,16 +46,17 @@ namespace Skylicht
 		m_numVSUniform(0),
 		m_numFSUniform(0),
 		m_deferred(false),
-		m_instancing(NULL),
-		m_instancingShader(NULL),
 		m_softwareSkinningShader(NULL),
 		m_skinning(false),
 		m_shadow(true),
 		m_shadowDepthShader(NULL),
 		m_shadowDistanceShader(NULL),
-		m_vertexType(video::EVT_UNKNOWN),
 		m_baseShader(EMT_SOLID)
 	{
+		// set null
+		for (int i = 0; i < (int)video::EVT_UNKNOWN + 1; i++)
+			m_shaderInstancing[i] = NULL;
+
 		// builtin callback
 		addCallback<CShaderLighting>();
 		addCallback<CShaderCamera>();
@@ -64,6 +66,7 @@ namespace Skylicht
 		addCallback<CShaderParticle>();
 		addCallback<CShaderDeferred>();
 		addCallback<CShaderTransformTexture>();
+		addCallback<CShaderRTT>();
 	}
 
 	CShader::~CShader()
@@ -77,8 +80,17 @@ namespace Skylicht
 		deleteAllUI();
 		deleteAllResource();
 
-		if (m_instancing)
-			delete m_instancing;
+		for (int i = 0; i < (int)video::EVT_UNKNOWN; i++)
+		{
+			SShaderInstancing* s = m_shaderInstancing[i];
+			if (s)
+			{
+				if (s->Instancing)
+					delete s->Instancing;
+				delete s;
+			}
+			m_shaderInstancing[i] = NULL;
+		}
 	}
 
 	void CShader::deleteAllUI()
@@ -101,14 +113,65 @@ namespace Skylicht
 		return m_softwareSkinningShader;
 	}
 
-	CShader* CShader::getInstancingShader()
+	CShader* CShader::getInstancingShader(video::E_VERTEX_TYPE vtxType)
 	{
-		if (m_instancingShader == NULL && !m_instancingShaderName.empty())
+		SShaderInstancing* s = m_shaderInstancing[vtxType];
+		if (s)
 		{
-			CShaderManager* shaderManager = CShaderManager::getInstance();
-			m_instancingShader = shaderManager->getShaderByName(m_instancingShaderName.c_str());
+			if (s->InstancingShader == NULL)
+			{
+				CShaderManager* shaderManager = CShaderManager::getInstance();
+				s->InstancingShader = shaderManager->getShaderByName(s->ShaderName.c_str());
+			}
+			return s->InstancingShader;
 		}
-		return m_instancingShader;
+		return NULL;
+	}
+
+	std::string CShader::getInstancingVertex(video::E_VERTEX_TYPE vtxType)
+	{
+		SShaderInstancing* s = m_shaderInstancing[vtxType];
+		if (s)
+			return s->InstancingVertex;
+		return std::string();
+	}
+
+	bool CShader::isSupportInstancing(video::E_VERTEX_TYPE vtxType)
+	{
+		return m_shaderInstancing[vtxType] != NULL;
+	}
+
+	void CShader::setInstancing(video::E_VERTEX_TYPE vtxType, IShaderInstancing* instancing)
+	{
+		SShaderInstancing* s = m_shaderInstancing[vtxType];
+		if (s)
+		{
+			if (s->Instancing)
+				delete s->Instancing;
+			s->Instancing = instancing;
+		}
+	}
+
+	IShaderInstancing* CShader::getInstancing(video::E_VERTEX_TYPE vtxType)
+	{
+		SShaderInstancing* s = m_shaderInstancing[vtxType];
+		if (s)
+		{
+			return s->Instancing;
+		}
+		return NULL;
+	}
+
+	void CShader::setShadowDepthWriteShader(const char* name)
+	{
+		m_shadowDepthShaderName = name;
+		m_shadowDepthShader = getShadowDepthWriteShader();
+	}
+
+	void CShader::setShadowDistanceWriteShader(const char* name)
+	{
+		m_shadowDistanceShaderName = name;
+		m_shadowDistanceShader = getShadowDistanceWriteShader();
 	}
 
 	CShader* CShader::getShadowDepthWriteShader()
@@ -155,11 +218,10 @@ namespace Skylicht
 			"BONE_COUNT",
 			"SHADOW_MAP_MATRIX",
 			"SHADOW_MAP_DISTANCE",
-			"CAMERA_POSITION",
+			"SHADOW_BIAS",
 			"WORLD_CAMERA_POSITION",
 			"LIGHT_COLOR",
 			"LIGHT_AMBIENT",
-			"LIGHT_DIRECTION",
 			"WORLD_LIGHT_DIRECTION",
 			"POINT_LIGHT_COLOR",
 			"POINT_LIGHT_POSITION",
@@ -175,13 +237,8 @@ namespace Skylicht
 			"SHADER_VEC4",
 			"SH_CONST",
 			"CUSTOM_VALUE",
-			"BPCEM_MIN",
-			"BPCEM_MAX",
-			"BPCEM_POS",
 			"TEXTURE_MIPMAP_COUNT",
 			"TEXTURE_WIDTH_HEIGHT",
-			"FOG_PARAMS",
-			"SSAO_KERNEL",
 			"DEFERRED_VIEW",
 			"DEFERRED_PROJECTION",
 			"DEFERRED_VIEW_PROJECTION",
@@ -192,6 +249,8 @@ namespace Skylicht
 			"PARTICLE_ORIENTATION_NORMAL",
 			"LIGHTMAP_INDEX",
 			"TIME",
+			"COLOR_INTENSITY",
+			"RENDER_TEXTURE_MATRIX",
 			"NULL"
 		};
 
@@ -364,7 +423,16 @@ namespace Skylicht
 						"ShadowMap",
 						"TransformTexture",
 						"VertexPositionTexture",
-						"VertexNormalTexture"
+						"VertexNormalTexture",
+						"LastFrame",
+						"RTT0",
+						"RTT1",
+						"RTT2",
+						"RTT3",
+						"RTT4",
+						"RTT5",
+						"RTT6",
+						"RTT7"
 					};
 
 					for (u32 i = 0, n = ResourceCount; i < n; i++)
@@ -602,16 +670,6 @@ namespace Skylicht
 							m_deferred = true;
 					}
 
-					// shader for instancing
-					wtext = xmlReader->getAttributeValue(L"instancing");
-					if (wtext != NULL)
-					{
-						CStringImp::convertUnicodeToUTF8(wtext, text);
-
-						m_instancingShaderName = text;
-						m_instancingShader = shaderManager->getShaderByName(text);
-					}
-
 					// shader for fallback to software skinning
 					wtext = xmlReader->getAttributeValue(L"softwareSkinning");
 					if (wtext != NULL)
@@ -655,27 +713,68 @@ namespace Skylicht
 						m_shadowDistanceShaderName = text;
 						m_shadowDistanceShader = shaderManager->getShaderByName(text);
 					}
+				}
+				else if (nodeName == L"instancing")
+				{
+					// base vertex type
+					wtext = xmlReader->getAttributeValue(L"vertex");
 
-					// vertex type for instancing batch
-					wtext = xmlReader->getAttributeValue(L"vertexType");
 					if (wtext != NULL)
 					{
-						CStringImp::convertUnicodeToUTF8(wtext, text);
-						std::string vertexType = text;
+						video::E_VERTEX_TYPE vtxType = video::EVT_UNKNOWN;
 
-						int i = 0;
-						while (video::sBuiltInVertexTypeNames[i] != 0)
+						CStringImp::convertUnicodeToUTF8(wtext, text);
+						for (int i = 0; i < video::EVT_UNKNOWN; i++)
 						{
-							if (vertexType == video::sBuiltInVertexTypeNames[i])
+							if (CStringImp::comp<const char>(text, video::sBuiltInVertexTypeNames[i]) == 0)
 							{
-								m_vertexType = (E_VERTEX_TYPE)i;
+								vtxType = (video::E_VERTEX_TYPE)i;
 								break;
 							}
-							i++;
+						}
+
+						std::string shaderName;
+						std::string instancingVertex;
+
+						if (vtxType != video::EVT_UNKNOWN)
+						{
+							// shader for instancing
+							wtext = xmlReader->getAttributeValue(L"shader");
+							if (wtext != NULL)
+							{
+								CStringImp::convertUnicodeToUTF8(wtext, text);
+								shaderName = text;
+							}
+
+							// vertex type for instancing batch
+							wtext = xmlReader->getAttributeValue(L"instancingVertex");
+							if (wtext != NULL)
+							{
+								CStringImp::convertUnicodeToUTF8(wtext, text);
+								instancingVertex = text;
+							}
+
+							if (!shaderName.empty() && !instancingVertex.empty())
+							{
+								SShaderInstancing* instancingShader = new SShaderInstancing();
+								instancingShader->VertexType = vtxType;
+								instancingShader->ShaderName = shaderName;
+								instancingShader->InstancingVertex = instancingVertex;
+								instancingShader->InstancingShader = shaderManager->getShaderByName(shaderName.c_str());
+
+								SShaderInstancing* s = m_shaderInstancing[vtxType];
+								if (s)
+								{
+									if (s->Instancing)
+										delete s->Instancing;
+									delete s;
+								}
+								m_shaderInstancing[vtxType] = instancingShader;
+							}
 						}
 					}
 				}
-				if (nodeName == L"dependent")
+				else if (nodeName == L"dependent")
 				{
 					wtext = xmlReader->getAttributeValue(L"shader");
 					if (wtext != NULL)
@@ -1238,19 +1337,21 @@ namespace Skylicht
 					}
 				}
 
+				float value[2] = { count, 0 };
+
 				if (vertexShader == true)
-					matRender->setShaderVariable(uniform.UniformShaderID, &count, uniform.SizeOfUniform, video::EST_VERTEX_SHADER);
+					matRender->setShaderVariable(uniform.UniformShaderID, value, uniform.SizeOfUniform, video::EST_VERTEX_SHADER);
 				else
-					matRender->setShaderVariable(uniform.UniformShaderID, &count, uniform.SizeOfUniform, video::EST_PIXEL_SHADER);
+					matRender->setShaderVariable(uniform.UniformShaderID, value, uniform.SizeOfUniform, video::EST_PIXEL_SHADER);
 			}
 			else
 			{
-				float count = 11.0f;
+				float value[2] = { 11.0f, 0 };
 
 				if (vertexShader == true)
-					matRender->setShaderVariable(uniform.UniformShaderID, &count, uniform.SizeOfUniform, video::EST_VERTEX_SHADER);
+					matRender->setShaderVariable(uniform.UniformShaderID, value, uniform.SizeOfUniform, video::EST_VERTEX_SHADER);
 				else
-					matRender->setShaderVariable(uniform.UniformShaderID, &count, uniform.SizeOfUniform, video::EST_PIXEL_SHADER);
+					matRender->setShaderVariable(uniform.UniformShaderID, value, uniform.SizeOfUniform, video::EST_PIXEL_SHADER);
 			}
 		}
 		break;
@@ -1284,25 +1385,6 @@ namespace Skylicht
 				matRender->setShaderVariable(uniform.UniformShaderID, &shaderManager->LightmapIndex, uniform.SizeOfUniform, video::EST_PIXEL_SHADER);
 		}
 		break;
-		/*
-		case BPCEM_MIN:
-		case BPCEM_MAX:
-		{
-		}
-		break;
-		case BPCEM_POS:
-		{
-		}
-		break;
-		case FOG_PARAMS:
-		{
-		}
-		break;
-		case SSAO_KERNEL:
-		{
-		}
-		break;
-		*/
 		case CUSTOM_VALUE:
 		{
 			// todo

@@ -36,12 +36,32 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "GUI/CGUIMask.h"
 #include "GUI/CGUILayout.h"
 #include "GUI/CGUIFitSprite.h"
+#include "GUI/CGUIElipse.h"
 
 #include "Entity/CEntityPrefab.h"
 #include "Entity/CEntityManager.h"
 
 namespace Skylicht
 {
+	/// @brief This class manages GUI components, including creating and deleting images and sprites.
+	/// @ingroup Graphics2D
+	/// You can initialize GUI components using the UI in the Skylicht-Editor, or load CCanvas information via the CGUIImporter class.
+	/// 
+	/// **Skylicht-Editor**
+	/// 
+	/// To design the GUI, open the Skylicht-Editor and switch to the GUI design window.
+	/// 
+	/// @image html Graphics2D/CCanvas/gui-design.jpg "The interface includes features for designing GUIs for Canvas." width=1200px
+	/// 
+	/// **Setting**
+	/// 
+	/// @image html Graphics2D/CCanvas/gui-design-tool.jpg "You can adjust the base size of the Canvas in the Settings section." width=1200px
+	/// 
+	/// **Working with .gui Files**
+	/// 
+	/// You can save the design file to .gui formats and use CGUIImporter to load it into the Canvas.
+	/// 
+	/// @image html Graphics2D/CCanvas/gui-design-sample.jpg "You can refer to the example file Assets\SampleGUIDemo\Setting.gui and the codes in Samples\GUI," width=1200px
 	class SKYLICHT_API CCanvas : public CComponentSystem
 	{
 	protected:
@@ -60,7 +80,6 @@ namespace Skylicht
 		CCamera* m_renderCamera;
 		CGUIMask* m_currentMask;
 
-		// ECS System
 		CEntityPrefab* m_entityMgr;
 
 		std::vector<IEntitySystem*> m_systems;
@@ -182,6 +201,12 @@ namespace Skylicht
 		CGUIRect* createRect(const core::rectf& r, const video::SColor& c);
 
 		CGUIRect* createRect(CGUIElement* e, const core::rectf& r, const video::SColor& c);
+
+		CGUIElipse* createElipse(const video::SColor& c);
+
+		CGUIElipse* createElipse(const core::rectf& r, const video::SColor& c);
+
+		CGUIElipse* createElipse(CGUIElement* e, const core::rectf& r, const video::SColor& c);
 
 		CGUILayout* createLayout();
 

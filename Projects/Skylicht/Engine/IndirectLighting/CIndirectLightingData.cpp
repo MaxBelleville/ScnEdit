@@ -25,6 +25,9 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "pch.h"
 #include "CIndirectLightingData.h"
 
+#include "Material/Shader/ShaderCallback/CShaderSH.h"
+#include "Material/Shader/ShaderCallback/CShaderLighting.h"
+
 namespace Skylicht
 {
 	IMPLEMENT_DATA_TYPE_INDEX(CIndirectLightingData);
@@ -38,6 +41,7 @@ namespace Skylicht
 		AutoSH(NULL),
 		InvalidateProbe(true),
 		InvalidateReflection(true),
+		Intensity(NULL),
 		ReleaseSH(false)
 	{
 
@@ -51,10 +55,16 @@ namespace Skylicht
 	void CIndirectLightingData::initSH()
 	{
 		Type = CIndirectLightingData::SH9;
-		AutoSH = new bool();
+
 		SH = new core::vector3df[9];
-		ReleaseSH = true;
+
+		AutoSH = new bool();
+		Intensity = new float();
+
 		*AutoSH = true;
+		*Intensity = 1.0f;
+
+		ReleaseSH = true;
 	}
 
 	void CIndirectLightingData::releaseSH()
@@ -71,7 +81,26 @@ namespace Skylicht
 				delete AutoSH;
 				AutoSH = NULL;
 			}
+			if (Intensity)
+			{
+				delete Intensity;
+				Intensity = NULL;
+			}
 			ReleaseSH = false;
 		}
+	}
+
+	void CIndirectLightingData::applyShader()
+	{
+		if (Type == CIndirectLightingData::SH9)
+		{
+			if (SH)
+			{
+				float intensity = Intensity ? *Intensity : 1.0f;
+				CShaderSH::setSH9(SH, intensity);
+			}
+		}
+		else if (Type == CIndirectLightingData::AmbientColor)
+			CShaderLighting::setLightAmbient(Color);
 	}
 }

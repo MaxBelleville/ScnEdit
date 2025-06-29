@@ -38,7 +38,9 @@ https://github.com/skylicht-lab/skylicht-engine
 namespace Skylicht
 {
 	CPointLightShadowBakeRP::CPointLightShadowBakeRP() :
-		m_currentLight(NULL)
+		m_currentLight(NULL),
+		m_bakeInUV0(false),
+		m_bakeDetailNormal(false)
 	{
 		CEventManager::getInstance()->registerEvent("ShadowBakeRP", this);
 	}
@@ -62,7 +64,8 @@ namespace Skylicht
 		if (direction)
 			return;
 
-		if (m_currentLight->getLightType() != CLight::Baked)
+		if (m_currentLight->getLightType() != CLight::Baked &&
+			m_currentLight->getLightType() != CLight::Mixed)
 			return;
 
 		setCamera(camera);
@@ -82,10 +85,10 @@ namespace Skylicht
 		// set state point light
 		m_renderShadowState = ERenderShadowState::PointLight;
 
+		// note: alway enable shadow on baked mode
 		CPointLight* pointLight = dynamic_cast<CPointLight*>(m_currentLight);
-		if (pointLight != NULL && pointLight->isCastShadow() == true)
+		if (pointLight != NULL)
 		{
-			CShaderLighting::setPointLight(pointLight);
 			pointLight->beginRenderShadowDepth();
 
 			core::vector3df lightPosition = pointLight->getGameObject()->getPosition();
@@ -96,19 +99,8 @@ namespace Skylicht
 
 			pointLight->endRenderShadowDepth();
 		}
-		else
-		{
-			CSpotLight* spotLight = dynamic_cast<CSpotLight*>(m_currentLight);
-			if (spotLight != NULL && spotLight->isCastShadow() == true)
-			{
-				spotLight->beginRenderShadowDepth();
 
-				// todo later
-				// ....
-
-				spotLight->endRenderShadowDepth();
-			}
-		}
+		setTarget(target, cubeFaceId);
 
 		// todo on next render pipeline
 		onNext(target, camera, entityManager, viewport, cubeFaceId);

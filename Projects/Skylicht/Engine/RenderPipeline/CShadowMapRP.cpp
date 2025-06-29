@@ -51,7 +51,8 @@ namespace Skylicht
 		m_currentCSM(0),
 		m_saveDebug(false),
 		m_screenWidth(0),
-		m_screenHeight(0)
+		m_screenHeight(0),
+		m_renderShadowState(CShadowMapRP::DirectionLight)
 	{
 		m_type = ShadowMap;
 		m_lightDirection.set(-1.0f, -1.0f, -1.0f);
@@ -68,12 +69,6 @@ namespace Skylicht
 		m_distanceWriteShader = shaderMgr->getShaderIDByName("ShadowLightDistanceWrite");
 		m_distanceWriteSkinMeshShader = shaderMgr->getShaderIDByName("ShadowLightDistanceWriteSkinMesh");
 
-		m_depthWriteStandardSGInstancing = shaderMgr->getShaderIDByName("SDWStandardInstancing");
-		m_depthWriteTBNSGInstancing = shaderMgr->getShaderIDByName("SDWTBNInstancing");
-
-		m_distanceWriteStandardSGInstancing = shaderMgr->getShaderIDByName("SDWLightDistanceStandardInstancing");
-		m_distanceWriteTBNSGInstancing = shaderMgr->getShaderIDByName("SDWLightDistanceTBNInstancing");
-
 		m_depthWriteSkinnedInstancing = shaderMgr->getShaderIDByName("SDWSkinInstancing");
 
 		m_writeDepthMaterial.BackfaceCulling = false;
@@ -87,6 +82,9 @@ namespace Skylicht
 		// CEventManager::getInstance()->unRegisterEvent(this);
 
 		release();
+
+		if (CShaderShadow::getShadowMapRP() == this)
+			CShaderShadow::setShadowMapRP(NULL);
 	}
 
 	void CShadowMapRP::release()
@@ -385,19 +383,6 @@ namespace Skylicht
 					m_writeDepthMaterial.MaterialType = instancingShader->getShadowDepthWriteShader()->getMaterialRenderID();
 					setMaterial = true;
 				}
-				else
-				{
-					if (vertexSize == sizeof(S3DVertex))
-					{
-						m_writeDepthMaterial.MaterialType = m_depthWriteStandardSGInstancing;
-						setMaterial = true;
-					}
-					else if (vertexSize == sizeof(S3DVertexTangents))
-					{
-						m_writeDepthMaterial.MaterialType = m_depthWriteTBNSGInstancing;
-						setMaterial = true;
-					}
-				}
 				break;
 			}
 			case PointLight:
@@ -405,19 +390,6 @@ namespace Skylicht
 				{
 					m_writeDepthMaterial.MaterialType = instancingShader->getShadowDistanceWriteShader()->getMaterialRenderID();
 					setMaterial = true;
-				}
-				else
-				{
-					if (vertexSize == sizeof(S3DVertex))
-					{
-						m_writeDepthMaterial.MaterialType = m_distanceWriteStandardSGInstancing;
-						setMaterial = true;
-					}
-					else if (vertexSize == sizeof(S3DVertexTangents))
-					{
-						m_writeDepthMaterial.MaterialType = m_distanceWriteTBNSGInstancing;
-						setMaterial = true;
-					}
 				}
 				break;
 			}
@@ -606,9 +578,9 @@ namespace Skylicht
 			for (u32 i = 0, n = listLight.size(); i < n && i < s_maxLight; i++)
 			{
 				CLight* light = listLight[i]->Light;
+
 				CPointLight* pointLight = dynamic_cast<CPointLight*>(light);
 
-				// no render shadow on bake light
 				if (s_bakeMode == false && light->getLightType() == CLight::Baked)
 					continue;
 
@@ -630,28 +602,19 @@ namespace Skylicht
 
 					pointLight->endRenderShadowDepth();
 				}
-				else
-				{
-					CSpotLight* spotLight = dynamic_cast<CSpotLight*>(light);
-					if (spotLight != NULL &&
-						spotLight->isCastShadow() == true &&
-						(spotLight->needRenderShadowDepth() || spotLight->isDynamicShadow()))
-					{
-						spotLight->beginRenderShadowDepth();
-
-						// todo later
-						// ....
-
-						spotLight->endRenderShadowDepth();
-					}
-				}
 			}
 		}
+
+		CShaderLighting::setPointLight(NULL);
 
 		if (listDepthTexture.size() > 0)
 		{
 			setTarget(target, cubeFaceId);
 		}
+
+		// Fix bugs if any textures are removed
+		for (int i = 0; i < MATERIAL_MAX_TEXTURES; i++)
+			m_writeDepthMaterial.setTexture(i, NULL);
 
 		onNext(target, camera, entityManager, viewport, cubeFaceId);
 	}

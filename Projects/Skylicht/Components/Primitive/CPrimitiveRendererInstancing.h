@@ -35,7 +35,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "IndirectLighting/CIndirectLightingData.h"
 
 #include "Instancing/SShaderMesh.h"
-#include "Instancing/SInstancingVertexBuffer.h"
+#include "Instancing/SPrimitiveMeshInstancing.h"
 
 namespace Skylicht
 {
@@ -46,9 +46,9 @@ namespace Skylicht
 	protected:
 		CEntityGroup* m_group;
 
-		// group instancing
-		std::map<SShaderMesh, ArrayPrimitives> m_groups;
-		std::map<SShaderMesh, SInstancingVertexBuffer*> m_buffers;
+		std::vector<SPrimitiveMeshInstancing*> m_meshInstancing;
+
+		std::map<SShaderMesh, SPrimitiveGroup*> m_groups;
 
 		// bake instancing
 		CFastArray<CMaterial*> m_materials;
@@ -68,5 +68,13 @@ namespace Skylicht
 		virtual void update(CEntityManager* entityManager);
 
 		virtual void render(CEntityManager* entityManager);
+
+		virtual void renderTransparent(CEntityManager* entityManager);
+
+	protected:
+
+		void renderPrimitive(CEntityManager* entityManager, bool isTransparent);
+
+		SPrimitiveGroup* getGroup(CEntity* entity, CShader* shader, CMesh* mesh);
 	};
 }

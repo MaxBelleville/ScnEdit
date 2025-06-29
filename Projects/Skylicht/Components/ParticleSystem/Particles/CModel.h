@@ -24,43 +24,60 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
-#include "CInterpolator.h"
+#include "Utils/CInterpolator.h"
 #include "ParticleSystem/Particles/CParticle.h"
+#include "ParticleSystem/Particles/CParticleSerializable.h"
 
 namespace Skylicht
 {
 	namespace Particle
 	{
-		class COMPONENT_API CModel
+		class CGroup;
+
+		class COMPONENT_API CModel : public CParticleSerializable
 		{
 		protected:
 			EParticleParams m_type;
 
-			bool m_haveStart;
+			bool m_randomStart;
 			float m_start1;
 			float m_start2;
 
-			bool m_haveEnd;
+			bool m_enableEndValue;
+			bool m_randomEnd;
 			float m_end1;
 			float m_end2;
 
-			CInterpolator *m_interpolator;
+			CGroup* m_group;
+
+			CInterpolator* m_interpolator;
 
 		public:
-			CModel(EParticleParams type);
+			CModel(CGroup* group, EParticleParams type);
 
 			virtual ~CModel();
+
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
+
+			const wchar_t* getName();
 
 			inline EParticleParams getType()
 			{
 				return m_type;
 			}
 
+			inline CGroup* getGroup()
+			{
+				return m_group;
+			}
+
 			inline CModel* setStart(float f)
 			{
 				m_start1 = f;
 				m_start2 = f;
-				m_haveStart = true;
+				m_randomStart = true;
 				return this;
 			}
 
@@ -68,8 +85,7 @@ namespace Skylicht
 			{
 				m_start1 = f1;
 				m_start2 = f2;
-
-				m_haveStart = true;
+				m_randomStart = true;
 				return this;
 			}
 
@@ -77,7 +93,7 @@ namespace Skylicht
 			{
 				m_end1 = f;
 				m_end2 = f;
-				m_haveEnd = true;
+				m_randomEnd = true;
 				return this;
 			}
 
@@ -85,19 +101,28 @@ namespace Skylicht
 			{
 				m_end1 = f1;
 				m_end2 = f2;
-
-				m_haveEnd = true;
+				m_randomEnd = true;
 				return this;
 			}
 
-			inline bool haveStart()
+			inline bool isEnableEndValue()
 			{
-				return m_haveStart;
+				return m_enableEndValue;
 			}
 
-			inline bool haveEnd()
+			inline void enableEndValue(bool b)
 			{
-				return m_haveEnd;
+				m_enableEndValue = b;
+			}
+
+			inline bool isRandomStart()
+			{
+				return m_randomStart;
+			}
+
+			inline bool isRandomEnd()
+			{
+				return m_randomEnd;
 			}
 
 			float getStartValue1()
@@ -105,9 +130,19 @@ namespace Skylicht
 				return m_start1;
 			}
 
+			void setStartValue1(float f)
+			{
+				m_start1 = f;
+			}
+
 			float getStartValue2()
 			{
 				return m_start2;
+			}
+
+			void setStartValue2(float f)
+			{
+				m_start2 = f;
 			}
 
 			float getEndValue1()
@@ -115,16 +150,26 @@ namespace Skylicht
 				return m_end1;
 			}
 
+			void setEndValue1(float f)
+			{
+				m_end1 = f;
+			}
+
 			float getEndValue2()
 			{
 				return m_end2;
+			}
+
+			void setEndValue2(float f)
+			{
+				m_end2 = f;
 			}
 
 			float getRandomStart();
 
 			float getRandomEnd();
 
-			inline void setInterpolator(CInterpolator *interpolate)
+			inline void setInterpolator(CInterpolator* interpolate)
 			{
 				m_interpolator = interpolate;
 			}
@@ -133,6 +178,8 @@ namespace Skylicht
 			{
 				return m_interpolator;
 			}
+
+			virtual std::string getTypeName();
 		};
 	}
 }

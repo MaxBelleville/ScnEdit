@@ -32,10 +32,8 @@ namespace Skylicht
 	namespace Particle
 	{
 		CStraightEmitter::CStraightEmitter() :
-			CEmitter(Straight),
-			m_direction(0.0f, 1.0f, 0.0f)
+			CDirectionEmitter(Straight)
 		{
-
 		}
 
 		CStraightEmitter::~CStraightEmitter()
@@ -43,7 +41,26 @@ namespace Skylicht
 
 		}
 
-		void CStraightEmitter::generateVelocity(CParticle& particle, float speed, CZone* zone, CGroup *group)
+		CObjectSerializable* CStraightEmitter::createSerializable()
+		{
+			CObjectSerializable* object = CEmitter::createSerializable();
+
+			CVector3Property* direction = new CVector3Property(object, "direction", m_direction);
+			direction->setUIHeader("Straight Emitter");
+			object->autoRelease(direction);
+
+			return object;
+		}
+
+		void CStraightEmitter::loadSerializable(CObjectSerializable* object)
+		{
+			CEmitter::loadSerializable(object);
+
+			core::vector3df direction = object->get<core::vector3df>("direction", Transform::Oy);
+			setDirection(direction, true);
+		}
+
+		void CStraightEmitter::generateVelocity(CParticle& particle, float speed, CZone* zone, CGroup* group)
 		{
 			core::vector3df direction = group->getTransformVector(m_direction);
 			direction.normalize();

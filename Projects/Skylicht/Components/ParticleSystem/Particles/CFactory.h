@@ -30,6 +30,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #include "Renderers/CQuadRenderer.h"
 #include "Renderers/CBillboardAdditiveRenderer.h"
+#include "Renderers/CMeshParticleRenderer.h"
 
 #include "Zones/CPoint.h"
 #include "Zones/CSphere.h"
@@ -70,13 +71,17 @@ namespace Skylicht
 
 			CNormalEmitter* createNormalEmitter(bool inverted);
 
-			void deleteEmitter(CEmitter *e);
+			void deleteEmitter(CEmitter* e);
 
 			CQuadRenderer* createQuadRenderer();
 
 			CBillboardAdditiveRenderer* createBillboardAdditiveRenderer();
 
+			CMeshParticleRenderer* createMeshParticleRenderer();
+
 			void deleteRenderer(IRenderer* r);
+
+			CZone* createZone(EZone type);
 
 			CPoint* createPointZone();
 
@@ -94,7 +99,13 @@ namespace Skylicht
 
 			CRing* createRingZone(const core::vector3df& pos, const core::vector3df& normal, float minRadius, float maxRadius);
 
-			void deleteZone(CZone *z);
+			void deleteZone(CZone* z);
+
+			CEmitter* createEmitter(const std::wstring& attributeName);
+
+			CZone* createZone(const std::wstring& attributeName);
+
+			IRenderer* createRenderer(const std::wstring& attributeName);
 		};
 	}
 }

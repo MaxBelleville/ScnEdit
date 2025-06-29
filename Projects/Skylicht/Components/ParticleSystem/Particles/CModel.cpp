@@ -24,20 +24,46 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #include "pch.h"
 #include "CModel.h"
+#include "CGroup.h"
 #include "ParticleSystem/Particles/Zones/CZone.h"
+#include "Utils/CStringImp.h"
+
+#include "Serializable/CInterpolateSerializable.h"
 
 namespace Skylicht
 {
 	namespace Particle
 	{
-		CModel::CModel(EParticleParams type) :
+		const wchar_t* g_modelName[] = {
+			L"Scale",
+			L"ScaleX",
+			L"ScaleY",
+			L"ScaleZ",
+			L"RotateX",
+			L"RotateY",
+			L"RotateZ",
+			L"ColorR",
+			L"ColorG",
+			L"ColorB",
+			L"ColorA",
+			L"Mass",
+			L"FrameIndex",
+			L"RotateSpeedX",
+			L"RotateSpeedY",
+			L"RotateSpeedZ",
+			L"NumParams"
+		};
+
+		CModel::CModel(CGroup* group, EParticleParams type) :
+			m_group(group),
 			m_type(type),
-			m_start1(0),
-			m_start2(0),
-			m_end1(0),
-			m_end2(0),
-			m_haveStart(false),
-			m_haveEnd(false),
+			m_start1(1.0f),
+			m_start2(1.0f),
+			m_end1(0.0f),
+			m_end2(0.0f),
+			m_randomStart(false),
+			m_randomEnd(false),
+			m_enableEndValue(true),
 			m_interpolator(NULL)
 		{
 
@@ -45,6 +71,77 @@ namespace Skylicht
 
 		CModel::~CModel()
 		{
+		}
+
+		std::string CModel::getTypeName()
+		{
+			return CStringImp::convertUnicodeToUTF8(g_modelName[(int)m_type]);
+		}
+
+		CObjectSerializable* CModel::createSerializable()
+		{
+			CObjectSerializable* object = CParticleSerializable::createSerializable();
+
+			CStringProperty* name = new CStringProperty(object, "name", CStringImp::convertUnicodeToUTF8(getName()).c_str());
+			name->setHidden(true);
+			object->autoRelease(name);
+
+			CBoolProperty* randomStart = new CBoolProperty(object, "randomStart", m_randomStart);
+			randomStart->setUIHeader("Start value");
+			object->autoRelease(randomStart);
+			object->autoRelease(new CFloatProperty(object, "start1", m_start1));
+			object->autoRelease(new CFloatProperty(object, "start2", m_start2));
+
+			CBoolProperty* endValue = new CBoolProperty(object, "enableEndValue", m_enableEndValue);
+			endValue->setUIHeader("End value");
+			object->autoRelease(endValue);
+			object->autoRelease(new CBoolProperty(object, "randomEnd", m_randomEnd));
+			object->autoRelease(new CFloatProperty(object, "end1", m_end1));
+			object->autoRelease(new CFloatProperty(object, "end2", m_end2));
+
+			CInterpolateFloatSerializable* interpolate = new CInterpolateFloatSerializable("interpolate", object);
+			interpolate->setUIHeader("Custom interpolate");
+			object->autoRelease(interpolate);
+			if (m_interpolator)
+				interpolate->setInterpolator(m_interpolator);
+
+			return object;
+		}
+
+		void CModel::loadSerializable(CObjectSerializable* object)
+		{
+			CParticleSerializable::loadSerializable(object);
+
+			m_randomStart = object->get<bool>("randomStart", false);
+			m_start1 = object->get<float>("start1", 0.0f);
+			m_start2 = object->get<float>("start2", 0.0f);
+
+			m_enableEndValue = object->get<bool>("enableEndValue", true);
+			m_randomEnd = object->get<bool>("randomEnd", false);
+			m_end1 = object->get<float>("end1", 0.0f);
+			m_end2 = object->get<float>("end2", 0.0f);
+
+			CInterpolateFloatSerializable* interpolate = (CInterpolateFloatSerializable*)object->getProperty("interpolate");
+			if (interpolate && interpolate->count() > 0)
+			{
+				if (m_interpolator == NULL)
+					m_interpolator = m_group->createInterpolator();
+
+				interpolate->getInterpolator(m_interpolator);
+			}
+			else
+			{
+				if (m_interpolator)
+				{
+					m_group->deleteInterpolator(m_interpolator);
+					m_interpolator = NULL;
+				}
+			}
+		}
+
+		const wchar_t* CModel::getName()
+		{
+			return g_modelName[(int)m_type];
 		}
 
 		float CModel::getRandomStart()

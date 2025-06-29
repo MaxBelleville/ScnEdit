@@ -31,6 +31,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #include "Instancing/SMeshInstancing.h"
 #include "Instancing/SMeshInstancingGroup.h"
+#include "Instancing/CInstancingMaterialData.h"
 
 namespace Skylicht
 {
@@ -40,6 +41,14 @@ namespace Skylicht
 		core::array<CRenderMeshData*> m_meshs;
 
 		std::map<SMeshInstancing*, SMeshInstancingGroup*> m_groups;
+
+		struct SInstancingGroup
+		{
+			SMeshInstancing* Instancing;
+			SMeshInstancingGroup* Group;
+		};
+
+		core::array<SInstancingGroup> m_transparents;
 
 	public:
 		CMeshRendererInstancing();
@@ -55,5 +64,9 @@ namespace Skylicht
 		virtual void update(CEntityManager* entityManager);
 
 		virtual void render(CEntityManager* entityManager);
+
+		virtual void renderTransparent(CEntityManager* entityManager);
+
+		void sortBeforeRender(core::array<SInstancingGroup>& instancing);
 	};
 }

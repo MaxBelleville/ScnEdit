@@ -46,8 +46,10 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Graphics2D/SpriteFrame/CSpriteManager.h"
 #include "Graphics2D/SpriteFrame/CFontManager.h"
 #include "Debug/CSceneDebug.h"
+#include "TextBillboard/CTextBillboardManager.h"
 
 // Tween
+#include "Tween/easing.h"
 #include "Tween/CTweenManager.h"
 
 // Activator
@@ -92,13 +94,16 @@ namespace Skylicht
 
 		CShadowRTTManager::createGetInstance();
 
+		initEasing();
 		CTweenManager::createGetInstance();
+
 		CActivator::createGetInstance();
 		CSerializableActivator::createGetInstance();
 		CDependentComponent::createGetInstance();
 		CComponentCategory::createGetInstance();
 
 		CSceneDebug::createGetInstance();
+		CTextBillboardManager::createGetInstance();
 
 		// alway use HW
 		g_video->setMinHardwareBufferVertexCount(0);
@@ -112,12 +117,15 @@ namespace Skylicht
 		os::Printer::log("Close skylicht core");
 
 		CSceneDebug::releaseInstance();
+		CTextBillboardManager::releaseInstance();
 
 		CComponentCategory::releaseInstance();
 		CDependentComponent::releaseInstance();
 		CActivator::releaseInstance();
 		CSerializableActivator::releaseInstance();
+
 		CTweenManager::releaseInstance();
+		releaseEasing();
 
 		CShadowRTTManager::releaseInstance();
 

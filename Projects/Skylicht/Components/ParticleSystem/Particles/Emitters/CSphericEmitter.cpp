@@ -34,7 +34,7 @@ namespace Skylicht
 	namespace Particle
 	{
 		CSphericEmitter::CSphericEmitter() :
-			CEmitter(Spheric),
+			CDirectionEmitter(Spheric),
 			m_angleA(0.0f),
 			m_angleB(0.0f),
 			m_cosAngleMin(0.0f),
@@ -46,6 +46,34 @@ namespace Skylicht
 		CSphericEmitter::~CSphericEmitter()
 		{
 
+		}
+
+		CObjectSerializable* CSphericEmitter::createSerializable()
+		{
+			CObjectSerializable* object = CEmitter::createSerializable();
+
+			CFloatProperty* angleA = new CFloatProperty(object, "angleA", m_angleA * core::RADTODEG, 0.0f, 360.0f);
+			angleA->setUIHeader("Spheric Emitter");
+			object->autoRelease(angleA);
+
+			object->autoRelease(new CFloatProperty(object, "angleB", m_angleB * core::RADTODEG, 0.0f, 360.0f));
+
+			object->autoRelease(new CVector3Property(object, "direction", m_direction));
+
+			return object;
+		}
+
+		void CSphericEmitter::loadSerializable(CObjectSerializable* object)
+		{
+			CEmitter::loadSerializable(object);
+
+			float angleA = object->get<float>("angleA", 0.0f);
+			float angleB = object->get<float>("angleB", 0.0f);
+
+			setAngles(angleA * core::DEGTORAD, angleB * core::DEGTORAD);
+
+			core::vector3df direction = object->get<core::vector3df>("direction", Transform::Oy);
+			setDirection(direction, true);
 		}
 
 		void CSphericEmitter::setAngles(float angleA, float angleB)
@@ -63,14 +91,12 @@ namespace Skylicht
 			m_cosAngleMax = cosf(m_angleB * 0.5f);
 		}
 
-		void CSphericEmitter::setDirection(const core::vector3df& d)
+		void CSphericEmitter::setDirection(const core::vector3df& d, bool updateRotation)
 		{
-			m_direction = d;
-			m_direction.normalize();
+			CDirectionEmitter::setDirection(d, updateRotation);
 
 			if ((m_direction.X == 0.0f) && (m_direction.Y == 0.0f))
 			{
-
 				m_matrix[0] = m_direction.Z;
 				m_matrix[1] = 0.0f;
 				m_matrix[2] = 0.0f;
@@ -106,7 +132,7 @@ namespace Skylicht
 			}
 		}
 
-		void CSphericEmitter::generateVelocity(CParticle& particle, float speed, CZone* zone, CGroup *group)
+		void CSphericEmitter::generateVelocity(CParticle& particle, float speed, CZone* zone, CGroup* group)
 		{
 			float a = random(m_cosAngleMax, m_cosAngleMin);
 			float theta = acosf(a);

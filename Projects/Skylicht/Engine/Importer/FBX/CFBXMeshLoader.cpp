@@ -43,6 +43,83 @@ https://github.com/skylicht-lab/skylicht-engine
 
 namespace Skylicht
 {
+	struct SVertexID
+	{
+		u32 Position;
+		u32 Normal;
+		u32 Color;
+		u32 UV;
+		u32 UV2;
+		u32 Tangent;
+		u32 Binormal;
+		u32 Blendshape;
+
+		SVertexID()
+		{
+			Position = 0;
+			Normal = 0;
+			Color = 0;
+			UV = 0;
+			UV2 = 0;
+			Tangent = 0;
+			Binormal = 0;
+			Blendshape = 0;
+		}
+
+		SVertexID(const SVertexID& v)
+		{
+			Position = v.Position;
+			Normal = v.Normal;
+			Color = v.Color;
+			UV = v.UV;
+			UV2 = v.UV2;
+			Tangent = v.Tangent;
+			Binormal = v.Binormal;
+			Blendshape = v.Blendshape;
+		}
+
+		bool operator<(const SVertexID& other) const
+		{
+			if (Position == other.Position)
+			{
+				if (Normal == other.Normal)
+				{
+					if (Color == other.Color)
+					{
+						if (UV == other.UV)
+						{
+							if (UV2 == other.UV2)
+							{
+								if (Tangent == other.Tangent)
+								{
+									if (Binormal == other.Binormal)
+									{
+										if (Blendshape == other.Blendshape)
+											return false;
+										return Blendshape < other.Blendshape;
+									}
+									else
+										return Tangent < other.Tangent;
+								}
+								else
+									return Tangent < other.Tangent;
+							}
+							else
+								return UV2 < other.UV2;
+						}
+						else
+							return UV < other.UV;
+					}
+					else
+						return Color < other.Color;
+				}
+				else
+					return Normal < other.Normal;
+			}
+			return Position < other.Position;
+		}
+	};
+
 	CFBXMeshLoader::CFBXMeshLoader()
 	{
 
@@ -151,6 +228,8 @@ namespace Skylicht
 
 		CShaderManager* shaderMgr = CShaderManager::getInstance();
 
+		char logInfo[1024];
+
 		// import mesh data
 		for (int i = 0; i < scene->meshes.count; i++)
 		{
@@ -163,6 +242,13 @@ namespace Skylicht
 
 			std::string meshName = mesh->name.data;
 
+			snprintf(logInfo, 1024, "[CFBXMeshLoader]: %s\ntris: %d\nvertex: %d\nuv: %d\nnormal: %d", meshName.c_str(),
+				(int)mesh->num_triangles,
+				(int)mesh->vertex_position.values.count,
+				(int)mesh->vertex_uv.values.count,
+				(int)mesh->vertex_normal.values.count);
+			os::Printer::log(logInfo);
+
 			// temp buffer
 			size_t num_tri_indices = mesh->max_face_triangles * 3;
 			uint32_t* tri_indices = new uint32_t[num_tri_indices];
@@ -173,10 +259,14 @@ namespace Skylicht
 			CMesh* resultMesh = NULL;
 			bool isSkinnedMesh = false;
 			bool haveBlendShape = false;
+			bool haveUV2 = false;
 			S3DVertexSkin* mesh_skin_vertices = NULL;
 
 			if (mesh->blend_deformers.count > 0)
 				haveBlendShape = true;
+
+			if (texcoord2 && mesh->uv_sets.count >= 2)
+				haveUV2 = true;
 
 			if (mesh->skin_deformers.count > 0)
 			{
@@ -210,7 +300,6 @@ namespace Skylicht
 						float* w = &skin_vert->BoneWeight.X;
 						float* b = &skin_vert->BoneIndex.X;
 
-						uint32_t quantized_sum = 0;
 						for (size_t i = 0; i < 4; i++)
 						{
 							w[i] = weights[i] / total_weight;
@@ -254,15 +343,33 @@ namespace Skylicht
 				{
 					if (normalMap || haveBlendShape)
 					{
-						mb = new CMeshBuffer<video::S3DVertexTangents>(
-							getVideoDriver()->getVertexDescriptor(EVT_TANGENTS),
-							indexType);
+						if (haveUV2)
+						{
+							mb = new CMeshBuffer<video::S3DVertex2TCoordsTangents>(
+								getVideoDriver()->getVertexDescriptor(EVT_2TCOORDS_TANGENTS),
+								indexType);
+						}
+						else
+						{
+							mb = new CMeshBuffer<video::S3DVertexTangents>(
+								getVideoDriver()->getVertexDescriptor(EVT_TANGENTS),
+								indexType);
+						}
 					}
 					else
 					{
-						mb = new CMeshBuffer<video::S3DVertex>(
-							getVideoDriver()->getVertexDescriptor(EVT_STANDARD),
-							indexType);
+						if (haveUV2)
+						{
+							mb = new CMeshBuffer<video::S3DVertex2TCoords>(
+								getVideoDriver()->getVertexDescriptor(EVT_2TCOORDS),
+								indexType);
+						}
+						else
+						{
+							mb = new CMeshBuffer<video::S3DVertex>(
+								getVideoDriver()->getVertexDescriptor(EVT_STANDARD),
+								indexType);
+						}
 					}
 				}
 
@@ -288,7 +395,7 @@ namespace Skylicht
 				IVertexBuffer* vertexBuffer = mb->getVertexBuffer();
 				IIndexBuffer* indexBuffer = mb->getIndexBuffer();
 
-				core::map<uint32_t, u32> vertMap;
+				std::map<SVertexID, u32> mapVT;
 
 				for (size_t fi = 0; fi < mesh_part->num_faces; fi++)
 				{
@@ -311,20 +418,30 @@ namespace Skylicht
 						ufbx_vec3 tangent = haveTangent ? ufbx_get_vertex_vec3(&mesh->vertex_tangent, ix) : default_vec;
 						ufbx_vec3 binormal = haveBitangent ? ufbx_get_vertex_vec3(&mesh->vertex_bitangent, ix) : default_vec;
 
+						SVertexID vinfo;
+						vinfo.Position = mesh->vertex_position.indices[ix];
+						vinfo.Normal = mesh->vertex_normal.indices[ix];
+						vinfo.Color = haveColor ? mesh->vertex_color.indices[ix] : 0;
+						vinfo.UV = haveUV ? mesh->vertex_uv.indices[ix] : 0;
+						vinfo.Tangent = haveTangent ? mesh->vertex_tangent.indices[ix] : 0;
+						vinfo.Binormal = haveBitangent ? mesh->vertex_bitangent.indices[ix] : 0;
+
+
+						// try load uv2
+						ufbx_vec2 uv2 = haveUV2 ? ufbx_get_vertex_vec2(&mesh->uv_sets.data[1].vertex_uv, ix) : default_uv;
+						vinfo.UV2 = haveUV2 ? mesh->uv_sets.data[1].vertex_uv.indices[ix] : 0;
+
+
 						SColor c(255, (u32)(color.x * 255), (u32)(color.y * 255), (u32)(color.z * 255));
 
 						// [vid] for morph, blendshape data as vertex index
 						int vid = mesh->vertex_indices[ix];
+						u32 vertLocation = 0;
 
-						u32 vertLocation;
-						core::map<uint32_t, u32>::Node* node = vertMap.find(ix);
-
-						if (node)
-							vertLocation = node->getValue();
-						else
 						{
 							if (isSkinnedMesh)
 							{
+								vinfo.Blendshape = vid;
 								if (normalMap || haveBlendShape)
 								{
 									S3DVertexSkinTangents v;
@@ -339,7 +456,17 @@ namespace Skylicht
 									v.BoneIndex = mesh_skin_vertices[vid].BoneIndex;
 									v.BoneWeight = mesh_skin_vertices[vid].BoneWeight;
 
-									vertexBuffer->addVertex(&v);
+									auto it = mapVT.find(vinfo);
+									if (it == mapVT.end())
+									{
+										vertexBuffer->addVertex(&v);
+										vertLocation = vertexBuffer->getVertexCount() - 1;
+										mapVT[vinfo] = vertLocation;
+									}
+									else
+									{
+										vertLocation = it->second;
+									}
 								}
 								else
 								{
@@ -352,26 +479,74 @@ namespace Skylicht
 									v.BoneIndex = mesh_skin_vertices[vid].BoneIndex;
 									v.BoneWeight = mesh_skin_vertices[vid].BoneWeight;
 
-									vertexBuffer->addVertex(&v);
+									auto it = mapVT.find(vinfo);
+									if (it == mapVT.end())
+									{
+										vertexBuffer->addVertex(&v);
+										vertLocation = vertexBuffer->getVertexCount() - 1;
+										mapVT[vinfo] = vertLocation;
+									}
+									else
+									{
+										vertLocation = it->second;
+									}
 								}
 							}
 							else
 							{
-								S3DVertexTangents v;
-								v.Pos = convertFBXVec3(pos);
-								v.Normal = convertFBXVec3(normal);
-								v.Normal.normalize();
-								v.Color = c;
-								v.TCoords = convertFBXUVVec2(uv);
-								v.Tangent = convertFBXVec3(tangent);
-								v.Binormal = convertFBXVec3(binormal);
-								v.VertexData.set(1.f, (float)vid);
+								if (haveUV2)
+								{
+									S3DVertex2TCoordsTangents v;
+									v.Pos = convertFBXVec3(pos);
+									v.Normal = convertFBXVec3(normal);
+									v.Normal.normalize();
+									v.Color = c;
+									v.TCoords = convertFBXUVVec2(uv);
+									v.Tangent = convertFBXVec3(tangent);
+									v.Binormal = convertFBXVec3(binormal);
+									v.VertexData.set(1.f, (float)vid);
 
-								vertexBuffer->addVertex(&v);
+									// uv2 data
+									v.TCoords2 = convertFBXUVVec2(uv2);
+									v.Lightmap.set(v.TCoords2.X, v.TCoords2.Y, 0.0f);
+
+									auto it = mapVT.find(vinfo);
+									if (it == mapVT.end())
+									{
+										vertexBuffer->addVertex(&v);
+										vertLocation = vertexBuffer->getVertexCount() - 1;
+										mapVT[vinfo] = vertLocation;
+									}
+									else
+									{
+										vertLocation = it->second;
+									}
+								}
+								else
+								{
+									S3DVertexTangents v;
+									v.Pos = convertFBXVec3(pos);
+									v.Normal = convertFBXVec3(normal);
+									v.Normal.normalize();
+									v.Color = c;
+									v.TCoords = convertFBXUVVec2(uv);
+									v.Tangent = convertFBXVec3(tangent);
+									v.Binormal = convertFBXVec3(binormal);
+									v.VertexData.set(1.f, (float)vid);
+
+									auto it = mapVT.find(vinfo);
+									if (it == mapVT.end())
+									{
+										vertexBuffer->addVertex(&v);
+										vertLocation = vertexBuffer->getVertexCount() - 1;
+										mapVT[vinfo] = vertLocation;
+									}
+									else
+									{
+										vertLocation = it->second;
+									}
+								}
 							}
-
-							vertLocation = vertexBuffer->getVertexCount() - 1;
-							vertMap.insert(ix, vertLocation);
 						}
 
 						trisIndices[indexCount++] = vertLocation;

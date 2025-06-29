@@ -116,21 +116,12 @@ namespace Skylicht
 			}
 		}
 		break;
-		case LIGHT_DIRECTION:
-		{
-			if (g_directionalLight != NULL)
-			{
-				core::vector3df dir = -g_directionalLight->getDirection();
-				shader->setDirection(matRender, uniform->UniformShaderID, vertexShader, dir);
-			}
-		}
-		break;
 		case WORLD_LIGHT_DIRECTION:
 		{
 			if (g_directionalLight != NULL)
 			{
 				core::vector3df dir = -g_directionalLight->getDirection();
-				shader->setDirection(matRender, uniform->UniformShaderID, vertexShader, dir, 4, true);
+				shader->setWorldDirection(matRender, uniform->UniformShaderID, vertexShader, dir, 4);
 			}
 		}
 		break;
@@ -149,7 +140,7 @@ namespace Skylicht
 			{
 				float attenuation[4] = { 0 };
 
-				// set attenuation			
+				// set attenuation
 				attenuation[0] = 0.0f;
 				attenuation[1] = g_pointLight->getAttenuation();
 				attenuation[2] = 0.0f;
@@ -180,7 +171,7 @@ namespace Skylicht
 			if (g_spotLight != NULL)
 			{
 				core::vector3df dir = -g_spotLight->getDirection();
-				shader->setDirection(matRender, uniform->UniformShaderID, vertexShader, dir, 4, true);
+				shader->setWorldDirection(matRender, uniform->UniformShaderID, vertexShader, dir, 4);
 			}
 		}
 		break;
@@ -199,7 +190,7 @@ namespace Skylicht
 			{
 				float attenuation[4] = { 0 };
 
-				// set attenuation			
+				// set attenuation
 				attenuation[0] = cosf(g_spotLight->getSplotCutoff() * core::DEGTORAD * 0.5f);
 				attenuation[1] = cosf(g_spotLight->getSpotInnerCutof() * core::DEGTORAD * 0.5f);
 				attenuation[2] = g_spotLight->getAttenuation();

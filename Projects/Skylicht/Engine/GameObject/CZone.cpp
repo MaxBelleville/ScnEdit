@@ -33,7 +33,8 @@ namespace Skylicht
 
 	CZone::CZone(CScene* scene) :
 		CContainerObject(NULL, this),
-		m_scene(scene)
+		m_scene(scene),
+		m_mainZoneInEditor(false)
 	{
 		m_enableEditorChange = false;
 
@@ -70,6 +71,13 @@ namespace Skylicht
 		if (CContainerObject::testConflictName(objectName) == true)
 			return true;
 
-		return m_scene->searchObject(objectName) != NULL;
+		ArrayZone* zones = m_scene->getAllZone();
+		for (CZone*& zone : *zones)
+		{
+			if (CStringImp::comp<const wchar_t>(zone->getName(), objectName) == 0)
+				return true;
+		}
+
+		return false;
 	}
 }

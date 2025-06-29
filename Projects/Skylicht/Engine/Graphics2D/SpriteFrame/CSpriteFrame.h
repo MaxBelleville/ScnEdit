@@ -28,7 +28,7 @@ namespace Skylicht
 {
 	class CAtlas;
 
-	struct SImage
+	struct SKYLICHT_API SImage
 	{
 		int ID;
 		std::string Path;
@@ -43,7 +43,7 @@ namespace Skylicht
 		}
 	};
 
-	struct SModuleRect
+	struct SKYLICHT_API SModuleRect
 	{
 		int ID;
 		std::string Name;
@@ -89,7 +89,7 @@ namespace Skylicht
 		void getColorBuffer(video::S3DVertex* vertices, const SColor& c);
 	};
 
-	struct SFrame
+	struct SKYLICHT_API SFrame
 	{
 		std::string ID;
 		std::string Name;
@@ -114,6 +114,31 @@ namespace Skylicht
 		}
 	};
 
+	/// @brief The object class holds data on an image, including the locations of sprites and frames on it.
+	/// @ingroup Graphics2D
+	/// 
+	/// You can use the Skylicht-Editor to combine multiple image files into a single sprite file to optimize drawing calls.
+	/// Use the CGraphics2D object or the CGUISprite, CGUIFitSprite to draw this sprite and image.
+	/// 
+	/// **Skylicht-Editor**
+	/// 
+	/// @image html Graphics2D/CSpriteFrame/create-sprite.jpg "You can create a .sprite from the Asset/Create/Sprite menu."
+	/// 
+	/// **Editing .sprite properties**
+	/// @image html Graphics2D/CSpriteFrame/edit-sprite.jpg "Next, select the .sprite file and fill in its details." width=1200px
+	/// 
+	/// - Width, Height: These properties define the output image size, which is the result of the sprite atlas.
+	/// - Image Folders: Input the Count, then drag Folder Items from your Assets to this property.
+	/// 
+	/// **Export .spritedata**
+	/// 
+	/// @image html Graphics2D/CSpriteFrame/export-sprite.jpg "Next, press the Export button to see the resulting .sprite and .png files." width=1200px
+	/// 
+	/// @code
+	/// CSpriteFrame* CSpriteManager::getInstance()->loadSprite("Assets/SampleGUI/SampleGUI.spritedata");
+	/// @endcode
+	/// 
+	/// @see CGUIFitSprite, CGUISprite
 	class SKYLICHT_API CSpriteFrame : public IReferenceCounted
 	{
 	protected:

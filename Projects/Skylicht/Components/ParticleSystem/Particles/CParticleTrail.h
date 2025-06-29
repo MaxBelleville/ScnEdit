@@ -32,6 +32,8 @@ namespace Skylicht
 
 	namespace Particle
 	{
+		class CParticleTrailComponent;
+
 		struct SParticlePosition
 		{
 			core::vector3df Position;
@@ -41,7 +43,7 @@ namespace Skylicht
 
 		struct STrailInfo
 		{
-			core::array<SParticlePosition> *Position;
+			core::array<SParticlePosition>* Position;
 			core::vector3df CurrentPosition;
 			core::vector3df LastPosition;
 			video::SColor CurrentColor;
@@ -50,6 +52,7 @@ namespace Skylicht
 			STrailInfo()
 			{
 				Flag = 0;
+				Position = NULL;
 			}
 
 			void InitData()
@@ -59,8 +62,11 @@ namespace Skylicht
 
 			void DeleteData()
 			{
-				delete Position;
-				Position = NULL;
+				if (Position)
+				{
+					delete Position;
+					Position = NULL;
+				}
 			}
 
 			void Copy(const STrailInfo& t)
@@ -75,13 +81,18 @@ namespace Skylicht
 
 		class COMPONENT_API CParticleTrail : public IParticleCallback
 		{
+			friend class CParticleTrailComponent;
+
 		protected:
-			CGroup *m_group;
+			CGroup* m_group;
+
+			std::wstring m_name;
 
 			core::array<STrailInfo> m_trails;
+
 			core::array<STrailInfo> m_deadTrails;
 
-			IMeshBuffer *m_meshBuffer;
+			IMeshBuffer* m_meshBuffer;
 
 			float m_segmentLength;
 
@@ -97,22 +108,34 @@ namespace Skylicht
 
 			float m_deadAlphaReduction;
 
-			CMaterial *m_material;
+			std::string m_texturePath;
+
+			CMaterial* m_material;
+
+			CMaterial* m_customMaterial;
+
+			bool m_useCustomMaterial;
+
+			core::matrix4 m_world;
+
+			bool m_emission;
+
+			float m_emissionIntensity;
 
 		public:
-			CParticleTrail(CGroup *group);
+			CParticleTrail(CGroup* group);
 
 			virtual ~CParticleTrail();
 
-			virtual void update(CCamera *camera);
+			virtual void update(CCamera* camera);
 
-			virtual void OnParticleUpdate(CParticle *particles, int num, CGroup *group, float dt);
+			virtual void OnParticleUpdate(CParticle* particles, int num, CGroup* group, float dt);
 
-			virtual void OnParticleBorn(CParticle &p);
+			virtual void OnParticleBorn(CParticle& p);
 
-			virtual void OnParticleDead(CParticle &p);
+			virtual void OnParticleDead(CParticle& p);
 
-			virtual void OnSwapParticleData(CParticle &p1, CParticle &p2);
+			virtual void OnSwapParticleData(CParticle& p1, CParticle& p2);
 
 			virtual void OnGroupDestroy();
 
@@ -146,7 +169,7 @@ namespace Skylicht
 				return m_segmentLength;
 			}
 
-			inline bool isDeadtroyWhenParticleDead()
+			inline bool isDestroyedWhenParticleDead()
 			{
 				return m_destroyWhenParticleDead;
 			}
@@ -166,13 +189,81 @@ namespace Skylicht
 				m_deadAlphaReduction = a;
 			}
 
+			inline void enableCustomMaterial(bool b)
+			{
+				m_useCustomMaterial = b;
+			}
+
+			inline void setCustomMaterial(CMaterial* material)
+			{
+				m_customMaterial = material;
+			}
+
+			inline bool useCustomMaterial()
+			{
+				return m_useCustomMaterial;
+			}
+
+			inline const char* getCustomMaterial()
+			{
+				if (m_customMaterial)
+					return m_customMaterial->getMaterialPath();
+				return "";
+			}
+
+			inline const wchar_t* getGroupName()
+			{
+				if (m_group)
+					return m_group->Name.c_str();
+				return m_name.c_str();
+			}
+
 			void setLength(float l);
 
+			inline float getLength()
+			{
+				return m_length;
+			}
+
+			void setTexture(ITexture* texture);
+
 			void applyMaterial();
+
+			void setTexturePath(const char* path);
+
+			inline const char* getTexturePath()
+			{
+				return m_texturePath.c_str();
+			}
+
+			inline void setEmission(bool b)
+			{
+				m_emission = b;
+			}
+
+			inline bool isEmission()
+			{
+				return m_emission;
+			}
+
+			inline void setEmissionIntensity(float f)
+			{
+				m_emissionIntensity = f;
+			}
+
+			inline float getEmissionIntensity()
+			{
+				return m_emissionIntensity;
+			}
 
 		protected:
 
 			void updateDeadTrail();
+
+			void setWorld(const core::matrix4& world)
+			{
+				m_world = world;
+			}
 
 		};
 	}

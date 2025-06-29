@@ -49,7 +49,12 @@ namespace Skylicht
 	{
 		for (auto it : m_instancingGroups)
 		{
-			it.first->InstancingGroup = NULL;
+			SMeshInstancing* meshInstancing = it.first;
+			meshInstancing->InstancingGroup = NULL;
+			meshInstancing->UseShareTransformBuffer = false;
+			meshInstancing->UseShareMaterialsBuffer = false;
+			meshInstancing->ShareDataTransform = NULL;
+			meshInstancing->ShareDataMaterials = NULL;
 			delete it.second;
 		}
 		m_instancingGroups.clear();
@@ -333,11 +338,8 @@ namespace Skylicht
 
 			CEntity* rootEntity = allEntities[group->RootEntityIndex];
 			CIndirectLightingData* indirectLighting = GET_ENTITY_DATA(rootEntity, CIndirectLightingData);
-			if (indirectLighting != NULL && indirectLighting->SH != NULL)
-			{
-				// apply sh
-				CShaderSH::setSH9(indirectLighting->SH);
-			}
+			if (indirectLighting != NULL)
+				indirectLighting->applyShader();
 
 			int materialCount = group->Materials.count();
 			CMaterial** materials = group->Materials.pointer();

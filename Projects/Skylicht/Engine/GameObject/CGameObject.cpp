@@ -74,6 +74,8 @@ namespace Skylicht
 		m_tagData = NULL;
 		m_tagDataInt = 0;
 		m_cullingLayer = 1;
+
+		m_templateChanged = false;
 	}
 
 	CGameObject::~CGameObject()
@@ -149,6 +151,31 @@ namespace Skylicht
 			m_entity->setVisible(b);
 	}
 
+	CGameObject* CGameObject::getParentTemplate()
+	{
+		CGameObject* obj = this;
+
+		if (!m_templateId.empty())
+		{
+			CGameObject* parent = obj;
+			std::string parentPrefabId;
+			do
+			{
+				parent = parent->getParent();
+				parentPrefabId = parent->getTemplateID();
+				if (parentPrefabId == m_templateId)
+					obj = parent;
+			} while (parentPrefabId == m_templateId);
+		}
+
+		return obj;
+	}
+
+	void CGameObject::setTemplateChanged(bool b)
+	{
+		m_templateChanged = b;
+	}
+
 	void CGameObject::setCullingLayer(u32 layer)
 	{
 		m_cullingLayer = layer;
@@ -157,6 +184,20 @@ namespace Skylicht
 			CVisibleData* visible = GET_ENTITY_DATA(m_entity, CVisibleData);
 			visible->CullingLayer = layer;
 		}
+
+		for (CComponentSystem* component : m_components)
+			component->onUpdateCullingLayer(layer);
+	}
+
+	void CGameObject::setCullingLayerOnOff(u32 value, bool on)
+	{
+		u32 currentMask = m_cullingLayer;
+		if (on)
+			currentMask = currentMask | value;
+		else
+			currentMask = currentMask & (~value);
+
+		setCullingLayer(currentMask);
 	}
 
 	CEntityManager* CGameObject::getEntityManager()
@@ -272,6 +313,22 @@ namespace Skylicht
 		core::vector3df front = Transform::Oz;
 		getWorldTransform().rotateVect(front);
 		return front;
+	}
+
+	bool CGameObject::isLock()
+	{
+		if (m_lock)
+			return true;
+
+		CGameObject* parent = m_parent;
+		while (parent != NULL)
+		{
+			if (parent->m_lock)
+				return true;
+			parent = parent->m_parent;
+		}
+
+		return false;
 	}
 
 	void CGameObject::releaseAllComponent()
@@ -514,14 +571,18 @@ namespace Skylicht
 		object->autoRelease(new CStringProperty(object, "id", getID().c_str()));
 		object->autoRelease(new CStringProperty(object, "name", getNameA()));
 
-		object->autoRelease(new CStringProperty(object, "templateId", getTemplateID()));
-		object->autoRelease(new CStringProperty(object, "templateAsset", getTemplateAsset()));
-		object->autoRelease(new CStringProperty(object, "templateObjectId", getTemplateObjectID()));
+		if (isTemplateObject())
+		{
+			object->autoRelease(new CStringProperty(object, "templateId", getTemplateID()));
+			object->autoRelease(new CStringProperty(object, "templateAsset", getTemplateAsset()));
+			object->autoRelease(new CStringProperty(object, "templateObjectId", getTemplateObjectID()));
+			object->autoRelease(new CBoolProperty(object, "templateChanged", isTemplateChanged()));
+		}
 
 		object->autoRelease(new CBoolProperty(object, "enable", isEnable()));
 		object->autoRelease(new CBoolProperty(object, "visible", isVisible()));
 		object->autoRelease(new CBoolProperty(object, "static", isStatic()));
-		object->autoRelease(new CBoolProperty(object, "lock", isLock()));
+		object->autoRelease(new CBoolProperty(object, "lock", isSelfLock()));
 
 		object->autoRelease(new CUIntProperty(object, "culling", getCullingLayer()));
 
@@ -563,13 +624,12 @@ namespace Skylicht
 		setTemplateID(object->get("templateId", std::string("")).c_str());
 		setTemplateAsset(object->get("templateAsset", std::string("")).c_str());
 		setTemplateObjectID(object->get("templateObjectId", std::string("")).c_str());
+		setTemplateChanged(object->get("templateChanged", false));
 
 		setEnable(object->get("enable", true));
 		setVisible(object->get("visible", true));
 		setStatic(object->get("static", true));
 		setLock(object->get("lock", false));
-
-		setCullingLayer(object->get<u32>("culling", 1));
 
 		CObjectSerializable* coms = object->getProperty<CObjectSerializable>("Components");
 		for (int i = 0, n = coms->getNumProperty(); i < n; i++)
@@ -587,5 +647,7 @@ namespace Skylicht
 				comSystem->loadSerializable(componentData);
 			}
 		}
+
+		setCullingLayer(object->get<u32>("culling", 1));
 	}
 }

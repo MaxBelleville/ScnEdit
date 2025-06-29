@@ -115,6 +115,8 @@ namespace Skylicht
 
 		virtual bool save(const char* file);
 
+		virtual bool saveToFile();
+
 		virtual bool load(const char* file);
 
 		virtual void save(io::IXMLWriter* writer);
@@ -137,7 +139,7 @@ namespace Skylicht
 
 #define SERIALIZABLE_REGISTER(type)  \
 	CObjectSerializable* type##CreateFunc() { return new type(); } \
-	bool type##_activator = CSerializableActivator::createGetInstance()->registerType(#type, &type##CreateFunc);
+	bool type##_activator = CSerializableActivator::createGetInstance()->registerType(#type, &type##CreateFunc)
 
 	typedef CObjectSerializable* (*SerializableCreateInstance)();
 

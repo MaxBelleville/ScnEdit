@@ -47,11 +47,15 @@ namespace Skylicht
 		void CParticleInstancingSystem::update(CParticle* particles, int num, CGroup* group, float dt)
 		{
 			CVertexBuffer<SParticleInstance>* buffer = group->getIntancing()->getInstanceBuffer();
-
 			buffer->set_used(num);
+			buffer->setDirty();
 
 			if (num == 0)
 				return;
+
+			// fix for AngleGLES
+			if (num == 1)
+				buffer->set_used(2);
 
 			SParticleInstance* vtx = (SParticleInstance*)buffer->getVertices();
 
@@ -86,7 +90,7 @@ namespace Skylicht
 			float frameH = 1.0f / frameY;
 			u32 frame, row, col;
 
-#pragma omp parallel for private(p, params, data, frame, row, col)
+// #pragma omp parallel for private(p, params, data, frame, row, col)
 			for (int i = 0; i < num; i++)
 			{
 				p = particles + i;
@@ -127,7 +131,20 @@ namespace Skylicht
 				data->UVOffset.set(col * frameW, row * frameH);
 			}
 
-			buffer->setDirty();
+			if (num == 1)
+			{
+				// null particle, fix for AngleGLES drawInstancing
+				data = vtx + 1;
+				data->Pos.X = 0.0f;
+				data->Pos.Y = 0.0f;
+				data->Pos.Z = 0.0f;
+				data->Color.set(0, 255, 255, 255);
+				data->Size.X = 0.0f;
+				data->Size.Y = 0.0f;
+				data->Size.Z = 0.0f;
+				data->UVScale.set(0.0f, 0.0f);
+				data->UVOffset.set(0.0f, 0.0f);
+			}
 		}
 	}
 }

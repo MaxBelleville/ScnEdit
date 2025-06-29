@@ -144,7 +144,7 @@ namespace Skylicht
 
 		IVideoDriver* driver = getVideoDriver();
 
-		// set projection & view			
+		// set projection & view
 		const SViewFrustum& viewArea = camera->getViewFrustum();
 		driver->setTransform(video::ETS_PROJECTION, viewArea.getTransform(video::ETS_PROJECTION));
 		driver->setTransform(video::ETS_VIEW, viewArea.getTransform(video::ETS_VIEW));
@@ -1357,6 +1357,87 @@ namespace Skylicht
 			flushWithMaterial(material);
 	}
 
+	void CGraphics2D::addFrameBatch(const core::rectf& pos, SFrame* frame, const SColor& color, const core::matrix4& absoluteMatrix, int materialID, CMaterial* material)
+	{
+		if (frame &&
+			pos.getWidth() > 0.0f &&
+			pos.getHeight() > 0.0f &&
+			frame->getWidth() > 0.0f &&
+			frame->getHeight() > 0.0f)
+		{
+			if (m_2dMaterial.getTexture(0) != frame->Image->Texture || m_2dMaterial.MaterialType != materialID || material != NULL)
+				flush();
+
+			int numSpriteVertex = (int)frame->ModuleOffset.size() * 4;
+
+			int numVertices = m_vertices->getVertexCount();
+			int vertexUse = numVertices + numSpriteVertex;
+
+			int numSpriteIndex = (int)frame->ModuleOffset.size() * 6;
+			int numIndices = m_indices->getIndexCount();
+			int indexUse = numIndices + numSpriteIndex;
+
+			if (vertexUse > MAX_VERTICES || indexUse > MAX_INDICES)
+			{
+				flush();
+				numVertices = 0;
+				numIndices = 0;
+				vertexUse = numSpriteVertex;
+				indexUse = numSpriteIndex;
+			}
+
+			m_2dMaterial.setTexture(0, frame->Image->Texture);
+			m_2dMaterial.MaterialType = materialID;
+
+			m_vertices->set_used(vertexUse);
+
+			video::S3DVertex* vertices = (video::S3DVertex*)m_vertices->getVertices();
+			vertices += numVertices;
+
+			m_indices->set_used(indexUse);
+
+			u16* indices = (u16*)m_indices->getIndices();
+			indices += numIndices;
+
+			float texWidth = 512.0f;
+			float texHeight = 512.0f;
+
+			if (frame->Image->Texture)
+			{
+				core::dimension2du size = frame->Image->Texture->getSize();
+				texWidth = (float)size.Width;
+				texHeight = (float)size.Height;
+			}
+
+			float scaleW = pos.getWidth() / frame->getWidth();
+			float scaleH = pos.getHeight() / frame->getHeight();
+
+			std::vector<SModuleOffset>::iterator it = frame->ModuleOffset.begin(), end = frame->ModuleOffset.end();
+			while (it != end)
+			{
+				SModuleOffset& module = (*it);
+
+				module.getPositionBuffer(
+					vertices, indices, numVertices,
+					pos.UpperLeftCorner.X,
+					pos.UpperLeftCorner.Y,
+					absoluteMatrix,
+					scaleW, scaleH);
+				module.getTexCoordBuffer(vertices, texWidth, texHeight);
+				module.getColorBuffer(vertices, color);
+
+				numVertices += 4;
+				vertices += 4;
+				indices += 6;
+
+				++it;
+			}
+
+			if (material != NULL)
+				flushWithMaterial(material);
+		}
+	}
+
 	void CGraphics2D::addRectangleBatch(const core::rectf& pos, const core::rectf& uv, const SColor& color, const core::matrix4& absoluteTransform, int shaderID, CMaterial* material)
 	{
 		if (m_2dMaterial.MaterialType != shaderID || material != NULL)
@@ -1392,6 +1473,82 @@ namespace Skylicht
 		// transform
 		for (int i = 0; i < 4; i++)
 			absoluteTransform.transformVect(vertices[numVertices + i].Pos);
+
+		m_2dMaterial.MaterialType = shaderID;
+		m_driver->setMaterial(m_2dMaterial);
+
+		m_buffer->setPrimitiveType(scene::EPT_TRIANGLES);
+		m_buffer->setDirty();
+
+		if (material != NULL)
+			flushWithMaterial(material);
+	}
+
+	void CGraphics2D::addEclipseBatch(const core::rectf& pos, const core::rectf& uv, const SColor& color, const core::matrix4& absoluteTransform, int shaderID, float a, float b, CMaterial* material)
+	{
+		if (m_2dMaterial.MaterialType != shaderID || material != NULL)
+			flush();
+
+		int fromVertices = m_vertices->getVertexCount();
+
+		int numStep = 30;
+		if (a > b)
+		{
+			float t = a;
+			a = b;
+			b = t;
+		}
+
+		float d = (b - a) / (float)numStep;
+
+		core::vector2df center = pos.getCenter();
+		float w = pos.getWidth();
+		float h = pos.getHeight();
+		float r1 = w * 0.5f;
+		float r2 = h * 0.5f;
+
+		if (w == 0.0f || h == 0.0f)
+			return;
+
+		S3DVertex vertex;
+		vertex.Pos = core::vector3df(center.X, center.Y, 0.0f);
+		vertex.Color = color;
+		vertex.Normal.set(0.5f, 0.5f, 1.0f);
+		vertex.TCoords.set(0.5f, 0.5f);
+		m_vertices->addVertex(&vertex);
+
+		for (int i = 0; i <= numStep; i++)
+		{
+			float angle = a + i * d - 90.0f;
+
+			float x = cosf(angle * core::DEGTORAD);
+			float y = sinf(angle * core::DEGTORAD);
+			vertex.Pos.set(center.X + x * r1, center.Y + y * r2, 0.0f);
+
+			float u = (vertex.Pos.X - pos.UpperLeftCorner.X) / w;
+			float v = (vertex.Pos.Y - pos.UpperLeftCorner.Y) / h;
+			vertex.Normal.set(u, v, 1.0f);
+
+			float du = uv.LowerRightCorner.X - uv.UpperLeftCorner.X;
+			float dv = uv.LowerRightCorner.Y - uv.UpperLeftCorner.Y;
+			vertex.TCoords.set(uv.UpperLeftCorner.X + u * du, uv.UpperLeftCorner.Y + dv);
+
+			m_vertices->addVertex(&vertex);
+		}
+
+		S3DVertex* vertices = (S3DVertex*)m_vertices->getVertices();
+		int totalVertices = m_vertices->getVertexCount();
+		for (int i = fromVertices; i < totalVertices; i++)
+		{
+			absoluteTransform.transformVect(vertices[i].Pos);
+		}
+
+		for (int i = 1; i <= numStep; i++)
+		{
+			m_indices->addIndex(fromVertices);
+			m_indices->addIndex(fromVertices + i);
+			m_indices->addIndex(fromVertices + (i + 1));
+		}
 
 		m_2dMaterial.MaterialType = shaderID;
 		m_driver->setMaterial(m_2dMaterial);
@@ -1715,7 +1872,7 @@ namespace Skylicht
 		m_vertices->set_used(0);
 	}
 
-	void CGraphics2D::drawText(const core::position2df& pos, CGlyphFont* font, const SColor& color, const std::wstring& string, int materialID, CMaterial* material)
+	void CGraphics2D::drawText(const core::position2df& pos, IFont* font, const SColor& color, const std::wstring& string, int materialID, CMaterial* material)
 	{
 		std::vector<SModuleOffset*> modules;
 		const wchar_t* lpString = string.c_str();
@@ -1753,7 +1910,7 @@ namespace Skylicht
 		}
 	}
 
-	float CGraphics2D::measureCharWidth(CGlyphFont* font, wchar_t c)
+	float CGraphics2D::measureCharWidth(IFont* font, wchar_t c)
 	{
 		if (c == '\n' || c == '\r')
 			return 0.0f;
@@ -1772,7 +1929,7 @@ namespace Skylicht
 		return charWidth;
 	}
 
-	core::dimension2df CGraphics2D::measureText(CGlyphFont* font, const std::wstring& string)
+	core::dimension2df CGraphics2D::measureText(IFont* font, const std::wstring& string)
 	{
 		float stringWidth = 0.0f;
 		float charSpacePadding = 0.0f;

@@ -67,11 +67,15 @@ namespace Skylicht
 
 		void updateIndexSearchObject();
 
+		CGameObject* getChildObjectBefore(CGameObject* object);
+
 		void bringToNext(CGameObject* object, CGameObject* target, bool behind);
 
 		void bringToChild(CGameObject* object);
 
 		void sortChildsByTemplateOrder(std::vector<std::string>& order);
+
+		virtual void setTemplateChanged(bool b);
 
 		virtual CGameObject* searchObject(const wchar_t* objectName);
 
@@ -81,9 +85,17 @@ namespace Skylicht
 
 		virtual CGameObject* searchObjectInChildByID(const char* id);
 
-		virtual CGameObject* searchObjectInScene(const wchar_t* objectName);
-
 		virtual CGameObject* searchObjectInChildByTemplateObjId(const char* id);
+
+		virtual u32 searchObjectByCullingLayer(ArrayGameObject& result, u32 mask);
+
+		virtual void setCullingLayerForChild(u32 mask);
+
+		virtual void setCullingOnOffForChild(u32 value, bool on);
+
+		virtual CEntity* searchEntityByID(const char* id);
+
+		virtual CEntity* searchEntityInChildByID(const char* id);
 
 		virtual bool testConflictName(const wchar_t* objectName);
 

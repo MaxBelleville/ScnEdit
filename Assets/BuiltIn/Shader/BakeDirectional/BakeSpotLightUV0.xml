@@ -1,0 +1,20 @@
+<shaderConfig name="BakeSpotLightUV0" baseShader="TRANSPARENT_ADD_COLOR">
+	<uniforms>
+		<vs>
+			<uniform name="uWorldMatrix" type="WORLD" value="0" float="16" matrix="true"/>
+		</vs>
+		<fs>
+			<uniform name="uPointLightShadowMap" type="DEFAULT_VALUE" value="0" float="1" directX="false"/>
+			<uniform name="uLightPosition" type="SPOT_LIGHT_POSITION" value="0" float="4"/>
+			<uniform name="uLightDirection" type="SPOT_LIGHT_DIRECTION" value="0" float="4"/>
+			<uniform name="uLightAttenuation" type="SPOT_LIGHT_ATTENUATION" value="0" float="4"/>
+			<uniform name="uLightColor" type="SPOT_LIGHT_COLOR" value="1.0,1.0,1.0,1.0" float="4"/>
+		</fs>
+	</uniforms>
+	<resources>
+	</resources>
+	<customUI>
+	</customUI>
+	<shader type="GLSL" vs="GLSL/BakeLightUV0VS.glsl" fs="GLSL/BakeSpotLightFS.glsl"/>
+	<shader type="HLSL" vs="HLSL/BakeLightUV0VS.hlsl" fs="HLSL/BakeSpotLightFS.hlsl"/>
+</shaderConfig>

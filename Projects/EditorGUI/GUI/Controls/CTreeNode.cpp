@@ -42,7 +42,8 @@ namespace Skylicht
 				m_root(root),
 				m_expand(false),
 				m_selected(false),
-				m_alwayShowExpandButton(false)
+				m_alwayShowExpandButton(false),
+				m_doPress(true)
 			{
 				setHeight(20.0f);
 
@@ -50,6 +51,7 @@ namespace Skylicht
 
 				m_row = new CTreeRowItem(this, root);
 				m_row->OnDown = BIND_LISTENER(&CTreeNode::onDown, this);
+				m_row->OnPress = BIND_LISTENER(&CTreeNode::onPress, this);
 				m_row->OnDoubleLeftMouseClick = BIND_LISTENER(&CTreeNode::onDoubleClick, this);
 
 				m_title = new CIconTextItem(this);
@@ -320,8 +322,11 @@ namespace Skylicht
 					}
 					else
 					{
-						// deselect all
-						m_root->onNodeClick(base);
+						if (!m_selected)
+						{
+							// deselect all when click on unSelect node
+							m_root->onNodeClick(base);
+						}
 					}
 				}
 				else
@@ -355,8 +360,46 @@ namespace Skylicht
 				}
 				else
 				{
-					setSelected(!m_selected);
+					if (!m_selected)
+					{
+						// Click on unSelect node
+						setSelected(true);
+						m_doPress = false;
+					}
 				}
+			}
+
+			void CTreeNode::onPress(CBase* base)
+			{
+				if (m_doPress)
+				{
+					CTreeControl* treeControl = (CTreeControl*)(m_root);
+					CInput* input = CInput::getInput();
+
+					if (treeControl->isMultiSelected())
+					{
+						if (input->isKeyDown(GUI::EKey::KEY_CONTROL) || input->isKeyDown(GUI::EKey::KEY_SHIFT))
+						{
+							// hold shift or control
+						}
+						else
+						{
+							if (m_selected)
+							{
+								// Press on selected node, unSelect all but not this
+								m_root->onNodeClick(base);
+								setSelected(true);
+							}
+						}
+					}
+
+					if (CInput::getInput()->isKeyDown(GUI::EKey::KEY_CONTROL))
+					{
+						setSelected(!m_selected);
+					}
+				}
+
+				m_doPress = true;
 			}
 
 			void CTreeNode::onNodeClick(CBase* base)

@@ -59,10 +59,14 @@ namespace Skylicht
 		CEnumProperty<CGUILayoutData::EAlignType>* alginType = new CEnumProperty<CGUILayoutData::EAlignType>(object, "layoutAlignType", m_layoutData->AlignType);
 		alginType->addEnumString("Vertical", CGUILayoutData::Vertical);
 		alginType->addEnumString("Horizontal", CGUILayoutData::Horizontal);
+		alginType->addEnumString("Vertical Bottom", CGUILayoutData::VerticalBottom);
+		alginType->addEnumString("Horizontal Right", CGUILayoutData::HorizontalRight);
 		object->autoRelease(alginType);
 
 		object->autoRelease(new CFloatProperty(object, "spacing", m_layoutData->Spacing));
 		object->autoRelease(new CBoolProperty(object, "fitChildrenSize", m_layoutData->FitChildrenSize));
+		object->autoRelease(new CBoolProperty(object, "layoutCenter", m_layoutData->LayoutCenter));
+		object->autoRelease(new CBoolProperty(object, "layoutMiddle", m_layoutData->LayoutMiddle));
 
 		return object;
 	}
@@ -73,6 +77,8 @@ namespace Skylicht
 
 		m_layoutData->AlignType = object->get<CGUILayoutData::EAlignType>("layoutAlignType", CGUILayoutData::Vertical);
 		m_layoutData->Spacing = object->get<float>("spacing", 0);
-		m_layoutData->FitChildrenSize = object->get<bool>("fitChildrenSize", 0);
+		m_layoutData->FitChildrenSize = object->get<bool>("fitChildrenSize", false);
+		m_layoutData->LayoutCenter = object->get<bool>("layoutCenter", false);
+		m_layoutData->LayoutMiddle = object->get<bool>("layoutMiddle", false);
 	}
 }

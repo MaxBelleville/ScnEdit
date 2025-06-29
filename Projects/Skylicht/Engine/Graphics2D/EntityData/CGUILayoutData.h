@@ -36,7 +36,9 @@ namespace Skylicht
 		enum EAlignType
 		{
 			Vertical,
-			Horizontal
+			Horizontal,
+			VerticalBottom,
+			HorizontalRight
 		};
 
 		EAlignType AlignType;
@@ -52,6 +54,14 @@ namespace Skylicht
 		float MaxH;
 
 		float Spacing;
+
+		bool LayoutCenter;
+
+		bool LayoutMiddle;
+
+		float ChildsWidth;
+
+		float ChildsHeight;
 
 	public:
 		CGUILayoutData();

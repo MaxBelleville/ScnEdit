@@ -139,7 +139,11 @@ namespace Skylicht
 
 		void setSkinnedInstancing(bool b);
 
+		void setSkinnedInstancing(bool b, IShaderInstancing* instancingShader);
+
 		bool setMaterial(CMaterial* material);
+
+		ArrayMaterial& getMaterials();
 
 		bool unusedMaterial(CMaterial* material);
 

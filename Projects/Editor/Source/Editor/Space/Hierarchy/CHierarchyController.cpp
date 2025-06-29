@@ -32,6 +32,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #include "Editor/SpaceController/CSceneController.h"
 #include "AssetManager/CAssetManager.h"
+#include "Selection/CSelection.h"
 
 namespace Skylicht
 {
@@ -76,7 +77,8 @@ namespace Skylicht
 							fileExt == "obj" ||
 							fileExt == "fbx" ||
 							fileExt == "smesh" ||
-							fileExt == "template")
+							fileExt == "template" ||
+							fileExt == "particle")
 						{
 							return true;
 						}
@@ -97,11 +99,13 @@ namespace Skylicht
 						CHierachyNode* newNode = NULL;
 						CSceneController* sceneController = CSceneController::getInstance();
 
+						CGameObject* targetObject = NULL;
+
 						if (fileExt == "template")
 						{
 							CContainerObject* container = sceneController->getZone();
 
-							CGameObject* targetObject = sceneController->createTemplateObject(path, container);
+							targetObject = sceneController->createTemplateObject(path, container, false);
 							updateTreeNode(targetObject);
 
 							newNode = m_node->getNodeByTag(targetObject);
@@ -115,7 +119,7 @@ namespace Skylicht
 								newNode = createChildObject(node);
 								if (newNode != NULL)
 								{
-									CGameObject* targetObject = (CGameObject*)newNode->getTagData();
+									targetObject = (CGameObject*)newNode->getTagData();
 
 									CSceneController* sceneController = CSceneController::getInstance();
 									sceneController->createResourceComponent(path, targetObject);
@@ -125,6 +129,9 @@ namespace Skylicht
 								}
 							}
 						}
+
+						if (targetObject)
+							sceneController->getHistory()->saveCreateHistory(targetObject);
 					}
 
 					editor->refresh();
@@ -187,7 +194,13 @@ namespace Skylicht
 
 			// visible
 			if (object->isVisible())
-				node->setTextColor(GUI::SGUIColor(255, 250, 250, 250));
+			{
+				// enable
+				if (object->isEnable())
+					node->setTextColor(GUI::SGUIColor(255, 250, 250, 250));
+				else
+					node->setTextColor(GUI::SGUIColor(255, 150, 150, 200));
+			}
 			else
 				node->setTextColor(GUI::SGUIColor(255, 150, 150, 150));
 
@@ -200,7 +213,7 @@ namespace Skylicht
 				node->showSubIcon(true);
 
 			// lock
-			if (object->isLock())
+			if (object->isSelfLock())
 				node->setSubIcon(GUI::ESystemIcon::Lock);
 			else
 				node->setSubIcon(GUI::ESystemIcon::None);
@@ -209,7 +222,12 @@ namespace Skylicht
 			if (object->isTemplateAsset())
 			{
 				if (CAssetManager::getInstance()->isExist(object->getTemplateAsset()))
+				{
 					node->setIconColor(GUI::SGUIColor(255, 110, 170, 255));
+
+					if (object->isTemplateChanged())
+						node->setIconColor(GUI::SGUIColor(255, 170, 110, 255));
+				}
 				else
 					node->setIconColor(GUI::SGUIColor(255, 255, 170, 110));
 			}
@@ -217,6 +235,16 @@ namespace Skylicht
 			{
 				node->setIconColor(GUI::SGUIColor(255, 200, 200, 200));
 			}
+		}
+
+		void CHierarchyController::updateObjectToUI(CGameObject* object)
+		{
+			if (m_node == NULL)
+				return;
+
+			CHierachyNode* node = m_node->getNodeByTag(object);
+			if (node != NULL)
+				updateObjectToUI(object, node);
 		}
 
 		void CHierarchyController::updateTreeNode(CGameObject* object, bool rebuildAllTree)
@@ -234,18 +262,23 @@ namespace Skylicht
 					node->OnUpdate(node);
 
 				// rebuild-gui child of entity
-				std::vector<CHierachyNode*>& childs = node->getChilds();
-				for (CHierachyNode* child : childs)
+				updateNodeToHierarchy(node, rebuildAllTree);
+			}
+		}
+
+		void CHierarchyController::updateNodeToHierarchy(CHierachyNode* node, bool rebuildAllTree)
+		{
+			std::vector<CHierachyNode*>& childs = node->getChilds();
+			for (CHierachyNode* child : childs)
+			{
+				if (rebuildAllTree)
 				{
-					if (rebuildAllTree)
-					{
+					buildTreeNode(node->getGUINode(), child);
+				}
+				else
+				{
+					if (child->getTagDataType() == CHierachyNode::Entity)
 						buildTreeNode(node->getGUINode(), child);
-					}
-					else
-					{
-						if (child->getTagDataType() == CHierachyNode::Entity)
-							buildTreeNode(node->getGUINode(), child);
-					}
 				}
 			}
 		}
@@ -387,6 +420,9 @@ namespace Skylicht
 
 			if (node->OnUpdate != nullptr)
 				node->OnUpdate(node);
+
+			// rebuild-gui child of entity
+			updateNodeToHierarchy(node, false);
 
 			m_tree->focus();
 		}
@@ -549,47 +585,69 @@ namespace Skylicht
 				{
 					if (data->Name == "HierarchyNode")
 					{
-						CHierachyNode* dragNode = (CHierachyNode*)data->UserData;
-						if (node->getTagDataType() == CHierachyNode::Zone)
+						std::vector<CHierachyNode*> affectNodes;
+						std::list<GUI::CTreeNode*> selectNodes = m_tree->getSelectedNodes();
+						for (GUI::CTreeNode* node : selectNodes)
 						{
-							if (dragNode->getTagDataType() == CHierachyNode::Zone)
+							CHierachyNode* tagData = (CHierachyNode*)node->getTagData();
+							if (tagData)
+								affectNodes.insert(affectNodes.begin(), tagData);
+						}
+
+						std::vector<CGameObject*> listGameObjects;
+						for (CHierachyNode* dragNode : affectNodes)
+						{
+							CGameObject* gameObject = (CGameObject*)dragNode->getTagData();
+							listGameObjects.push_back(gameObject);
+						}
+
+						CSceneHistory* history = CSceneController::getInstance()->getHistory();
+						history->enableAddSelectHistory(false);
+
+						for (CHierachyNode* dragNode : affectNodes)
+						{
+							if (node->getTagDataType() == CHierachyNode::Zone)
 							{
-								GUI::SPoint local = rowItem->canvasPosToLocal(GUI::SPoint(mouseX, mouseY));
-								if (local.Y < rowItem->height() * 0.5f)
+								if (dragNode->getTagDataType() == CHierachyNode::Zone)
 								{
-									move(dragNode, node, false);
+									GUI::SPoint local = rowItem->canvasPosToLocal(GUI::SPoint(mouseX, mouseY));
+									if (local.Y < rowItem->height() * 0.5f)
+										move(dragNode, node, false);
+									else
+										move(dragNode, node, true);
 								}
 								else
 								{
-									move(dragNode, node, true);
+									moveToChild(dragNode, node);
 								}
+								dragNode->getGUINode()->setSelected(true);
 							}
-							else
+							else if (node->getTagDataType() == CHierachyNode::Container)
 							{
-								moveToChild(dragNode, node);
+								GUI::SPoint local = rowItem->canvasPosToLocal(GUI::SPoint(mouseX, mouseY));
+								if (local.Y < rowItem->height() * 0.25f)
+									move(dragNode, node, false);
+								else if (local.Y > rowItem->height() * 0.75f)
+									move(dragNode, node, true);
+								else
+									moveToChild(dragNode, node);
+
+								dragNode->getGUINode()->setSelected(true);
 							}
-							dragNode->getGUINode()->setSelected(true);
+							else if (node->getTagDataType() == CHierachyNode::GameObject)
+							{
+								GUI::SPoint local = rowItem->canvasPosToLocal(GUI::SPoint(mouseX, mouseY));
+								if (local.Y < rowItem->height() * 0.5f)
+									move(dragNode, node, false);
+								else
+									move(dragNode, node, true);
+								dragNode->getGUINode()->setSelected(true);
+							}
 						}
-						else if (node->getTagDataType() == CHierachyNode::Container)
-						{
-							GUI::SPoint local = rowItem->canvasPosToLocal(GUI::SPoint(mouseX, mouseY));
-							if (local.Y < rowItem->height() * 0.25f)
-								move(dragNode, node, false);
-							else if (local.Y > rowItem->height() * 0.75f)
-								move(dragNode, node, true);
-							else
-								moveToChild(dragNode, node);
-							dragNode->getGUINode()->setSelected(true);
-						}
-						else if (node->getTagDataType() == CHierachyNode::GameObject)
-						{
-							GUI::SPoint local = rowItem->canvasPosToLocal(GUI::SPoint(mouseX, mouseY));
-							if (local.Y < rowItem->height() * 0.5f)
-								move(dragNode, node, false);
-							else
-								move(dragNode, node, true);
-							dragNode->getGUINode()->setSelected(true);
-						}
+
+						// save the modify struct
+						history->saveStructureHistory(listGameObjects);
+						history->enableAddSelectHistory(true);
 					}
 					else if (data->Name == "ListFSItem")
 					{
@@ -726,7 +784,7 @@ namespace Skylicht
 			from->nullGUI();
 
 			// update position
-			from->bringNextNode(target, behind);
+			target->getParent()->bringToNext(from, target, behind);
 
 			// add new tree gui at new position
 			GUI::CTreeNode* gui = buildTreeNode(target->getParent()->getGUINode(), from);
@@ -793,10 +851,11 @@ namespace Skylicht
 
 			CGameObject* newGameObject = CSceneController::getInstance()->createEmptyObject(parentObject);
 			CHierachyNode* thisNode = parentNode->getNodeByTag(newGameObject);
+
 			if (thisNode != NULL)
 			{
 				parentObject->bringToNext(newGameObject, targetObject, behind);
-				thisNode->bringNextNode(position, behind);
+				parentNode->bringToNext(thisNode, position, behind);
 				thisNode->getGUINode()->bringNextToControl(position->getGUINode(), behind);
 			}
 
@@ -808,7 +867,7 @@ namespace Skylicht
 			CGameObject* parentGameObject = (CGameObject*)parent->getTagData();
 			CContainerObject* parentContainer = (CContainerObject*)parentGameObject;
 
-			CGameObject* newGameObject = CSceneController::getInstance()->createEmptyObject(parentContainer);
+			CGameObject* newGameObject = CSceneController::getInstance()->createEmptyObject(parentContainer, false);
 			CHierachyNode* thisNode = parent->getNodeByTag(newGameObject);
 			return thisNode;
 		}

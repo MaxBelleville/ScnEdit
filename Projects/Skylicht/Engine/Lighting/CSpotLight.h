@@ -24,17 +24,14 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
-#include "CLight.h"
+#include "CPointLight.h"
 #include "CLightCullingData.h"
 
 namespace Skylicht
 {
-	class SKYLICHT_API CSpotLight : public CLight
+	class SKYLICHT_API CSpotLight : public CPointLight
 	{
 	protected:
-		CLightCullingData* m_cullingData;
-
-		bool m_needRenderShadowDepth;
 
 	public:
 		CSpotLight();
@@ -50,15 +47,5 @@ namespace Skylicht
 		virtual void loadSerializable(CObjectSerializable* object);
 
 		DECLARE_GETTYPENAME(CSpotLight)
-
-	public:
-
-		bool needRenderShadowDepth();
-
-		void beginRenderShadowDepth();
-
-		void endRenderShadowDepth();
-
-		core::vector3df getPosition();
 	};
 }

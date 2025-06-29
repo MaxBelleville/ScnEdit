@@ -49,6 +49,10 @@ namespace Skylicht
 
 		bool Occlusion;
 
+		bool ShadowCasting;
+
+		bool NeedValidate;
+
 	public:
 		CCullingData();
 

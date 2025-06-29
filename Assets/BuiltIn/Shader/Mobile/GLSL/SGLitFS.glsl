@@ -16,7 +16,6 @@ in vec3 vWorldLightDir;
 in vec3 vWorldTangent;
 in vec3 vWorldBinormal;
 in float vTangentW;
-in vec4 vViewPosition;
 out vec4 FragColor;
 const float gamma = 2.2;
 const float invGamma = 1.0 / 2.2;
@@ -34,7 +33,7 @@ vec3 shAmbient(vec3 n)
 		uSHConst[1].xyz * n.y +
 		uSHConst[2].xyz * n.z +
 		uSHConst[3].xyz * n.x;
-	return ambientLighting * 0.9;
+	return ambientLighting * 0.75;
 }
 const float PI = 3.1415926;
 void main(void)
@@ -46,7 +45,6 @@ void main(void)
 	vec3 localCoords = normalMap * 2.0 - vec3(1.0, 1.0, 1.0);
 	localCoords.y *= vTangentW;
 	vec3 n = normalize(rotation * localCoords);
-	n = normalize(n);
 	vec3 ambientLighting = shAmbient(n);
 	ambientLighting = sRGB(ambientLighting);
 	vec3 diffuseColor = sRGB(diffuseMap.rgb);

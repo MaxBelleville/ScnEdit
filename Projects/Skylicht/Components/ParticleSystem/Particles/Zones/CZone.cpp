@@ -25,6 +25,8 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "pch.h"
 #include "CZone.h"
 
+#include "Utils/CStringImp.h"
+
 namespace Skylicht
 {
 	namespace Particle
@@ -40,7 +42,7 @@ namespace Skylicht
 		s32 particle_rand()
 		{
 			// (a*seed)%m with Schrage's method
-			seed = a * (seed%q) - r * (seed / q);
+			seed = a * (seed % q) - r * (seed / q);
 			if (seed < 0)
 				seed += m;
 
@@ -49,7 +51,7 @@ namespace Skylicht
 
 		f32 particle_frand()
 		{
-			return particle_rand()*(1.f / rMax);
+			return particle_rand() * (1.f / rMax);
 		}
 
 		s32 particle_rand_max()
@@ -84,6 +86,23 @@ namespace Skylicht
 
 		}
 
+		const wchar_t* g_zoneName[] =
+		{
+			L"Point",
+			L"Sphere",
+			L"AABox",
+			L"Cylinder",
+			L"Line",
+			L"PolyLine",
+			L"Ring",
+			L"NumOfZone"
+		};
+
+		const wchar_t* CZone::getName()
+		{
+			return g_zoneName[(int)m_type];
+		}
+
 		void CZone::normalizeOrRandomize(core::vector3df& v)
 		{
 			while (v.getLengthSQ() == 0.0f)
@@ -94,6 +113,22 @@ namespace Skylicht
 			}
 
 			v.normalize();
+		}
+
+		CObjectSerializable* CZone::createSerializable()
+		{
+			CObjectSerializable* object = CParticleSerializable::createSerializable();
+
+			CStringProperty* name = new CStringProperty(object, "name", CStringImp::convertUnicodeToUTF8(getName()).c_str());
+			name->setHidden(true);
+			object->autoRelease(name);
+
+			return object;
+		}
+
+		void CZone::loadSerializable(CObjectSerializable* object)
+		{
+			CParticleSerializable::loadSerializable(object);
 		}
 	}
 }

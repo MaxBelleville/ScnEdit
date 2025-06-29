@@ -45,6 +45,8 @@ namespace Skylicht
 		bool* AutoSH;
 		core::vector3df* SH;
 
+		float* Intensity;
+
 		SColor Color;
 
 		ITexture* IndirectTexture;
@@ -65,6 +67,8 @@ namespace Skylicht
 		void initSH();
 
 		void releaseSH();
+
+		void applyShader();
 	};
 
 	DECLARE_PUBLIC_DATA_TYPE_INDEX(CIndirectLightingData);

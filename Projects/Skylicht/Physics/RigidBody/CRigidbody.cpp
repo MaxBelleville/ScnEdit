@@ -47,7 +47,10 @@ namespace Skylicht
 
 		void CRigidbody::startComponent()
 		{
-			initRigidbody();
+#ifdef USE_BULLET_PHYSIC_ENGINE
+			if (!m_rigidBody)
+				initRigidbody();
+#endif
 		}
 
 		void CRigidbody::updateComponent()
@@ -163,14 +166,17 @@ namespace Skylicht
 
 			btTransform startTransform;
 
-			const f32* matrix = NULL;
+			core::matrix4 matrix, nonScale;
 
 			if (engine->IsInEditor)
-				matrix = transform->calcWorldTransform().pointer();
+				matrix = transform->calcWorldTransform();
 			else
-				matrix = transform->getRelativeTransform().pointer();
+				matrix = transform->getRelativeTransform();
 
-			startTransform.setFromOpenGLMatrix(matrix);
+			Transform::getNonScaleTransform(matrix, nonScale);
+
+			startTransform.setFromOpenGLMatrix(nonScale.pointer());
+			m_shape->setLocalScaling(Bullet::irrVectorToBulletVector(matrix.getScale()));
 
 			btVector3 localInertia(0, 0, 0);
 			float mass = m_mass;
@@ -241,12 +247,33 @@ namespace Skylicht
 				const btTransform& world = m_rigidBody->getWorldTransform();
 				CTransformMatrix* transform = m_gameObject->getTransformMatrix();
 
+				core::matrix4 scale;
+				scale.setScale(getLocalScale());
+
 				core::matrix4 mat;
 				Bullet::bulletTransformToIrrMatrix(world, mat);
 
-				transform->setWorldMatrix(mat);
+				transform->setWorldMatrix(mat * scale);
 			}
 #endif
+		}
+
+		void CRigidbody::setLocalScale(const core::vector3df& scale)
+		{
+#ifdef USE_BULLET_PHYSIC_ENGINE
+			if (m_shape)
+				m_shape->setLocalScaling(Bullet::irrVectorToBulletVector(scale));
+#endif
+		}
+
+		core::vector3df CRigidbody::getLocalScale()
+		{
+			core::vector3df scale(1.0f, 1.0f, 1.0f);
+#ifdef USE_BULLET_PHYSIC_ENGINE
+			if (m_shape)
+				scale = Bullet::bulletVectorToIrrVector(m_shape->getLocalScaling());
+#endif
+			return scale;
 		}
 
 		core::vector3df CRigidbody::getPosition()
@@ -517,6 +544,30 @@ namespace Skylicht
 				m_rigidBody->clearForces();
 			}
 #endif
+		}
+
+		core::matrix4 CRigidbody::getWorldTransform()
+		{
+			core::matrix4 world;
+
+#ifdef USE_BULLET_PHYSIC_ENGINE
+			if (m_rigidBody)
+			{
+				btTransform& transform = m_rigidBody->getWorldTransform();
+#ifdef BT_USE_NEON
+				float ptr[16] __attribute__((aligned(16)));
+				transform.getOpenGLMatrix(ptr);
+
+				float* m = world.pointer();
+				for (int i = 0; i < 16; i++)
+					m[i] = ptr[i];
+#else
+				f32* ptr = world.pointer();
+				transform.getOpenGLMatrix(ptr);
+#endif
+			}
+#endif
+			return world;
 		}
 	}
 }

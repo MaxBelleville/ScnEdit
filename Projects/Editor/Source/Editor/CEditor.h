@@ -34,6 +34,10 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Graph/CGraphComponent.h"
 #endif
 
+#ifdef BUILD_SKYLICHT_LIGHMAPPER
+#include "BakeLightComponent/CBakeLightComponent.h"
+#endif
+
 namespace Skylicht
 {
 	namespace Editor
@@ -128,7 +132,13 @@ namespace Skylicht
 
 			CSpace* getWorkspaceByName(const std::wstring& name);
 
+			std::vector<CSpace*> getAllWorkspaceByName(const std::wstring& name);
+
+			void refreshAssetSpace(CSpace* skip);
+
 			CSpace* openWorkspace(const std::wstring& name);
+
+			void getWorkspaceSize(const std::wstring& name, float& w, float& h);
 
 		protected:
 
@@ -192,9 +202,15 @@ namespace Skylicht
 
 			void showGoogleMap();
 
+			void showInterpolateCurves();
+
 			void exportGMap(const char* path, long x1, long y1, long x2, long y2, int zoom, int type, int gridSize);
 
 			void exportSprite(const char* id, const char* path, const std::vector<std::string>& pngs, int width, int height, bool alpha);
+
+#ifdef BUILD_SKYLICHT_LIGHMAPPER
+			void bakeDirectional(Lightmapper::CBakeLightComponent* component);
+#endif
 		};
 	}
 }

@@ -1,4 +1,6 @@
 <shaderConfig name="MobileSGNoNormalMap" baseShader="SOLID">
+	<instancing vertex="tangents" shader="MobileSGNoNormalMapInstancing" instancingVertex="tangents_sg"/>
+	<dependent shader="MobileSGNoNormalMapInstancing.xml"/>
 	<uniforms>
 		<vs>
 			<uniform name="uMvpMatrix" type="WORLD_VIEW_PROJECTION" value="0" float="16" matrix="true"/>

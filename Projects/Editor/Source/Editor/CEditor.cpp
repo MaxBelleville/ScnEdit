@@ -43,6 +43,8 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Space/GoogleMap/CSpaceExportGMap.h"
 #include "Space/Sprite/CSpaceExportSprite.h"
 #include "Space/Sprite/CSpaceSprite.h"
+#include "Space/Particle/CSpaceParticle.h"
+#include "Space/InterpolateCurves/CSpaceInterpolateCurves.h"
 
 #include "SpaceController/CSceneController.h"
 #include "SpaceController/CPropertyController.h"
@@ -50,6 +52,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "SpaceController/CAssetCreateController.h"
 #include "SpaceController/CSpriteController.h"
 #include "SpaceController/CGUIDesignController.h"
+#include "SpaceController/CParticleController.h"
 
 #include "Handles/CHandles.h"
 
@@ -60,6 +63,10 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #ifdef BUILD_SKYLICHT_GRAPH
 #include "Space/BuildWalkingMap/CSpaceBuildWalkingMap.h"
+#endif
+
+#ifdef BUILD_SKYLICHT_LIGHMAPPER
+#include "Space/BakeDirectional/CSpaceBakeDirectional.h"
 #endif
 
 namespace Skylicht
@@ -96,11 +103,14 @@ namespace Skylicht
 			CSceneController::createGetInstance()->initContextMenu(m_canvas);
 			CSpriteController::createGetInstance()->initContextMenu(m_canvas);
 			CGUIDesignController::createGetInstance()->initContextMenu(m_canvas);
+			CParticleController::createGetInstance()->initContextMenu(m_canvas);
 
 			CPropertyController::createGetInstance();
 			CAssetPropertyController::createGetInstance();
 			CAssetCreateController::createGetInstance();
+
 			CSelection::createGetInstance();
+
 			CEditorActivator::createGetInstance();
 			CProjectSettings::createGetInstance();
 		}
@@ -116,8 +126,10 @@ namespace Skylicht
 			CAssetPropertyController::releaseInstance();
 			CAssetCreateController::releaseInstance();
 			CPropertyController::releaseInstance();
+
 			CSelection::releaseInstance();
 
+			CParticleController::releaseInstance();
 			CSceneController::releaseInstance();
 			CSpriteController::releaseInstance();
 			CGUIDesignController::releaseInstance();
@@ -426,7 +438,8 @@ namespace Skylicht
 			submenu->addItem(L"Font");
 			submenu->addItem(L"GUI");
 			submenu->addItem(L"Sprite");
-			submenu->addItem(L"Animation");
+			submenu->addItem(L"File array");
+			submenu->addItem(L"Texture array");
 			submenu->OnCommand = BIND_LISTENER(&CEditor::OnCommandAssetCreate, this);
 
 			GUI::CMenuItem* gameObject = m_menuBar->addItem(L"GameObject");
@@ -445,10 +458,9 @@ namespace Skylicht
 			submenu->addItem(L"Cube");
 			submenu->addItem(L"Sphere");
 			submenu->addItem(L"Plane");
-			/*
 			submenu->addItem(L"Capsule");
 			submenu->addItem(L"Cylinder");
-			*/
+
 			submenu->addSeparator();
 
 			submenu->addItem(L"Skydome");
@@ -458,6 +470,10 @@ namespace Skylicht
 
 			submenu->addItem(L"Mesh");
 			submenu->addItem(L"Mesh Instancing");
+
+			submenu->addSeparator();
+			submenu->addItem(L"Particle");
+
 			/*
 			submenu->addSeparator();
 
@@ -503,10 +519,10 @@ namespace Skylicht
 			m_menuWindowItems.push_back(submenu->addItem(L"Property"));
 			m_menuWindowItems.push_back(submenu->addItem(L"Scene"));
 			m_menuWindowItems.push_back(submenu->addItem(L"Hierarchy"));
-			m_menuWindowItems.push_back(submenu->addItem(L"Animation"));
 			m_menuWindowItems.push_back(submenu->addItem(L"Console"));
 			m_menuWindowItems.push_back(submenu->addItem(L"GUI Design"));
 			m_menuWindowItems.push_back(submenu->addItem(L"GUI Hierarchy"));
+			m_menuWindowItems.push_back(submenu->addItem(L"Particle"));
 			submenu->addSeparator();
 			m_menuWindowItems.push_back(submenu->addItem(L"Google Map"));
 			submenu->addSeparator();
@@ -619,10 +635,6 @@ namespace Skylicht
 			{
 				ret = new CSpaceApplyTemplate(window, this);
 			}
-			else if (workspace == L"Animation")
-			{
-
-			}
 			else if (workspace == L"Sprite")
 			{
 				ret = new CSpaceSprite(window, this);
@@ -669,6 +681,20 @@ namespace Skylicht
 				ret = new CSpaceBuildWalkingMap(window, this);
 			}
 #endif
+			else if (workspace == L"Particle")
+			{
+				ret = new CSpaceParticle(window, this);
+			}
+			else if (workspace == L"Interpolate Curves")
+			{
+				ret = new CSpaceInterpolateCurves(window, this);
+			}
+#ifdef BUILD_SKYLICHT_LIGHMAPPER
+			else if (workspace == L"Bake Directional")
+			{
+				ret = new CSpaceBakeDirectional(window, this);
+			}
+#endif
 
 			if (ret)
 				m_workspaces.push_back(ret);
@@ -704,6 +730,32 @@ namespace Skylicht
 					return s;
 			}
 			return NULL;
+		}
+
+		std::vector<CSpace*> CEditor::getAllWorkspaceByName(const std::wstring& name)
+		{
+			std::vector<CSpace*> results;
+
+			for (CSpace* s : m_workspaces)
+			{
+				if (s->getWindow()->getCaption() == name)
+					results.push_back(s);
+			}
+
+			return results;
+		}
+
+		void CEditor::refreshAssetSpace(CSpace* skip)
+		{
+			for (CSpace* s : m_workspaces)
+			{
+				if (s == skip)
+					continue;
+
+				CSpaceAssets* asset = dynamic_cast<CSpaceAssets*>(s);
+				if (asset)
+					asset->refresh();
+			}
 		}
 
 		void CEditor::initSessionLayout(const std::string& data)
@@ -1297,6 +1349,14 @@ namespace Skylicht
 			{
 				assetCreater->createEmptyGUI();
 			}
+			else if (label == L"File array")
+			{
+				assetCreater->createEmptyFileArray();
+			}
+			else if (label == L"Texture array")
+			{
+				assetCreater->createEmptyTextureArray();
+			}
 		}
 
 		void CEditor::OnCommandWindowOpen(GUI::CBase* item)
@@ -1359,8 +1419,12 @@ namespace Skylicht
 				// Space is hide -> open
 				float w = 680.0f;
 				float h = 480.0f;
+
+				const std::wstring& label = item->getLabel();
+				getWorkspaceSize(label, w, h);
+
 				GUI::CDockableWindow* window = new GUI::CDockableWindow(m_dockPanel, 0.0f, 0.0f, w, h);
-				window->setCaption(item->getLabel());
+				window->setCaption(label);
 				window->setCenterPosition();
 				initWorkspace(window, window->getCaption());
 			}
@@ -1371,6 +1435,7 @@ namespace Skylicht
 			// Space is hide -> open
 			float w = 680.0f;
 			float h = 480.0f;
+			getWorkspaceSize(name, w, h);
 
 			GUI::CDockableWindow* window = new GUI::CDockableWindow(m_dockPanel, 0.0f, 0.0f, w, h);
 			window->setCaption(name);
@@ -1381,6 +1446,20 @@ namespace Skylicht
 				window->onCloseWindow();
 
 			return ret;
+		}
+
+		void CEditor::getWorkspaceSize(const std::wstring& name, float& w, float& h)
+		{
+			w = 680.0f;
+			h = 480.0f;
+
+			if (name == L"GUI Hierarchy" ||
+				name == L"Hierarchy" ||
+				name == L"Property" ||
+				name == L"Particle")
+			{
+				w = 300.0f;
+			}
 		}
 
 		void CEditor::OnCommandWindow(GUI::CBase* item)
@@ -1452,6 +1531,17 @@ namespace Skylicht
 			initWorkspace(window, window->getCaption());
 		}
 
+		void CEditor::showInterpolateCurves()
+		{
+			float w = 680.0f;
+			float h = 480.0f;
+			GUI::CWindow* window = new GUI::CWindow(m_canvas, 0.0f, 0.0f, w, h);
+			window->setCaption(L"Interpolate Curves");
+			window->setCenterPosition();
+			window->setResizable(true);
+			initWorkspace(window, window->getCaption());
+		}
+
 		void CEditor::exportGMap(const char* path, long x1, long y1, long x2, long y2, int zoom, int type, int gridSize)
 		{
 			m_waitingDialog = new GUI::CDialogWindow(m_canvas, 0.0f, 0.0f, 600.0f, 120.0f);
@@ -1481,6 +1571,23 @@ namespace Skylicht
 			CSpaceExportSprite* spaceExport = dynamic_cast<CSpaceExportSprite*>(space);
 			spaceExport->exportSprite(id, path, pngs, width, height, alpha);
 		}
+
+#ifdef BUILD_SKYLICHT_LIGHMAPPER
+		void CEditor::bakeDirectional(Lightmapper::CBakeLightComponent* component)
+		{
+			m_waitingDialog = new GUI::CDialogWindow(m_canvas, 0.0f, 0.0f, 600.0f, 120.0f);
+			m_waitingDialog->setCaption(L"Bake Directional");
+			m_waitingDialog->showCloseButton(true);
+			m_waitingDialog->setCenterPosition();
+			m_waitingDialog->bringToFront();
+
+			initWorkspace(m_waitingDialog, m_waitingDialog->getCaption());
+
+			CSpace* space = getWorkspace(m_waitingDialog);
+			CSpaceBakeDirectional* spaceExport = dynamic_cast<CSpaceBakeDirectional*>(space);
+			spaceExport->bake(component);
+		}
+#endif
 
 		void CEditor::OnCommandGameObject(GUI::CBase* item)
 		{

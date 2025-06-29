@@ -12,7 +12,6 @@ in vec2 vTexCoord0;
 in vec3 vWorldNormal;
 in vec3 vWorldViewDir;
 in vec3 vWorldLightDir;
-in vec4 vViewPosition;
 out vec4 FragColor;
 const float gamma = 2.2;
 const float invGamma = 1.0 / 2.2;
@@ -30,7 +29,7 @@ vec3 shAmbient(vec3 n)
 		uSHConst[1].xyz * n.y +
 		uSHConst[2].xyz * n.z +
 		uSHConst[3].xyz * n.x;
-	return ambientLighting * 0.9;
+	return ambientLighting * 0.75;
 }
 const float PI = 3.1415926;
 void main(void)

@@ -1,9 +1,21 @@
-precision mediump float;
+precision highp float;
+precision highp samplerCube;
 
-uniform samplerCube uShadowMap;
+uniform samplerCube uPointLightShadowMap;
 
+#if defined(NORMAL_MAP)
+uniform sampler2D uTexNormal;
+#endif
+
+in vec2 varTex0;
 in vec3 varWorldPosition;
 in vec3 varWorldNormal;
+
+#if defined(NORMAL_MAP)
+in vec3 vWorldTangent;
+in vec3 vWorldBinormal;
+in float vTangentW;
+#endif
 
 uniform vec4 uLightPosition;
 uniform vec4 uLightAttenuation;
@@ -11,54 +23,30 @@ uniform vec4 uLightColor;
 
 out vec4 FragColor;
 
-#define HARD_SHADOW
-
-#define SHADOW_SAMPLE(x, y, z) {\
-fragToLight = -lightDir + vec3(x, y, z);\
-shadow += step(texture(uShadowMap, fragToLight).r, d);\
-}
+#include "../../Light/GLSL/LibPointLightShadow.glsl"
 
 void main(void)
 {
-	// Lighting
-	vec3 direction = uLightPosition.xyz - varWorldPosition;
-	float distance = length(direction);
-	float attenuation = max(0.0, 1.0 - (distance * uLightAttenuation.y)) * uLightColor.a;
-
-	vec3 lightDir = normalize(direction);
-	float NdotL = max(0.0, dot(lightDir, varWorldNormal));
-	
-	// Shadow
-	float bias = 0.2;
-	float d = distance - bias;
-	
-#if defined(HARD_SHADOW)
-	float sampledDistance = texture(uShadowMap, -lightDir).r;
-	float shadow = step(sampledDistance, d);
+#if defined(NORMAL_MAP)
+	vec3 normalMap = texture(uTexNormal, varTex0).xyz;
+	mat3 rotation = mat3(vWorldTangent, vWorldBinormal, varWorldNormal);
+	vec3 localCoords = normalMap * 2.0 - vec3(1.0, 1.0, 1.0);
+	localCoords.y *= vTangentW;
+	vec3 worldNormal = normalize(rotation * localCoords);
 #else
-	
-	float shadow = 0.0;
-	float samples = 2.0;
-	float offset = 0.01;
-	float delta = offset / (samples * 0.5);
-	vec3 fragToLight;
-		
-	for (float x = -offset; x < offset; x += delta)
-	{
-		for (float y = -offset; y < offset; y += delta)
-		{
-			for (float z = -offset; z < offset; z += delta)
-			{
-				SHADOW_SAMPLE(x, y, z)
-			}
-		}
-	}
-	
-	shadow /= (samples * samples * samples);
+	vec3 worldNormal = varWorldNormal;
 #endif
-	
-	shadow = max(1.0 - shadow, 0.0);
-	
-	vec3 directionalLightColor = NdotL * attenuation * uLightColor.rgb * shadow;
-	FragColor = vec4(directionalLightColor/ 3.0, 1.0);
+
+	vec3 directionalLightColor = pointlightShadow(
+		varWorldPosition, 
+		worldNormal,
+		vec3(0.0, 100.0, 0.0), 
+		uLightColor, 
+		uLightPosition.xyz, 
+		uLightAttenuation, 
+		0.0, 
+		0.1, 
+		vec3(1.0, 1.0, 1.0));
+		
+	FragColor = vec4(directionalLightColor / 3.0, 1.0);
 }

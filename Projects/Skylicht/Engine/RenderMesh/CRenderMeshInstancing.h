@@ -30,6 +30,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Material/CMaterialManager.h"
 #include "RenderMesh/CRenderMeshData.h"
 #include "Transform/CWorldTransformData.h"
+#include "Instancing/CInstancingMaterialData.h"
 
 namespace Skylicht
 {
@@ -77,7 +78,7 @@ namespace Skylicht
 
 		virtual CEntity* spawn();
 
-		CEntity* spawn(const core::matrix4& transform);
+		virtual CEntity* spawn(const core::matrix4& transform);
 
 		const std::string& getMeshResource()
 		{
@@ -89,7 +90,7 @@ namespace Skylicht
 			return m_materialFile;
 		}
 
-		void initFromMeshFile(const char* path);
+		void initFromMeshFile(const char* path, bool loadNormalMap = true, bool loadTexcoord2 = false);
 
 		void initMaterialFromFile(const char* material);
 

@@ -80,6 +80,7 @@ namespace Skylicht
 		std::string m_templateId;
 		std::string m_templateAsset;
 		std::string m_templateObjectId;
+		bool m_templateChanged;
 
 	public:
 		CGameObject(CGameObject* parent, CZone* zone);
@@ -169,6 +170,20 @@ namespace Skylicht
 			m_templateObjectId = id;
 		}
 
+		inline bool isTemplateObject()
+		{
+			return !m_templateId.empty();
+		}
+
+		CGameObject* getParentTemplate();
+
+		virtual void setTemplateChanged(bool b);
+
+		inline bool isTemplateChanged()
+		{
+			return m_templateChanged;
+		}
+
 		inline CGameObject* getParent()
 		{
 			return m_parent;
@@ -241,7 +256,9 @@ namespace Skylicht
 			return m_visible;
 		}
 
-		inline bool isLock()
+		bool isLock();
+
+		inline bool isSelfLock()
 		{
 			return m_lock;
 		}
@@ -279,6 +296,8 @@ namespace Skylicht
 		}
 
 		void setCullingLayer(u32 layer);
+
+		void setCullingLayerOnOff(u32 value, bool on);
 
 		inline u32 getCullingLayer()
 		{

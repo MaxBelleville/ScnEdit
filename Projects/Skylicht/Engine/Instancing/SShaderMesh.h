@@ -32,6 +32,7 @@ namespace Skylicht
 	struct SShaderMesh
 	{
 		CShader* Shader;
+
 		CMesh* Mesh;
 		ITexture* Textures[MATERIAL_MAX_TEXTURES];
 		ITexture* IndirectLM;
@@ -43,6 +44,7 @@ namespace Skylicht
 			Mesh = NULL;
 			IndirectLM = NULL;
 			DirectLM = NULL;
+
 			for (int i = 0; i < MATERIAL_MAX_TEXTURES; i++)
 				Textures[i] = NULL;
 		}

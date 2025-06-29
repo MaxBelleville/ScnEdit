@@ -37,7 +37,7 @@ namespace Skylicht
 		protected:
 			CGroup* m_parentGroup;
 
-			ISystem *m_parentSystem;
+			ISystem* m_parentSystem;
 
 			core::vector3df m_position;
 			core::vector3df m_direction;
@@ -45,17 +45,21 @@ namespace Skylicht
 
 			bool m_followParentTransform;
 			bool m_emitterWorldOrientation;
+			bool m_syncLife;
+			bool m_syncColor;
 
 		public:
-			CSubGroup(CGroup *group);
+			CSubGroup(CGroup* group);
 
 			virtual ~CSubGroup();
 
-			virtual void OnParticleBorn(CParticle &p);
+			void initParticles();
 
-			virtual void OnParticleDead(CParticle &p);
+			virtual void OnParticleBorn(CParticle& p);
 
-			virtual void OnSwapParticleData(CParticle &p1, CParticle &p2);
+			virtual void OnParticleDead(CParticle& p);
+
+			virtual void OnSwapParticleData(CParticle& p1, CParticle& p2);
 
 			virtual void OnGroupDestroy();
 
@@ -84,6 +88,12 @@ namespace Skylicht
 			{
 				return m_parentGroup;
 			}
+
+			DECLARE_GETTYPENAME(CSubGroup)
+
+			virtual CObjectSerializable* createSerializable();
+
+			virtual void loadSerializable(CObjectSerializable* object);
 		};
 	}
 }

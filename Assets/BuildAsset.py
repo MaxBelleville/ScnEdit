@@ -6,13 +6,14 @@ compressExt = ["xml", "ttf", "otf", "txt",
                "mat",
                "hlsl", "glsl",
                "png", "jpg",
-               "smesh", "sanim",
                "mp3", "wav",
-               "font","fnt",
+               "font", "fnt",
                "atlas","json",
                "template",
-               "scene"]
-compressResourceModel = ["dae", "obj", "mtl", "fbx"]
+               "scene",
+               "particle",
+               "texarray"]
+compressResourceModel = ["dae", "obj", "mtl", "fbx", "smesh", "sanim", "wtm"]
 compressTextureDDSExt = ["dds"]
 compressTexturePVRExt = ["pvr"]
 compressTextureETCExt = ["etc2"]

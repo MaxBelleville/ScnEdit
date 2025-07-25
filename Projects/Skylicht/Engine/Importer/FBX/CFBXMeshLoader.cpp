@@ -41,6 +41,8 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "RenderMesh/CRenderMeshData.h"
 #include "Culling/CCullingData.h"
 
+using namespace FBX;
+
 namespace Skylicht
 {
 	struct SVertexID
@@ -148,6 +150,8 @@ namespace Skylicht
 		if (!filesize)
 			return 0;
 
+		std::string filename = CPath::getFileName(std::string(resource));
+
 		c8* buf = new c8[filesize];
 		memset(buf, 0, filesize);
 		file->read((void*)buf, (u32)filesize);
@@ -242,7 +246,7 @@ namespace Skylicht
 
 			std::string meshName = mesh->name.data;
 
-			snprintf(logInfo, 1024, "[CFBXMeshLoader]: %s\ntris: %d\nvertex: %d\nuv: %d\nnormal: %d", meshName.c_str(),
+			snprintf(logInfo, 1024, "[CFBXMeshLoader]: %s, mesh: #%d %s\ntris: %d\nvertex: %d\nuv: %d\nnormal: %d", filename.c_str(), i, meshName.c_str(),
 				(int)mesh->num_triangles,
 				(int)mesh->vertex_position.values.count,
 				(int)mesh->vertex_uv.values.count,

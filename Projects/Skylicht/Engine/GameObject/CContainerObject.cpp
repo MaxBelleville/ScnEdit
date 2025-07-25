@@ -194,16 +194,26 @@ namespace Skylicht
 			ret->startComponent();
 		}
 
-		if (generateNewID)
-		{
-			id->set(saveId);
-
-			if (!m_templateObjectId.empty())
-				ret->setTemplateObjectID(ret->getID().c_str());
-		}
-
 		if (ret != NULL)
+		{
+			if (generateNewID)
+			{
+				id->set(saveId);
+
+				std::string tid = ret->getTemplateObjectID();
+				if (!m_templateObjectId.empty() && tid.empty())
+					ret->setTemplateObjectID(ret->getID().c_str());
+
+				for (CComponentSystem* component : ret->getListComponent())
+				{
+					CEntityHandler* handler = dynamic_cast<CEntityHandler*>(component);
+					if (handler)
+						handler->regenerateEntityId();
+				}
+			}
+
 			updateIndexSearchObject();
+		}
 
 		return ret;
 	}

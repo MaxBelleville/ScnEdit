@@ -99,6 +99,12 @@ namespace Skylicht
 		wchar_t name[1024];
 		CStringImp::convertUTF8ToUnicode(lpName, name);
 		m_name = name;
+
+		if (m_entity)
+		{
+			CWorldTransformData* t = GET_ENTITY_DATA(m_entity, CWorldTransformData);
+			t->Name = getNameA();
+		}
 	}
 
 	const char* CGameObject::getNameA()
@@ -123,7 +129,6 @@ namespace Skylicht
 
 		// create entity
 		m_entity = entityManager->createEntity();
-
 		return m_entity;
 	}
 
@@ -165,6 +170,12 @@ namespace Skylicht
 				parentPrefabId = parent->getTemplateID();
 				if (parentPrefabId == m_templateId)
 					obj = parent;
+				if (!parentPrefabId.empty() && parentPrefabId != m_templateId)
+				{
+					// if parent is in another template
+					obj = parent;
+					break;
+				}
 			} while (parentPrefabId == m_templateId);
 		}
 

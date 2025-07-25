@@ -128,6 +128,10 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/Lightmap/LightmapVertex.xml");
 		loadShader("BuiltIn/Shader/Lightmap/LightmapSH.xml");
 		loadShader("BuiltIn/Shader/Lightmap/LightmapColor.xml");
+		loadShader("BuiltIn/Shader/Lightmap/LightmapSkinSH.xml");
+
+		loadShader("BuiltIn/Shader/Lightmap/LMInstancingStandardSG.xml");
+		loadShader("BuiltIn/Shader/Lightmap/LMInstancingTangentSG.xml");
 
 		loadShader("BuiltIn/Shader/PostProcessing/AdaptLuminance.xml");
 		loadShader("BuiltIn/Shader/PostProcessing/PostEffect.xml");
@@ -185,9 +189,6 @@ namespace Skylicht
 
 	void CShaderManager::initSGDeferredShader()
 	{
-		loadShader("BuiltIn/Shader/Lightmap/LMStandardSGInstancing.xml");
-		loadShader("BuiltIn/Shader/Lightmap/LMTBNSGInstancing.xml");
-
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/Color.xml");
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/DiffuseNormal.xml");
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/Specular.xml");
@@ -196,6 +197,9 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/SpecularGlossinessMask.xml");
 
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/MetallicRoughness.xml");
+
+		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/SkinColor.xml");
+		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/SkinDiffuse.xml");
 
 		loadShader("BuiltIn/Shader/SpecularGlossiness/Deferred/MetersGrid.xml");
 
@@ -228,6 +232,7 @@ namespace Skylicht
 		loadShader("BuiltIn/Shader/Mobile/MobileSGDiffuse.xml");
 		loadShader("BuiltIn/Shader/Mobile/MobileSGNoNormalMap.xml");
 		loadShader("BuiltIn/Shader/Mobile/MobileSGNoNormalMapAO.xml");
+		loadShader("BuiltIn/Shader/Mobile/MobileSGDiffuseCutoff.xml");
 
 		loadShader("BuiltIn/Shader/Mobile/MobileSGShadow.xml");
 		loadShader("BuiltIn/Shader/Mobile/MobileSGShadowAO.xml");

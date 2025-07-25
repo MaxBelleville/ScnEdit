@@ -162,18 +162,17 @@ float3 SG(
 	float3 directionLightColor = sRGB(lightColor);
 	float3 pointLightColor = sRGB(light.rgb);
 	float3 indirectColor = sRGB(indirect.rgb);
-	float c = (1.0 - spec * gloss);
 	float NdotL = max(dot(worldNormal, worldLightDir), 0.0);
 	NdotL = min(NdotL, 1.0);
 	float3 H = normalize(worldLightDir + worldViewDir);
 	float NdotE = max(0.0, dot(worldNormal, H));
 	float specular = pow(NdotE, 10.0 + 100.0 * gloss) * spec;
-	float3 envSpecColor = lerp(indirectColor, float3(1.0, 1.0, 1.0), visibility);
+	float3 envSpecColor = lerp(indirectColor * 0.2, float3(1.0, 1.0, 1.0), visibility);
 	float3 directionalLight = NdotL * directionLightColor * visibility;
-	float3 color = (directionalLight * directMultiplier) * diffuseColor * (0.1 + roughness * 0.3) * c;
+	float3 color = (directionalLight * directMultiplier) * diffuseColor * (0.1 + roughness * 0.3);
 	color += pointLightColor * lightMultiplier * diffuseColor * 0.5;
 	color += specular * specularColor * envSpecColor;
-	color += indirectColor * diffuseColor * indirectMultiplier * (0.1 + c * 0.9) / PI;
+	color += indirectColor * diffuseColor * indirectMultiplier / PI;
 	float brightness = (0.8 + gloss * 1.8);
 	float3 reflection = -normalize(reflect(worldViewDir, worldNormal));
 	color += sRGB(SSR(linearRGB(color), position, reflection, roughness)) * brightness * specularColor;
@@ -181,7 +180,7 @@ float3 SG(
 }
 float4 main(PS_INPUT input) : SV_TARGET
 {
-	float3 albedo = uTexAlbedo.Sample(uTexAlbedoSampler, input.tex0).rgb;
+	float4 albedo = uTexAlbedo.Sample(uTexAlbedoSampler, input.tex0);
 	float4 posdepth = uTexPosition.Sample(uTexPositionSampler, input.tex0);
 	float3 position = posdepth.xyz;
 	float3 normal = uTexNormal.Sample(uTexNormalSampler, input.tex0).xyz;
@@ -204,7 +203,7 @@ float4 main(PS_INPUT input) : SV_TARGET
 	shadowDistance[2] = uShadowDistance.z;
 	float visibility = shadow(shadowCoord, shadowDistance, depth);
 	float3 color = SG(
-		albedo,
+		albedo.rgb,
 		data.r,
 		data.g,
 		posdepth,
@@ -218,5 +217,5 @@ float4 main(PS_INPUT input) : SV_TARGET
 		directMul,
 		indirectMul,
 		lightMul);
-	return float4(color, 1.0);
+	return float4(color, albedo.a);
 }

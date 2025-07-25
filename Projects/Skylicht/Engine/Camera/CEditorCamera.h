@@ -56,6 +56,7 @@ namespace Skylicht
 		core::position2df m_cursorPos;
 
 		bool m_altKeyDown;
+		bool m_ctrlKeyDown;
 		bool m_shiftKeyDown;
 		bool m_leftMousePress;
 		bool m_rightMousePress;
@@ -66,6 +67,8 @@ namespace Skylicht
 		bool m_mouseWhell;
 		float m_wheel;
 
+		float m_pivotRotateDistance;
+		
 		EControlStyle m_controlStyle;
 	public:
 		CEditorCamera();
@@ -142,10 +145,19 @@ namespace Skylicht
 			return m_leftMousePress;
 		}
 
+		void setPivotRotate(const core::vector3df& pos);
+		
+		inline void setPivotRotateDistance(float d)
+		{
+			m_pivotRotateDistance = d;
+		}
+		
 	protected:
 
-		void updateInputRotate(core::vector3df& relativeRotation, f32 timeDiff);
-
+		void fixVector(core::vector3df& v);
+		
+		void updateInputRotate(core::vector3df& relativeRotation, f32 timeDiff, bool useCenterPivot = false);
+		
 		void updateInputOffset(core::vector3df& offsetPosition, f32 timeDiff);
 
 		void updateInputZoom(f32 timeDiff, core::vector3df& pos, const core::vector3df& moveDir);

@@ -149,18 +149,17 @@ vec3 SG(
 	vec3 directionLightColor = sRGB(lightColor);
 	vec3 pointLightColor = sRGB(light.rgb);
 	vec3 indirectColor = sRGB(indirect.rgb);
-	float c = (1.0 - spec * gloss);
 	float NdotL = max(dot(worldNormal, worldLightDir), 0.0);
 	NdotL = min(NdotL, 1.0);
 	vec3 H = normalize(worldLightDir + worldViewDir);
 	float NdotE = max(0.0, dot(worldNormal, H));
 	float specular = pow(NdotE, 10.0 + 100.0 * gloss) * spec;
-	vec3 envSpecColor = mix(indirectColor, vec3(1.0, 1.0, 1.0), visibility);
+	vec3 envSpecColor = mix(indirectColor * 0.2, vec3(1.0, 1.0, 1.0), visibility);
 	vec3 directionalLight = NdotL * directionLightColor * visibility;
-	vec3 color = (directionalLight * directMultiplier) * diffuseColor * (0.1 + roughness * 0.3) * c;
+	vec3 color = (directionalLight * directMultiplier) * diffuseColor * (0.1 + roughness * 0.3);
 	color += pointLightColor * lightMultiplier * diffuseColor * 0.5;
 	color += specular * specularColor * envSpecColor;
-	color += indirectColor * diffuseColor * indirectMultiplier * (0.1 + c * 0.9) / PI;
+	color += indirectColor * diffuseColor * indirectMultiplier / PI;
 	float brightness = (0.8 + gloss * 1.8);
 	vec3 reflection = -normalize(reflect(worldViewDir, worldNormal));
 	color += sRGB(SSR(linearRGB(color), position, reflection, roughness)) * brightness * specularColor;
@@ -168,7 +167,7 @@ vec3 SG(
 }
 void main(void)
 {
-	vec3 albedo = texture(uTexAlbedo, varTexCoord0.xy).rgb;
+	vec4 albedo = texture(uTexAlbedo, varTexCoord0.xy);
 	vec4 posdepth = texture(uTexPosition, varTexCoord0.xy);
 	vec3 position = posdepth.xyz;
 	vec3 normal = texture(uTexNormal, varTexCoord0.xy).xyz;
@@ -191,7 +190,7 @@ void main(void)
 	shadowDistance[2] = uShadowDistance.z;
 	float visibility = shadow(shadowCoord, shadowDistance, depth);
 	vec3 color = SG(
-		albedo,
+		albedo.rgb,
 		data.r,
 		data.g,
 		posdepth,
@@ -205,5 +204,5 @@ void main(void)
 		directMul,
 		indirectMul,
 		lightMul);
-	FragColor = vec4(color, 1.0);
+	FragColor = vec4(color, albedo.a);
 }

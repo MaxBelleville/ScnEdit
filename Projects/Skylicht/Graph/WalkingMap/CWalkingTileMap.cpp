@@ -62,10 +62,12 @@ namespace Skylicht
 			int nX = (int)ceilf(size.X / tileWidth);
 			int nZ = (int)ceilf(size.Z / tileWidth);
 
+			int h = core::max_(nY, 1);
+
 			core::vector3df boxSize(tileWidth, tileHeight, tileWidth);
 
 			m_bbox.MinEdge = bbox.MinEdge;
-			m_bbox.MaxEdge = bbox.MinEdge + core::vector3df(nX * tileWidth, nY * tileHeight, nZ * tileWidth);
+			m_bbox.MaxEdge = bbox.MinEdge + core::vector3df(nX * tileWidth, h * tileHeight, nZ * tileWidth);
 
 			m_bbox.MinEdge.Y = m_bbox.MinEdge.Y - 0.1f;
 			m_bbox.MaxEdge.Y = m_bbox.MaxEdge.Y + 0.1f;
@@ -780,8 +782,8 @@ namespace Skylicht
 					}
 					else if (nodeName == L"link")
 					{
-						int a = xmlReader->getAttributeValueAsInt(L"a");
-						currentTile = m_tiles[a];
+						int id = xmlReader->getAttributeValueAsInt(L"id");
+						currentTile = m_tiles[id];
 					}
 					break;
 				}
@@ -823,8 +825,8 @@ namespace Skylicht
 							if (*begin)
 							{
 								value = -1;
-								swscanf(begin, L"%d", &value);
-								if (value >= 0 && value < numTiles)
+								int ret = swscanf(begin, L"%d", &value);
+								if (ret > 0 && value >= 0 && value < numTiles)
 								{
 									STile* tile = m_tiles[value];
 

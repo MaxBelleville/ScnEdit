@@ -41,12 +41,10 @@ public:
 	inline u16 getCellIndex(u32 solidi, u32 surfi) {
 	   return hlmaps[solidi][surfi].cellidx;
     }
-	inline f32* resetMults(u32 solidindx, u32 surfindx) {
+	inline void resetMults(u32 solidindx, u32 surfindx) {
 		if (hslmaps && loaded) {
-			hlmaps[solidindx][surfindx].uv_mults[0] = omults[solidindx][surfindx][0];
-			hlmaps[solidindx][surfindx].uv_mults[1] = omults[solidindx][surfindx][1];
-			hlmaps[solidindx][surfindx].uv_mults[2] = omults[solidindx][surfindx][2];
-			hlmaps[solidindx][surfindx].uv_mults[3] = omults[solidindx][surfindx][3];
+			for(int i=0;i<4;i++)
+				hlmaps[solidindx][surfindx].uv_mults[i] = omults[solidindx][surfindx][i];
 		}
 	}
 	inline f32* getMults(u32 solidindx, u32 surfindx) {

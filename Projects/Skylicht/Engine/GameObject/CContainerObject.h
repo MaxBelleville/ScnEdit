@@ -50,8 +50,10 @@ namespace Skylicht
 
 		virtual ~CContainerObject();
 
+		CGameObject* createEmptyObject(const char* lpName);
 		CGameObject* createEmptyObject();
 
+		CContainerObject* createContainerObject(const char* lpName);
 		CContainerObject* createContainerObject();
 
 		CGameObject* createObject(CObjectSerializable* data, bool generateNewID);

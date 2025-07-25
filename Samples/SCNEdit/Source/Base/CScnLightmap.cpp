@@ -6,15 +6,19 @@ using namespace std;
 using namespace irr;
 using namespace video;
 
-
+CScnLightmap::CScnLightmap() :
+	current_atlas(NULL),
+	hslmaps(NULL){}
 
 CScnLightmap::~CScnLightmap()
 {
 	omults.clear();
 	atlas.clear();
 
-	if(hslmaps) delete hslmaps;
-	if (current_atlas) delete current_atlas;
+	if(hslmaps) 
+		delete hslmaps;
+	if (current_atlas) 
+		delete current_atlas;
 	curr_atlas_pos = core::vector3di(0, 0, 0);
 	bitmap.clear();
 	atlas_pos.clear();
@@ -28,6 +32,7 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 	offset = file->tellg();
 	read_generic(hslmaps, file, sizeof(scnSwitchableLMapHeader_t) * n_extralmaps);
 	hl_offset = file->tellg();
+
 	for (u32 i = 0; i < n_solid; i++) {
 		scnLMapHeader_t* tmp_hlmap = new (std::nothrow) scnLMapHeader_t[solids[i].n_surfs];
 
@@ -38,6 +43,7 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 				scnLMapLump_t* tmp_lump = new scnLMapLump_t;
 				tmp_lump->size = read_u32(file);
 				tmp_lump->unk = read_s32(file);
+
 				if (tmp_lump->size > 0) {
 					tmp_lump->data = new s8[tmp_lump->size];
 					read_generic(tmp_lump->data, file, sizeof(s8)* tmp_lump->size);
@@ -50,6 +56,7 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 	}
 	for (u32 i = 0; i < hlmaps.size(); i++) {
 		core::array<f32*> tmp_mults;
+
 		for (u32 j = 0; j < solids[i].n_surfs; j++) {
 			scnLMapHeader_t hlmap = hlmaps[i][j];
 			tmp_mults.push_back(hlmap.uv_mults);
@@ -72,13 +79,11 @@ core::vector3di CScnLightmap::getAtlasPos(u32 solidi, u32 surfi) {
 
 s8* CScnLightmap::getBitmap(CScnSolid* solids,u32 solididx, u32 surfidx)
 {
-	scnLMapHeader_t hlmap = hlmaps[solididx][surfidx];
 	scnSurf_t surf = solids[solididx].surfs[surfidx];
+	scnLMapHeader_t hlmap = hlmaps[solididx][surfidx];
+
 	scnLMapLump_t* lump = lumps[hlmap.cellidx];
-	u32 w = surf.lmsize_h;
-	u32 h = surf.lmsize_v;
 	s8* start = lump->data + hlmap.offset;
- 
 
 	return start;
 }
@@ -87,7 +92,7 @@ u16_pair CScnLightmap::getMasterBitmapId(scnLMapHeader_t hlmap)
 {
 	return make_pair(hlmap.cellidx, hlmap.unk);
 }
-
+///Takes the raw lightmap data and converts it into a larger bitmap I can use in the renderer.
 void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 {
 	CScnEnt* ambient = CScn::getGlobalAmbient();
@@ -97,28 +102,27 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 			scnSurf_t surf  = solids[i].surfs[j];
 			if (hlmap.unk == -1)
 				continue; // Surfaces are not lit
+
 			u16 lmapcell = hlmap.cellidx;
 			CScnEnt* cellEnt = CScn::getCell(lmapcell);
 		
-			if (cellEnt&& !ambient) {
+			if (cellEnt&& !ambient) 
 				ambient = CScn::getAmbientByCell(cellEnt->getField("TargetName"));
-			}
-			std::string color = "0.00 0.00 0.00";
-			if (!ambient) {
-				color = ambient->getField("color");
-			}
-			core::array<std::string> split = str_split(color.c_str(), " ");
-			u8 r = round(std::stof(split[0]) * 255);
-			u8 g = round(std::stof(split[1]) * 255);
-			u8 b = round(std::stof(split[2]) * 255);
+
+			std::string colorStr = "0.00 0.00 0.00";
+			if (ambient) 
+				colorStr = ambient->getField("color");
+		
+			core::array<std::string> split = str_split(colorStr.c_str(), " ");
+			int color[3] = { 0,0,0 };
+			for (int c = 0; c < 3; c++)
+				color[c] = round(std::stof(split[c]) * 255);
 		
 			u16_pair id = getMasterBitmapId(hlmap);
 
-			u32 w = surf.lmsize_h;
-			u32 h = surf.lmsize_v;
-			if (bitmap.find(id)==bitmap.end()) {
+			if (bitmap.find(id)==bitmap.end()) 
 				bitmap[id] = vector<s8>(TEXSIZE * TEXSIZE * 3, 0);
-			}
+		
 			atlas_pos[id] = curr_atlas_pos;
 
 			if (atlas_pos[id].X == 0 && atlas_pos[id].Y == 0) {
@@ -127,43 +131,42 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 			}
 
 			s8* lbitmap= getBitmap(solids,i, j);
-			u32 x0 = hlmap.pos % TEXSIZE;
-			u32 y0 = hlmap.pos / TEXSIZE;
 			
-			if ((x0 + w <= TEXSIZE) && (y0 + h <= TEXSIZE)) {
-				for (int y = 0; y < h; ++y) {
-					for (int x = 0; x < w; ++x) {
-							// Compute the linear index for bitmap
-							int bitmapIndex = ((y0 + y) * TEXSIZE + (x0 + x)) * 3;
-							// Compute the linear index for lbitmap
-							int lbitmapIndex = (y * w + x) * 3;
-							bitmap[id][bitmapIndex] = min(lbitmap[lbitmapIndex],255);
-							bitmap[id][bitmapIndex+1] = min(lbitmap[lbitmapIndex+1], 255);
-							bitmap[id][bitmapIndex+2] = min(lbitmap[lbitmapIndex+2], 255);
-							if (lbitmap[lbitmapIndex] >= 0 && lbitmap[lbitmapIndex] + r < 255) {
-								bitmap[id][bitmapIndex] += r;
-							}
-							if (lbitmap[lbitmapIndex+1]  >= 0 && lbitmap[lbitmapIndex+1] + g < 255) {
-								bitmap[id][bitmapIndex+1] += g;
-							}
-							if (lbitmap[lbitmapIndex + 2] >= 0 && lbitmap[lbitmapIndex + 2] + b < 255) {
-								bitmap[id][bitmapIndex+2] += b;
-							}
+			core::vector2di atpos = core::vector2di(hlmap.pos % TEXSIZE, hlmap.pos / TEXSIZE);
+			core::vector2di dim = core::vector2di(surf.lmsize_h, surf.lmsize_v);
+			
+			//Safety check to make sure it's out out of bounds for the texture size
+			if ((atpos.X + dim.X <= TEXSIZE) && (atpos.Y + dim.Y <= TEXSIZE)) {
+
+				for (int y = 0; y < dim.Y; ++y) {
+					for (int x = 0; x < dim.X; ++x) {
+						// Compute the linear index for bitmap(current atlas point)
+						int bitmapIndex = ((atpos.Y + y) * TEXSIZE + (atpos.X + x)) * 3;
+						// Compute the linear index for lightmap bitmap
+						int lbitmapIndex = (y * dim.X + x) * 3;
+
+						//Fill in all color based on light bitmap and add ambient if not beyond 255.
+						for (int c = 0; c < 3; c++) {
+							bitmap[id][bitmapIndex+c] = min(lbitmap[lbitmapIndex+c], 255);
+							if (lbitmap[lbitmapIndex+c] >= 0 && lbitmap[lbitmapIndex+c] + color[c] < 255)
+								bitmap[id][bitmapIndex+c] += color[c];
+						}
 
 					} 
 				}
 			}
+
 			core::dimension2du rawSize(TEXSIZE, TEXSIZE);
 			IImage* rawImage = getVideoDriver()->createImageFromData(ECF_R8G8B8, rawSize, bitmap[id].data(),false);
 			if (rawImage) {
 				rawImage->copyTo(current_atlas, core::vector2di(curr_atlas_pos.X, curr_atlas_pos.Y));
 				rawImage->drop();
 			}
-			if (curr_atlas_pos.X < ATLASSIZE) {
+			if (curr_atlas_pos.X < ATLASSIZE) 
 				curr_atlas_pos.X += TEXSIZE;
-			}
+	
 			if (curr_atlas_pos.X >= ATLASSIZE){
-				curr_atlas_pos.X =0;
+				curr_atlas_pos.X = 0;
 				curr_atlas_pos.Y +=TEXSIZE;
 			}
 			if (curr_atlas_pos.Y >= ATLASSIZE) {
@@ -178,9 +181,3 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 	atlas.push_back(current_atlas);
 }
 
-CScnLightmap::CScnLightmap():
-	current_atlas(NULL),
-	hslmaps(NULL)
-{
-
-}

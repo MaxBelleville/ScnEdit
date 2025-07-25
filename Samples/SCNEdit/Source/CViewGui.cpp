@@ -12,20 +12,23 @@
 CViewGui::CViewGui(CScnArguments* args)
 {
 	m_arguments = args;
-	if (!m_arguments->isExtrasEnabled()) m_missingItems += 1;
-	if (!m_arguments->isPortalEnabled()) m_missingItems += 1;
-	if (!m_arguments->isBBEnabled()) m_missingItems += 1;
+	CScn* scn = SCNEdit::getSCN();
+	
 	bool lightmaps = false;
-	if (SCNEdit::getSCN()) lightmaps = SCNEdit::getSCN()->getLightmap()->hasLightmaps();
-	if (!m_arguments->isEntityEnabled()) m_missingItems += 1;
-	if (!m_arguments->isLightmapEnable()|| !lightmaps) m_missingItems += 3;
-	if (!m_arguments->isInternalDebug()) m_missingItems += 3;
+	if (scn) 
+		lightmaps = scn->getLightmap()->hasLightmaps();
+	if (!lightmaps) 
+		m_missingItems += 3;
+	if (!m_arguments->isInternalDebug()) 
+		m_missingItems += 3;
 }
 
 CViewGui::~CViewGui()
 {
 	m_missingItems = 0;
-	delete m_canvas;
+	//delete m_canvas;
+	m_tooltip = "";
+
 }
 
 void CViewGui::onInit()
@@ -54,7 +57,8 @@ void CViewGui::onInit()
 	addTooltip(m_closeButton, "Close current .scn map.", "No map found so does nothing.");
 	
 	m_exportButton = addButton("Canvas/Export_Btn");
-	addTooltip(m_exportButton, "Export obj,map mtl, 3ds files\nfor use in other programs.", "Nothing to export,\nplease open a .scn map.");
+	addTooltip(m_exportButton, "Export obj,map mtl, 3ds files\nfor use in other programs.", 
+		"Nothing to export,\nplease open a .scn map.");
 	
 	m_saveButton = addButton("Canvas/Save_Btn");
 	addTooltip(m_saveButton, "Save over current .scn file.", "Nothing to save,\nplease open a .scn map");
@@ -79,21 +83,22 @@ void CViewGui::onInit()
 	float diff = m_arguments->getDesktopRes().Height - m_arguments->getRes().Height;
 	float diffW = m_arguments->getDesktopRes().Width - m_arguments->getRes().Width;
 	el->setWidth(m_arguments->getCurrentRes().Width);
+
 	////TODO: REDO THIS
-	//if (m_arguments->isFullscreen() || diff >= taskbarHeight * 2 + 10 ||
-	//	(m_arguments->getDesktopRes().Width-25 > m_arguments->getRes().Width && diff <= taskbarHeight-8)) {
-	//	el->setHeight(150);
-	//}
-	//if (!m_arguments->isFullscreen() && 
-	//	m_arguments->getDesktopRes().Width-25 > m_arguments->getRes().Width && diff <= taskbarHeight/2) {
-	//	el2->setHeight(140);
-	//	el->setHeight(280);
-	//}
-	//else if (!m_arguments->isFullscreen()&&
-	//	m_arguments->getDesktopRes().Width-25 > m_arguments->getRes().Width &&diff <= taskbarHeight + 10) {
-	//	el2->setHeight(100);
-	//	el->setHeight(250);
-	//}
+	if (m_arguments->isFullscreen() || diff >= taskbarHeight * 2 + 10 ||
+		(m_arguments->getDesktopRes().Width-25 > m_arguments->getRes().Width && diff <= taskbarHeight-8)) {
+		el->setHeight(150);
+	}
+	if (!m_arguments->isFullscreen() && 
+		m_arguments->getDesktopRes().Width-25 > m_arguments->getRes().Width && diff <= taskbarHeight/2) {
+		el2->setHeight(140);
+		el->setHeight(280);
+	}
+	else if (!m_arguments->isFullscreen()&&
+		m_arguments->getDesktopRes().Width-25 > m_arguments->getRes().Width &&diff <= taskbarHeight + 10) {
+		el2->setHeight(100);
+		el->setHeight(250);
+	}
 	setupEvents();
 }
 UI::CUITextBox* CViewGui::addTextbox(const char* textPath) {
@@ -103,6 +108,7 @@ UI::CUITextBox* CViewGui::addTextbox(const char* textPath) {
 		CGUIElement* bg = textbox->getElement();
 		textbox->setText("");
 		textbox->setEnable(false);
+		textbox->setContinueGameEvent(true);
 		return textbox;
 	}
 }
@@ -119,6 +125,7 @@ UI::CUIButton* CViewGui::addButton(const char* btnPath) {
 			button->addMotion(UI::EMotionEvent::PointerUp, bg, new UI::CColorMotion(SColor(255, 175, 175, 225)))->setTime(0.0f, 50.0f);
 			button->addMotion(UI::EMotionEvent::PointerOut, bg, new UI::CColorMotion())->setTime(0.0f, 50.0f);
 			button->setSkipPointerEventWhenDrag(true);
+			button->setContinueGameEvent(true);
 			return button;
 		}
 	}
@@ -129,17 +136,20 @@ void CViewGui::addTooltip(UI::CUIButton* btn, std::string text, std::string altT
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	btn->OnPointerHover = [interaction,altText,text](float x, float y) {
 		
-		if (interaction->setFoundState(GUIState::Hover, GUIState::Default)) {
+		if (interaction->guiStateLayer().swap(GUIState::Hover, GUIState::Default)) {
 			interaction->setMouse(core::vector2df(x, y));
 			if (!altText.empty()) {
-				if (SCNEdit::getSCN()) m_tooltip = text;
-				else m_tooltip = altText;
+				if (SCNEdit::getSCN()) 
+					m_tooltip = text;
+				else 
+					m_tooltip = altText;
 			}
-			else m_tooltip = text;
+			else 
+				m_tooltip = text;
 		}
 	};
 	btn->OnPointerOut = [interaction](float x, float y) {
-		interaction->setFoundState(GUIState::Default, GUIState::Hover);
+		interaction->guiStateLayer().swap(GUIState::Default, GUIState::Hover);
 	};
 }
 
@@ -152,31 +162,30 @@ void CViewGui::setupEvents() {
 	//UI Button events
 	m_quitButton->OnPressed = [interaction](UI::CUIBase* base)
 	{
-		interaction->setState(GUIState::Quit);
+		interaction->guiStateLayer().set(GUIState::Quit);
 	};
 
 	m_openButton->OnPressed = [camera, interaction](UI::CUIBase* base)
 	{
-		if (!interaction->setFoundState(GUIState::OpenScn, GUIState::Default, GUIState::Hover))
+		if (!interaction->guiStateLayer().swap(GUIState::OpenScn, GUIState::Default, GUIState::Hover))
 		{
 			camera->setEnable(true);
+			camera->updateComponent();
 			ImGui::CloseCurrentPopup();
-			interaction->setState(GUIState::Default);
+			interaction->guiStateLayer().set(GUIState::Default);
+			interaction->infoModeLayer().set(GUIInfoMode::Basic);
 		}
 	};
 
 	m_closeButton->OnPressed = [interaction](UI::CUIBase* base)
 	{
-		if (SCNEdit::getSCN()) interaction->setState(GUIState::CloseFile);
+		if (SCNEdit::getSCN()) interaction->guiStateLayer().set(GUIState::CloseFile);
 	};
 
-	bool bExtra = m_arguments->isExtrasEnabled();
-	m_exportButton->OnPressed = [bExtra, interaction](UI::CUIBase* base)
+	m_exportButton->OnPressed = [interaction](UI::CUIBase* base)
 	{
-		if (SCNEdit::getSCN()) {
-			SCNEdit::exportSCN(bExtra);
-
-		}
+		if (SCNEdit::getSCN()) 
+			SCNEdit::exportSCN();
 	};
 
 	m_saveButton->OnPressed = [interaction](UI::CUIBase* base)
@@ -184,72 +193,96 @@ void CViewGui::setupEvents() {
 		//Save data will initalize a warning msgbox before save.
 		if (SCNEdit::getSCN()) {
 			
-			if (interaction->setFoundState(GUIState::Save, GUIState::Default, GUIState::Hover)) {
+			if (interaction->guiStateLayer().swap(GUIState::Save, GUIState::Default, GUIState::Hover)) {
 				static const char* buttons[] = { "Save", "Cancel", NULL };
 				m_msgbox = ImGuiAl::MsgBox();
 				m_msgbox.Init("Save with Scraped Lightmaps", NULL,
 					"Notice Lightmaps are Scraped. Will save without lightmaps.", buttons, false);
 			}
-			else interaction->setState(GUIState::Default);
+			else {
+				interaction->guiStateLayer().set(GUIState::Default);
+				interaction->infoModeLayer().set(GUIInfoMode::Basic);
+			}
 		}
 	};
 
 	//Section 1 and 2 text edit events
 	m_textSection1->OnTextSet = [interaction](UI::CUIBase* base) {
-		if (interaction->findState(GUIState::EditFlags,GUIState::EditAlpha, GUIState::EditShading)) {
+		if (interaction->guiStateLayer().find(GUIState::EditFlags,GUIState::EditAlpha, GUIState::EditShading)) {
 			//Uses the ": " in the input to proccess the number and update surf
 			std::string msg = str_split(m_textSection1->getText(), ": ")[1];
 			u8 num = std::atoi(msg.c_str());
 			//This section is repeated maybe I can improve it so it's shared between textsections?
 			CScn* scn = SCNEdit::getSCN();
-			std::pair<int, int> surfdata = interaction->getSurfISelected();
-			CScnSolid* solid = scn->getSolid(surfdata.first);
-			scnSurf_t* surfi =&solid->surfs[surfdata.second];
+			solidSelect_t surfdata = interaction->getSurfISelected();
+			CScnSolid* solid = scn->getSolid(surfdata.solididx);
+			scnSurf_t* surfi =&solid->surfs[surfdata.surfsel];
 
-;			if (interaction->getState() == GUIState::EditAlpha) 
+;			if (interaction->guiStateLayer().get() == GUIState::EditAlpha) 
 				surfi->alpha = num;
-			else if (interaction->getState() == GUIState::EditShading)
+			else if (interaction->guiStateLayer().get() == GUIState::EditShading)
 				surfi->hasVertexColors = num;
 			else 
 				surfi->flag1 = num;
 		}
-		else if(interaction->findState(GUIState::EditAll)) {
+		else if(interaction->guiStateLayer().find(GUIState::EditAll)) {
 			core::array<std::string> msg = str_split(m_textSection1->getText(), ",");
 			//This will need some proccessing so probably do in another function.
 			
 		}
-		if (m_textSection1->isCompleted() && (m_textSection2->isCompleted() || !m_textSection2->isEnable())) 
+		isSection1Set = true;
+		if (interaction->guiStateLayer().find(GUIState::EditFlags, GUIState::EditAll) && isSection1Set && isSection2Set) {
 			resetEditText();
+			interaction->setCursorMode(false);
+		}
+		
+		if (interaction->guiStateLayer().find(GUIState::EditAlpha, GUIState::EditShading) && isSection1Set) {
+			resetEditText();
+			interaction->setCursorMode(false);
+		}
 		
 	};
 
 	m_textSection2->OnTextSet = [interaction](UI::CUIBase* base) {
-		if (interaction->findState(GUIState::EditFlags)) {
+		if (interaction->guiStateLayer().find(GUIState::EditFlags)) {
 			std::string msg = str_split(m_textSection2->getText(), ": ")[1];
 			u8 flag2 = std::atoi(msg.c_str());
 			CScn* scn = SCNEdit::getSCN();
-			std::pair<int, int> surfdata = interaction->getSurfISelected();
-			CScnSolid* solid = scn->getSolid(surfdata.first);
-			scnSurf_t* surfi = &solid->surfs[surfdata.second];
+			solidSelect_t surfdata = interaction->getSurfISelected();
+			CScnSolid* solid = scn->getSolid(surfdata.solididx);
+			scnSurf_t* surfi = &solid->surfs[surfdata.surfsel];
 
 			surfi->flag2 = flag2;
 		}
-		else if (interaction->findState(GUIState::EditAll)) {
+		else if (interaction->guiStateLayer().find(GUIState::EditAll)) {
 			core::array<std::string> msg = str_split(m_textSection1->getText(), ",");
 			//This will need some proccessing so probably do in another function.
 			
 		}
-		if (m_textSection1->isCompleted() && m_textSection2->isCompleted()) 
+		isSection2Set = true;
+		if (isSection1Set && isSection2Set) {
 			resetEditText();
+			interaction->setCursorMode(false);
+		}
 	};
+	interaction->OnCursorModeEvent([interaction](bool state, bool isRightClick) {
+		if (!state && isRightClick) {
+			interaction->guiStateLayer().swap(GUIState::Default,
+				GUIState::EditAll, GUIState::EditFlags, GUIState::EditShading, GUIState::EditAlpha);
+			interaction->infoModeLayer().set(GUIInfoMode::Basic);
+			os::Printer::log("Resetting edit on cursor change");
+			resetEditText();
+		}
+	});
 
 	//Custom interaction manager events/callbacks
 	interaction->OnKeyEvent([interaction, camera](key_pair pair) {
+
 		//Update positition of entity.
 		if ((interaction->getKeyState(make_pair(pair.first, pair.second)) &&
 			pair.first >= KEY_LEFT && pair.first <= KEY_DOWN) ||
 			interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::None))) {
-			if (interaction->getSelectedType() == SelectedType::Entity) 
+			if (interaction->selTypeLayer().get() == SelectedType::Entity) 
 				updateSections();
 		}
 		//Update UV mode and scale
@@ -270,57 +303,92 @@ void CViewGui::setupEvents() {
 				updateUVInfo();
 			}
 		}
-		
-		if (!interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) // The next statments require solid.
-			return;
-		//Open texture popup if t is pressed.
-		if (interaction->findKeyState({ make_pair(KEY_KEY_T, KeyAugment::None), make_pair(KEY_KEY_T, KeyAugment::Shift) })) {
-			if (interaction->setFoundState(GUIState::OpenTexture, GUIState::Hover, GUIState::Default)) {
-				getApplication()->getDevice()->getCursorControl()->setVisible(true);
+		// help menu oem_2 = ?
+		if (interaction->getKeyState(make_pair(KEY_OEM_2, KeyAugment::None))) {
+			if (interaction->guiStateLayer().swap(GUIState::Help, GUIState::Hover, GUIState::Default)){ 
+				interaction->setCursorMode(true);
+				interaction->resetKeyState();
 			}
 			else {
-				camera->setEnable(true);
 				ImGui::CloseCurrentPopup();
 				getApplication()->getDevice()->getCursorControl()->setVisible(false);
-				interaction->setState(GUIState::Default);
+				interaction->guiStateLayer().set(GUIState::Default);
+				interaction->infoModeLayer().set(GUIInfoMode::Basic);
 			}
 		}
+
+		if (!interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra)) // The next statments require solid.
+			return;
+
+		//Open texture popup if t is pressed.
+		if (interaction->findKeyState({ make_pair(KEY_KEY_T, KeyAugment::None), make_pair(KEY_KEY_T, KeyAugment::Shift) })) {
+			if (interaction->guiStateLayer().swap(GUIState::OpenTexture, GUIState::Hover, GUIState::Default)) {
+				getApplication()->getDevice()->getCursorControl()->setVisible(true);
+				interaction->resetKeyState();
+			}
+			else {
+				ImGui::CloseCurrentPopup();
+				getApplication()->getDevice()->getCursorControl()->setVisible(false);
+				interaction->guiStateLayer().set(GUIState::Default);
+				interaction->infoModeLayer().set(GUIInfoMode::Basic);
+			}
+		}
+		core::array<std::pair<irr::EKEY_CODE, int>> numerickeys;
+		CInteractionManager::getNumeric(numerickeys);
+
+
 		//Proccess Alpha,Shading,Flag editing. TODO: EditAll
 		if (interaction->getKeyState(make_pair(KEY_KEY_F, KeyAugment::Ctrl))) {
-			if (interaction->setFoundState(GUIState::Default, GUIState::EditAlpha, GUIState::EditShading, GUIState::EditAll)) 
+			if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditAlpha, GUIState::EditShading, GUIState::EditAll)) 
 				resetEditText();
-			if (interaction->setFoundState(GUIState::EditFlags, GUIState::Default)) {
-				CInteractionManager::activateText(m_textSection1, CInteractionManager::getNumeric(), "Set Flag 1 (0 - 999): ", 3);
-				CInteractionManager::activateText(m_textSection2, CInteractionManager::getNumeric(), "Set Flag 2 (0 - 999): ", 3);
+			os::Printer::log("Hello there");
+			if (interaction->guiStateLayer().swap(GUIState::EditFlags, GUIState::Default)) {
+				interaction->infoModeLayer().set(GUIInfoMode::Edit);
+				interaction->setCursorMode(true);
+				interaction->resetKeyState();
+				CInteractionManager::activateText(m_textSection1, numerickeys, "Set Flag 1 (0 - 999): ", 3);
+				CInteractionManager::activateText(m_textSection2, numerickeys, "Set Flag 2 (0 - 999): ", 3);
 			}
-			else if (interaction->findState(GUIState::EditFlags)) 
+			else if (interaction->guiStateLayer().find(GUIState::EditFlags)) {
+				interaction->setCursorMode(false);
 				resetEditText();
+			}
 		}
 		if (interaction->getKeyState(make_pair(KEY_KEY_T, KeyAugment::Ctrl))) {
-			if (interaction->setFoundState(GUIState::Default, GUIState::EditFlags, GUIState::EditShading, GUIState::EditAll)) 
+			if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags, GUIState::EditShading, GUIState::EditAll))
 				resetEditText();
-			if (interaction->setFoundState(GUIState::EditAlpha, GUIState::Default)) 
-				CInteractionManager::activateText(m_textSection1, CInteractionManager::getNumeric(), "Set Alpha (0 - 255): ", 3);
-			else if (interaction->findState(GUIState::EditAlpha)) 
+			
+			
+			if (interaction->guiStateLayer().swap(GUIState::EditAlpha, GUIState::Default)) {
+				interaction->infoModeLayer().set(GUIInfoMode::Edit);
+				interaction->setCursorMode(true);
+				interaction->resetKeyState();
+				CInteractionManager::activateText(m_textSection1, numerickeys, "Set Alpha (0 - 255): ", 3);
+			}
+			else if (interaction->guiStateLayer().find(GUIState::EditAlpha)) {
+				interaction->setCursorMode(false);
 				resetEditText();
+			}
 		}
-		if (interaction->getKeyState(make_pair(KEY_KEY_L, KeyAugment::Ctrl))) {
-			if (interaction->setFoundState(GUIState::Default, GUIState::EditFlags, GUIState::EditAlpha, GUIState::EditAll)) 
+		/*if (interaction->getKeyState(make_pair(KEY_KEY_L, KeyAugment::Ctrl))) {
+			if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags, GUIState::EditAlpha, GUIState::EditAll)) 
 				resetEditText();
-			if (interaction->setFoundState(GUIState::EditShading, GUIState::Default)) 
+
+			if (interaction->guiStateLayer().swap(GUIState::EditShading, GUIState::Default)) 
 				CInteractionManager::activateText(m_textSection1, CInteractionManager::getNumeric(), "Set Shading (0 - 999): ", 3);
-			else if (interaction->findState(GUIState::EditShading))
+			else if (interaction->guiStateLayer().find(GUIState::EditShading))
 				resetEditText();
-		}
+		}*/
 
 	});
 
+
 	interaction->OnCollisionEvent([interaction](core::triangle3df tri, core::vector3df intersection) {
 		//Update section if you select a solid/entity/portal
-		if (interaction->getSelectedType() != SelectedType::Empty) 
+		if (interaction->selTypeLayer().get() != SelectedType::Empty) 
 			updateSections();
 		else 
-			resetSections();
+			m_textSection3a->setText("");
 	});
 
 	interaction->OnVertexUpdateEvent([interaction]() {
@@ -329,23 +397,22 @@ void CViewGui::setupEvents() {
 	});
 
 }
-void CViewGui::resetEditText() {
+void CViewGui::resetEditText() {	
+	isSection1Set = false; 
+	isSection2Set = false;
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	interaction->setState(GUIState::Default);
+	interaction->guiStateLayer().set(GUIState::Default);
+	interaction->infoModeLayer().set(GUIInfoMode::Basic);
 	CInteractionManager::resetText(m_textSection1,512);
 	CInteractionManager::resetText(m_textSection2, 512);
 	updateSections();
 }
 
-void CViewGui::onDestroy()
-{
-
+void CViewGui::onDestroy(){
+	CInteractionManager::releaseInstance();
 }
 
-void CViewGui::onData()
-{
-
-}
+void CViewGui::onData(){}
 
 void CViewGui::onUpdate()
 {
@@ -362,10 +429,7 @@ void CViewGui::onRender()
 }
 
 
-void CViewGui::onPostRender()
-{
-
-}
+void CViewGui::onPostRender(){}
 
 void CViewGui::onGUI()
 {
@@ -384,7 +448,6 @@ void CViewGui::onGUI()
 	}
 
 	// BEGIN WINDOW
-
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	guiSettings_t* gui = interaction->getGuiSettings();
 	
@@ -398,28 +461,26 @@ void CViewGui::onGUI()
 	bool lightmaps = false;
 
 	if(SCNEdit::getSCN()) lightmaps = SCNEdit::getSCN()->getLightmap()->hasLightmaps();
-	if (m_arguments->isExtrasEnabled()) CInteractionManager::ToggleButton("Doors/Others", &gui->vis_doors);
-	if (m_arguments->isPortalEnabled()) CInteractionManager::ToggleButton("Portals", &gui->vis_portals);
-	if (m_arguments->isBBEnabled())  CInteractionManager::ToggleButton("Bounding Boxes", &gui->vis_bb);
-	if (m_arguments->isEntityEnabled()) CInteractionManager::ToggleButton("Entites", &gui->vis_entities);
-	if (m_arguments->isLightmapEnable()&& lightmaps) CInteractionManager::ToggleButton("Lightmap", &gui->vis_lightmaps);
-	if (m_arguments->isLightmapEnable()&& lightmaps) ImGui::SeparatorText("Save Settings");
-	if (m_arguments->isLightmapEnable() && lightmaps) {
-		if (CInteractionManager::ToggleButton("Scrape Lightmap", &gui->scrape_lightmaps)) {
-		//if (gui->scrape_lightmaps) { //Msgbox.}
-		}
-	}
-	if (m_arguments->isInternalDebug()) ImGui::SeparatorText("Debug");
+	CInteractionManager::ToggleButton("Doors/Others", &gui->vis_doors);
+	CInteractionManager::ToggleButton("Portals", &gui->vis_portals);
+	CInteractionManager::ToggleButton("Bounding Boxes", &gui->vis_bb);
+	CInteractionManager::ToggleButton("Entites", &gui->vis_entities);
+	if(lightmaps) CInteractionManager::ToggleButton("Lightmap", &gui->vis_lightmaps);
+	if(lightmaps) ImGui::SeparatorText("Save Settings");
+	if(lightmaps) CInteractionManager::ToggleButton("Scrape Lightmap", &gui->scrape_lightmaps);
+	if (m_arguments->isInternalDebug()) 
+		ImGui::SeparatorText("Debug");
+
 	if (m_arguments->isInternalDebug()) {
-		if (interaction->findState(GUIState::Debug)) {
+		if (interaction->guiStateLayer().find(GUIState::Debug)) {
 			if (ImGui::Button("Close Debug", ImVec2(130, 20))) {
-				interaction->setState(GUIState::Default);
+				interaction->guiStateLayer().set(GUIState::Default);
 				camera->setEnable(true);
 			}
 		}
 		else {
 			if (ImGui::Button("Open Debug", ImVec2(130, 20))) {
-				interaction->setFoundState(GUIState::Debug, GUIState::Hover, GUIState::Default);
+				interaction->guiStateLayer().swap(GUIState::Debug, GUIState::Hover, GUIState::Default);
 				interaction->getLog()->scrollToBottom();
 				camera->setEnable(false);
 			}
@@ -444,13 +505,14 @@ void CViewGui::onGUI()
 	}
 	ImGui::End();
 	
-	if	    (interaction->findState(GUIState::Hover))		drawTooltip();
-	else if (interaction->findState(GUIState::Debug))		interaction->getLog()->draw();
-	else if (interaction->findState(GUIState::Save))		saveFile();
-	else if (interaction->findState(GUIState::CloseFile))	closeFile();
-	else if (interaction->findState(GUIState::OpenScn))		openFile();
-	else if (interaction->findState(GUIState::OpenTexture)) openTextures();
-	else if (interaction->findState(GUIState::Quit))		quit();
+	if (interaction->guiStateLayer().find(GUIState::Hover))		    drawTooltip();
+	else if (interaction->guiStateLayer().find(GUIState::Debug))		interaction->getLog()->draw();
+	else if (interaction->guiStateLayer().find(GUIState::Save))		saveFile();
+	else if (interaction->guiStateLayer().find(GUIState::Help))		helpDialog();
+	else if (interaction->guiStateLayer().find(GUIState::CloseFile))	closeFile();
+	else if (interaction->guiStateLayer().find(GUIState::OpenScn))		openFile();
+	else if (interaction->guiStateLayer().find(GUIState::OpenTexture)) openTextures();
+	else if (interaction->guiStateLayer().find(GUIState::Quit))		quit();
 
 	//Bottom bar gui
 	if (SCNEdit::getSCN()) {
@@ -460,9 +522,8 @@ void CViewGui::onGUI()
 			scnRawCell_t cell = SCNEdit::getSCN()->getSolid(0)->rawcells[cellindx];
 			m_textSection3c->setText(format("Pos: X {:.1f} Y {:.1f} Z {:.1f} | Cell: {}", pos.X, pos.Y, pos.Z, cell.name).c_str());
 		}
-		else {
+		else 
 			m_textSection3c->setText(format("Pos: X {:.1f} Y {:.1f} Z {:.1f}", pos.X, pos.Y, pos.Z).c_str());
-		}
 	}
 }
 void CViewGui::drawTooltip() {
@@ -472,10 +533,7 @@ void CViewGui::drawTooltip() {
 	ImGui::SetNextWindowSize(ImVec2(230, 40), ImGuiCond_Always);
 	bool tmp = false;
 	if (ImGui::Begin("Tooltip", &tmp, ImGuiWindowFlags_NoDecoration))
-	{
 		ImGui::Text(m_tooltip.c_str());
-		//m_guiState = GUIState::Default;
-	}
 	ImGui::End();
 }
 
@@ -485,16 +543,78 @@ void CViewGui::saveFile() {
 	if (gui->scrape_lightmaps) {
 		int selected = m_msgbox.Draw();
 		m_msgbox.Open();
+		interaction->infoModeLayer().set(GUIInfoMode::Dialog);
 		if (selected == 1) 
-			SCNEdit::saveSCN(m_arguments->getSCNPath(), m_arguments->isExtrasEnabled());
-		if (selected > 0) 
-			interaction->setState(GUIState::Default);
+			SCNEdit::saveSCN();
+		if (selected > 0) {
+			interaction->guiStateLayer().set(GUIState::Default);
+			interaction->infoModeLayer().set(GUIInfoMode::Basic);
+		}
 	}
 	else {
-		SCNEdit::saveSCN(m_arguments->getSCNPath(), m_arguments->isExtrasEnabled());
-		interaction->setState(GUIState::Default);
+		SCNEdit::saveSCN();
+		interaction->guiStateLayer().set(GUIState::Default);
+		interaction->infoModeLayer().set(GUIInfoMode::Basic);
 	}
 }
+void CViewGui::helpDialog() {
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	CContext* context = CContext::getInstance();
+	CCamera* camera = context->getActiveCamera();
+	static const char* buttons[] = { "Ok", NULL };
+	m_msgbox = ImGuiAl::MsgBox();
+	m_msgbox.Init("Controls and help", NULL,
+		"H (ANY SELECTED): Hides element from editor\n"
+		"SHIFT+H (SOLID SELECTED): Hides shared and selected surfaces\n"
+		"CTRL+H: Unhides hidden elements\n\n"
+
+		"X (SOLID SELECTED & -flip): Flips selected texture horizontally\n"
+		"V (SOLID SELECTED & -flip): Flips selected texture vertically\n\n"
+
+		"T (SOLID SELECTED): Change texture using file dialog.\n\n"
+
+		"Ctrl+T (SOLID SELECTED): Change alpha of selected surface\n"
+		"CTRL+F (SOLID SELECTED): Change flags of selected surface\n"
+		"CTRL+L (SOLID SELECTED): Change shading of selected surface\n\n"
+
+		"F: Change face uv mode\n"
+		"Q: Decrease UV Scalar\n"
+		"E: Increase UV Scalar\n\n"
+
+		"R (SOLID SELECTED): Reset uv\n"
+		"UP (SOLID SELECTED): Change UV v+\n"
+		"DOWN (SOLID SELECTED): Change UV v -\n"
+		"LEFT (SOLID SELECTED): Change UV u+\n"
+		"RIGHT (SOLID SELECTED): Change UV v-\n\n"
+
+		"CTRL or SHIFT (SOLID SELECTED): Select vertex to move\n\n"
+
+		"CTRL+R (SOLID or ENTITY SELECTED): Reset position\n"
+		"SHIFT+UP (SOLID or ENTITY SELECTED): Move X+\n"
+		"SHIFT+DOWN (SOLID or ENTITY SELECTED): Move X-\n"
+		"SHIFT+LEFT (SOLID or ENTITY SELECTED): Move Z+\n"
+		"SHIFT+RIGHT (SOLID or ENTITY SELECTED): Move Z-\n"
+		"CTRL+UP (SOLID or ENTITY SELECTED): Move Y+\n"
+		"CTRL+DOWN (SOLID/ENTITY SELECTED): Move Y-\n", buttons, false);
+
+	float size = getApplication()->getDriver()->getScreenSize().Width;
+	float sizeH = getApplication()->getDriver()->getScreenSize().Height;
+	ImGui::SetNextWindowPos(ImVec2(size/2-260, sizeH/2-260), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(475, 480), ImGuiCond_Always);
+	int selected = m_msgbox.Draw();
+	
+
+	if (selected > 0) {
+		ImGui::CloseCurrentPopup();
+		interaction->guiStateLayer().set(GUIState::Default);
+		interaction->infoModeLayer().set(GUIInfoMode::Basic);
+		interaction->setCursorMode(false);	
+	}
+	else if(interaction->infoModeLayer().swap(GUIInfoMode::Dialog,GUIInfoMode::Basic)) 
+		m_msgbox.Open();
+
+}
+
 
 void CViewGui::closeFile() {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
@@ -507,7 +627,8 @@ void CViewGui::closeFile() {
 		obj->remove();
 		skybox->setVisible(false);
 	}
-	interaction->setState(GUIState::Default);
+	interaction->guiStateLayer().set(GUIState::Default);
+	interaction->infoModeLayer().set(GUIInfoMode::Basic);
 }
 
 void CViewGui::openFile() {
@@ -516,12 +637,11 @@ void CViewGui::openFile() {
 	IGFD::FileDialogConfig config;
 	config.path = ".";
 	CContext* context = CContext::getInstance();
-	CCamera* camera = context->getActiveCamera();
-	camera->setEnable(false);
 	float w = getApplication()->getDriver()->getScreenSize().Width;
 	float h = getApplication()->getDriver()->getScreenSize().Height;
 	ImGui::SetNextWindowPos(ImVec2(15, 60), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(w / 1.5, h / 1.5), ImGuiCond_FirstUseEver);
+	interaction->infoModeLayer().set(GUIInfoMode::Dialog);
 	ImGuiFileDialog::Instance()->OpenDialog("ChooseScnDlg", "Choose Scn File", "Scn file{.scn}", config);
 	if (ImGuiFileDialog::Instance()->Display("ChooseScnDlg")) {
 		if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
@@ -529,14 +649,15 @@ void CViewGui::openFile() {
 			m_arguments->setSCNPath(filePathName.c_str());
 			m_arguments->setScnLoaded(false);
 		}
-		camera->setEnable(true);
-		// close
+
 		ImGuiFileDialog::Instance()->Close();
-		interaction->setState(GUIState::Default);
+		interaction->guiStateLayer().set(GUIState::Default);
+		interaction->infoModeLayer().set(GUIInfoMode::Basic);
 		if (!m_arguments->getScnLoaded()) {
-			interaction->getLog()->clear();
+			//interaction->getLog()->clear();
 			CViewManager::getInstance()->getLayer(1)->destroyAllView();
 			CViewManager::getInstance()->getLayer(0)->changeView<CViewInit>(m_arguments);
+			
 		}
 	}
 }
@@ -548,7 +669,6 @@ void CViewGui::openTextures() {
 	config.path = "./textures";
 	CContext* context = CContext::getInstance();
 	CCamera* camera = context->getActiveCamera();
-	camera->setEnable(false);
 
 	//Set window pos
 	float w = getApplication()->getDriver()->getScreenSize().Width;
@@ -556,21 +676,22 @@ void CViewGui::openTextures() {
 	ImGui::SetNextWindowPos(ImVec2(15, 60), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(w / 1.5, h / 1.5), ImGuiCond_FirstUseEver);
 
+	CGameObject* selected = interaction->getSelectObj();
+	interaction->infoModeLayer().set(GUIInfoMode::Dialog);
 	//Open dialog when finished proccess texture and update text.
 	ImGuiFileDialog::Instance()->OpenDialog("ChooseTexturesDlg", "Choose Texture File", "Image files{.png,.tga,.bmp}, *", config);
 	if (ImGuiFileDialog::Instance()->Display("ChooseTexturesDlg")) {
 		if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
 			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-			if (interaction->getSelectObj()) {
-				interaction->getSelectObj()->getComponent<CScnMeshComponent>()->setTexture(SCNEdit::getSCN(), filePathName.c_str());
-			}
+			if (selected)
+				selected->getComponent<CScnMeshComponent>()->setTexture(SCNEdit::getSCN(), filePathName.c_str());
 			updateSections();
 		}
-		camera->setEnable(true);
 		// close
 		ImGuiFileDialog::Instance()->Close();
-		interaction->setState(GUIState::Default);
-
+		interaction->guiStateLayer().set(GUIState::Default);
+		interaction->infoModeLayer().set(GUIInfoMode::Basic);
+		interaction->setCursorMode(false);
 	}
 }
 void CViewGui::quit() {
@@ -581,36 +702,23 @@ void CViewGui::quit() {
 }
 
 
-///Reset sections text ie when solid/entity/portal is unselected.
-void CViewGui::resetSections() {
-	CInteractionManager* interaction = CInteractionManager::getInstance();
-	if (interaction->findState(GUIState::EditAlpha, GUIState::EditFlags, GUIState::EditAll,GUIState::EditShading)) 
-		resetEditText();
-
-	m_textSection3a->setText("");
-}
-
 void CViewGui::updateUVInfo() {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	m_textSection3b->setText(std::format("UV {}. Grid scale: {:.3f}",
-		interaction->findUVMode(UVMode::Move) ? "Move" : "Resize", interaction->getUVScalar()
-		).c_str());
+	const char* uvmode = interaction->findUVMode(UVMode::Move) ? "Move" : "Resize";
+	m_textSection3b->setText(std::format("UV {}. Grid scale: {:.3f}",uvmode, interaction->getUVScalar()).c_str());
 }
 
 /// Splits the data into solid info, portal info, entity info sections and updates it.
 void CViewGui::updateSections() {
 	CScn* scn = SCNEdit::getSCN();
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	if (interaction->findState(GUIState::Default)) {
-		if (interaction->findSelectedType(SelectedType::SolidExtra, SelectedType::Solid)) {
+	if (interaction->guiStateLayer().find(GUIState::Default)) {
+		if (interaction->selTypeLayer().find(SelectedType::SolidExtra, SelectedType::Solid)) 
 			updateSolidInfo();
-		}
-		if (interaction->getSelectedType() == SelectedType::Portal) {
+		if (interaction->selTypeLayer().get() == SelectedType::Portal) 
 			updatePortalInfo();
-		}
-		if (interaction->getSelectedType() == SelectedType::Entity) {
+		if (interaction->selTypeLayer().get() == SelectedType::Entity)
 			updateEntityInfo();
-		}
 	}
 }
 
@@ -618,43 +726,53 @@ void CViewGui::updateSolidInfo() {
 	//Get values from singletons for solids.
 	CScn* scn = SCNEdit::getSCN();
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	std::pair<int, int> surfdata = interaction->getSurfISelected();
-	CScnSolid* solid = scn->getSolid(surfdata.first);
-	scnSurf_t surf = solid->surfs[surfdata.second];
+	solidSelect_t surfdata = interaction->getSurfISelected();
+	CScnSolid* solid = scn->getSolid(surfdata.solididx);
+	scnSurf_t surf = solid->surfs[surfdata.surfsel];
+	scnSurfParamFrame_t params = solid->paramFrames[surfdata.surfsel];
 	scnPlane_t plane = solid->planes[surf.planeidx];
 
 	//Display surface details
-	if (interaction->findState(GUIState::Default)) {
+	if (interaction->guiStateLayer().find(GUIState::Default)) {
 		m_textSection1->setText(format("surf[{}]: | texture = {} | flags = {} {} | alpha = {} | lighmap size = {}x{} | texture size = {}x{} |",
-			surfdata.second, surf.texture, surf.flag1, surf.flag2, surf.alpha, surf.lmsize_h, surf.lmsize_v, surf.height, surf.width).c_str());
-		m_textSection2->setText(format("| verts idx idx = from {} to {} | plane idx = {} | normal = ({:.1f}, {:.1f}, {:.1f}), d={:.1f} | shading = {} |",
+			surfdata.surfsel, surf.texture, surf.flag1, surf.flag2, surf.alpha, surf.lmsize_h, surf.lmsize_v, surf.height, surf.width).c_str());
+
+		m_textSection2->setText(format("| verts idx idx = from {} to {} | plane idx = {} | normal = ({:.1f}, {:.1f}, {:.1f}), d={:.1f} | has shading = {} |",
 			surf.vertidxstart, surf.vertidxstart + surf.vertidxlen, surf.planeidx, plane.a, plane.b, plane.c, plane.d, surf.hasVertexColors).c_str());
+	
+		//os::Printer::log(format("U_AX {} V_AX {} ORG {}", vec3_to_str(params.u_axis,2), vec3_to_str(params.v_axis,2), vec3_to_str(params.origin,2)).c_str());
 	}
 
 	//Check internal surface/vert data in the mesh and display it.
 	if (interaction->getSelectObj()) {
 		CScnMeshComponent* comp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
+		const char* mode = interaction->keyAugLayer().get() == KeyAugment::None ? "Hover" : "Select";
 		indexedVec3df_t vert = interaction->getMoveableVert();
-		m_textSection3a->setText(format("Surfs: ({}), Shared: ({}) {} Vert: {:.0f} {:.0f} {:.0f}",
-			comp->selsurfs.size(), comp->sharedsurfs.size(), 
-			interaction->getKeyAugment() == KeyAugment::None ? "Hover" : "Select",
-			vert.pos.X, vert.pos.Y, vert.pos.Z).c_str());
+		m_textSection3a->setText(format("Surfs: ({}), Shared: ({}) {} V: {}",
+			comp->selsurfs.size(), comp->sharedsurfs.size(), mode,vec3_to_str(vert.pos,0)).c_str());
+
+		core::vector3df local = vert.pos - params.origin;
+		core::vector2df uv = core::vector2df(local.dotProduct(params.u_axis), local.dotProduct(params.v_axis));
+	//	os::Printer::log(format("Local {} UV {}", vec3_to_str(local, 2), vec2_to_str(uv, 2)).c_str());
 	}
+
 }
 
 void CViewGui::updatePortalInfo() {
 	CScn* scn = SCNEdit::getSCN();
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	m_textSection1->setText("Portal");
-	std::pair<int, int> portaldata = interaction->getPortalISelected();
+	portalSelect_t portaldata = interaction->getPortalISelected();
 	CScnSolid* solid = scn->getSolid(0);
-	scnRawCell_t cell = solid->rawcells[portaldata.first];
-	scnPortal_t portal = solid->rawcells[portaldata.first].portals[portaldata.second];
+	scnRawCell_t cell = solid->rawcells[portaldata.cellidx];
+	scnPortal_t portal = solid->rawcells[portaldata.cellidx].portals[portaldata.portalidx];
 	scnRawCell_t nextcell = solid->rawcells[portal.nextcell];
 	scnPlane_t plane = portal.plane;
 
-	m_textSection1->setText(format(" | portal id: {} name: \"{}\" | cell #{}, name: \"{}\" | nextcell id: {}, name: \"{}\" | normal = ({:.1f}, {:.1f}, {:.1f}), d = {:.1f} |",
-		portaldata.second, portal.name, portaldata.first, cell.name, portal.nextcell, nextcell.name, plane.a, plane.b, plane.c, plane.d, portal.unk).c_str());
+	m_textSection1->setText(format(" | portal id: {} name: \"{}\" | cell #{}, name: \"{}\" | nextcell id: {}, name: \"{}\" "
+		"| normal = ({:.1f}, {:.1f}, {:.1f}), d = {:.1f} |",
+		portaldata.portalidx, portal.name, portaldata.cellidx, cell.name, portal.nextcell, 
+		nextcell.name, plane.a, plane.b, plane.c, plane.d, portal.unk).c_str());
 	m_textSection2->setText("");
 	m_textSection3a->setText("");
 }

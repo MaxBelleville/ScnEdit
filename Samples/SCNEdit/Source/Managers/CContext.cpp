@@ -19,9 +19,7 @@ CContext::CContext() :
 #ifdef BUILD_SKYLICHT_COLLISION
 	, m_collisionMgr(NULL)
 #endif
-{
-
-}
+{}
 
 CContext::~CContext()
 {

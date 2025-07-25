@@ -7,7 +7,7 @@ class CScnPortalData : public CRenderMeshData
 {
 public:
 	IMeshBuffer *MeshBuffer;
-	std::pair<u32, s32> portaldata;
+	portalSelect_t portaldata = portalSelect_t(-1,-1);
 public:
 	CScnPortalData();
 

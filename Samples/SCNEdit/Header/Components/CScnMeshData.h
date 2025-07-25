@@ -14,10 +14,11 @@ struct BackupData {
 class CScnMeshData : public CRenderMeshData
 {
 protected:
-	u32 solidindx;
+	u32 solidindx =0;
 	core::array<IImage*>lmapImages;
 	core::array<BackupData> vis_backup;
 	core::array<BackupData> vert_backup;
+	core::array<scnSurfParamFrame_t> param_backup;
 	core::array<int> hiddensurfs;
 
 public:
@@ -31,7 +32,7 @@ public:
 
 	void initMesh(CScn* scn, CScnSolid* solid, CScnArguments*);
 	void setLightmapVisible(bool);
-	std::pair<int, int> getSurfaceIndx(CScn* scn, core::triangle3df);
+	solidSelect_t getSurfaceIndx(CScn* scn, core::triangle3df);
 	core::array<int> getSharedSurface(CScn* scn, core::array<int>sindices);
 	core::array<int> getSharedSurface(CScn* scn, int si);
 	core::array<vertProp_t> getSurfVertProps(CScn* scn, int si);
@@ -41,6 +42,8 @@ public:
 	void deselectAll();
 	void hide(int si);
 	void show();
+	bool try_load_texture(video::ITexture*& t, std::set<std::string>& cantFind, const char* format, const wchar_t* baseDir, const char* texPath, bool&);
+
 	void setTexture(CScn* scn, const char* path,int si);
 	indexedVec3df_t updateVert(CScn* scn, indexedVec3df_t vert, core::vector3df);
 	indexedVec3df_t resetVert(CScn* scn, indexedVec3df_t vert);

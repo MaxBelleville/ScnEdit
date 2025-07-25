@@ -78,13 +78,12 @@ int CScn::loadHeader(ifstream * file)
 {
 	os::Printer::log("\nGetting header...");
 
-	//header=(scnHeader_t*) malloc(sizeof(struct scnHeader_t));
 	header = new scnHeader_t;
 
 	file->seekg(0);
 	read_generic(header,file,sizeof(scnHeader_t));
 
-	if (!str_nequals(header->magic,"NCSM",4))
+	if (!str_equals_lim(header->magic,"NCSM",4))
 		error(true,"CScn::loadHeader: Magic doesn't match, not a scn file!");
 
 	if (header->version!=269)
@@ -102,16 +101,14 @@ int CScn::loadEntities(std::ifstream * file)
 	os::Printer::log(format("\nGetting {} Entities...",n_ents).c_str());
 
 	ents = new (std::nothrow) CScnEnt[n_ents];
-	if (ents==NULL) {
+	if (ents==NULL) 
 		error(true,"Error allocating memory for CScnEnt");
-	}
+	
 	file->seekg(header->ents_offset2);
 
-	u16 keylen;
-	u16 vallen;
+	u16 keylen, vallen;
 	CScnEnt * enti;
-	char str1[512]{};
-	char str2[512]{};
+	char str1[512] = {},str2[512] = {};
 	CScn::cells.clear();
 	CScn::ambients.clear();
 	
@@ -126,6 +123,7 @@ int CScn::loadEntities(std::ifstream * file)
 		enti->fields = new (std::nothrow) CScnEnt::field[enti->n_fields];
 		if (enti->fields == nullptr)
 			error(true,"Error allocating memory for %u fields of ent[%u]",enti->n_fields,i);
+
 		for (u32 n=0;n<enti->n_fields;n++)
 		{
 			keylen=read_u16(file);
@@ -139,33 +137,36 @@ int CScn::loadEntities(std::ifstream * file)
 			enti->keylengths.push_back(keylen);
 			enti->vallengths.push_back(vallen);
 			
-			if(str_equiv(enti->fields[n].key, "Classname")) os::Printer::log(format("({}) ({})",
-				enti->fields[n].key, 
-				enti->fields[n].value).c_str());
-			else os::Printer::log(format("\t({}) ({})",
-					enti->fields[n].key,
-					enti->fields[n].value).c_str());
+			if(str_equiv(enti->fields[n].key, "Classname")) 
+				os::Printer::log(format("({}) ({})",enti->fields[n].key, enti->fields[n].value).c_str());
+			else 
+				os::Printer::log(format("\t({}) ({})",enti->fields[n].key,enti->fields[n].value).c_str());
 
 			//TODO: make sorted according to cell indexs
 			if (str_equiv(enti->fields[n].key, "Classname") && str_equiv(enti->fields[n].value, "swt_start")) {
-				if (!swt_start) swt_start = enti;
+				if (!swt_start) 
+					swt_start = enti;
 			}
-			if (str_equiv(enti->fields[n].key, "Position") && str_equiv(enti->fields[n].value, "0")) {
-				if(str_equiv(enti->getField("Classname"),"swt_start")) swt_start = enti;
 
+			if (str_equiv(enti->fields[n].key, "Position") && str_equiv(enti->fields[n].value, "0")) {
+				if(str_equiv(enti->getField("Classname"),"swt_start")) 
+					swt_start = enti;
 			}
+
 			if (str_equiv(enti->fields[n].key, "Position")) {
-				if (str_equiv(enti->getField("Classname"), "swt_start")) hasPos = true;
+				if (str_equiv(enti->getField("Classname"), "swt_start")) 
+					hasPos = true;
 			}
 
 			if (str_equiv(enti->fields[n].key,"Classname") && str_equiv(enti->fields[n].value,"Cell"))
 				CScn::cells.push_back(enti);
+
 			if (str_equiv(enti->fields[n].key, "Classname") && str_equiv(enti->fields[n].value, "light_ambient"))
 				CScn::ambients.push_back(enti);
 		}
-		if (!hasPos && str_equiv(enti->getField("Classname"), "swt_start")) {
+		if (!hasPos && str_equiv(enti->getField("Classname"), "swt_start")) 
 			swt_start = enti;
-		}
+		
 	}
 	os::Printer::log("done.");
 	return n_ents;
@@ -178,10 +179,11 @@ int CScn::loadLightmap(std::ifstream* file) {
 
 	file->seekg(header->lmaps_offset);
 	os::Printer::log(format("\tlightmap offset at {}", file->peek()).c_str());
-	if (file->peek() != EOF) { //Verify that there is a lightmap.
+	if (file->peek() != EOF)  //Verify that there is a lightmap.
 		lmap->loadLightmap(file, solids, header->n_solids, header->n_extralmaps);
-	}
-	else error(false, "CScn::loadLightmap: No lightmap found");
+	
+	else 
+		error(false, "CScn::loadLightmap: No lightmap found");
 	os::Printer::log("\tdone.");
 	return n_lights;
 }
@@ -203,7 +205,8 @@ CScnEnt * CScn::getCell(u32 idx)
 CScnEnt* CScn::getAmbientByCell(const char* name)
 {
 	CScnEnt* ambienti;
-	if (!name) return nullptr;
+	if (!name) 
+		return nullptr;
 
 	for (u16 i = 0; i < CScn::ambients.size(); i++)
 	{
@@ -233,7 +236,6 @@ CScnEnt* CScn::getGlobalAmbient()
 		const char* val = ambienti->getField("TargetName");
 		
 		if (val) {
-			
 			if (str_equiv(val, "global_ambient"))
 				return ambienti;
 		}

@@ -62,6 +62,7 @@ namespace Skylicht
 
 		while (it != end)
 		{
+			
 			CGameObject* pObj = (*it);
 
 			++i;
@@ -207,6 +208,13 @@ namespace Skylicht
 		return ret;
 	}
 
+	CGameObject* CContainerObject::createEmptyObject(const char* lpName)
+	{
+		CGameObject* p = createEmptyObject();
+		p->setName(lpName);
+		return p;
+	}
+
 	CGameObject* CContainerObject::createEmptyObject()
 	{
 		CGameObject* p = new CGameObject(this, m_zone);
@@ -227,6 +235,12 @@ namespace Skylicht
 		p->setupEulerTransform();
 
 		return p;
+	}
+	CContainerObject* CContainerObject::createContainerObject(const char* lpName)
+	{
+		CContainerObject* container = createContainerObject();
+		container->setName(lpName);
+		return container;
 	}
 
 	CContainerObject* CContainerObject::createContainerObject()

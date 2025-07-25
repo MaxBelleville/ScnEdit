@@ -152,9 +152,14 @@ namespace Skylicht
 		void CUITextBox::onLostFocus()
 		{
 			m_text->showCaret(false);
-			m_completed = true;
-			if (OnTextSet != nullptr)
+			
+			if (OnTextSet != nullptr && !m_completed) {
+				m_completed = true;
 				OnTextSet(this);
+			}
+			else {
+				m_completed = true;
+			}
 
 		}
 
@@ -307,9 +312,13 @@ namespace Skylicht
 	
 					CUIEventManager::getInstance()->setCapture(NULL);
 					CUIEventManager::getInstance()->setFocus(NULL);
-					m_completed = true;
-					if (OnTextSet != nullptr)
+					if (OnTextSet != nullptr && !m_completed) {
+						m_completed = true;
 						OnTextSet(this);
+					}
+					else {
+						m_completed = true;
+					}
 					
 				}
 				break;

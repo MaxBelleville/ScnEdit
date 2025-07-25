@@ -2,6 +2,7 @@
 #define SCNTYPES_H_
 
 #include <SkylichtEngine.h>
+#include <unordered_set>
 //---------------------------------Start of Original SCN TYPES-----------------------------------
 
 struct tempLight_t
@@ -40,7 +41,7 @@ struct scnSurf_t
 {
 	//IMPORTANT: keep order, we rely on it to read
 	char texture[32];
-	f32 unk[2];
+	f32 unk[2]; // Some sort offset,
 	u8 flag1, flag2;
 	u16 alpha;
 	u16 lmsize_h, lmsize_v;
@@ -129,6 +130,12 @@ struct scnLMapLump_t {
 	s8* data; //byte[size]
 };
 
+struct scnSurfParamFrame_t {
+	core::vector3df u_axis;
+	core::vector3df v_axis;
+	core::vector3df origin;
+};
+
 struct scnNode_t  //16 bytes
 {
 	s16 plane;  //splitting plane idx
@@ -147,7 +154,8 @@ struct scnNode_t  //16 bytes
 struct scnPortal_t
 {
 	char name[32];
-	s32 nextcell; //cell idx this portal looks into
+	s16 nextcell; //cell idx this portal looks into
+	s16 unk2;
 	scnPlane_t plane;
 	f32 unk;        //float ?
 	s32 n_verts;    //number of verts defining the portal
@@ -188,8 +196,9 @@ struct vertProp_t
 	core::array<u32> sharesWith;
 };
 
-//---------------------------------END OF Original SCN TYPES-----------------------------------
-//---------------------------------Start of Custom Types------------------------------------
+// ---------------------------------END OF Original SCN TYPES-----------------------------------
+// ---------------------------------Start of Custom Types------------------------------------
+
 struct indexedVec3df_t
 {
 	core::vector3df pos;
@@ -199,6 +208,22 @@ struct indexedVec3df_t
 	u32 surf_vertindx = 0;
 	bool bShared;
 	core::array<u32> sharesWith;
+};
+
+struct solidSelect_t
+{
+	int solididx = 0;
+	int surfsel = 0;
+	solidSelect_t(int si, int surfs)
+		: solididx(si), surfsel(surfs) {}
+};
+
+struct portalSelect_t
+{
+	int cellidx = 0;
+	int portalidx = 0;
+	portalSelect_t(int ci, int pi)
+		: cellidx(ci), portalidx(pi) {}
 };
 
 //Simplify the 3d array type call so I don't nee to refer to it as vector<vectory<vector<u8>>>
@@ -227,7 +252,7 @@ struct pair_hash {
 
 typedef std::pair<irr::EKEY_CODE, KeyAugment> key_pair;
 
-typedef std::unordered_map<key_pair, bool, pair_hash> key_map; //key is (key code, augment) value is state.
+typedef std::unordered_set<key_pair, pair_hash> key_map; //key is (key code, augment) value is state.
 
 typedef std::pair<core::array<indexedVec3df_t>, core::array<indexedVec3df_t>> indexed_vertices;
 

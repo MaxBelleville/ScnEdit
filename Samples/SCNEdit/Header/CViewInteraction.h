@@ -5,6 +5,7 @@
 #include "CScnArguments.h"
 #include "Header/Managers/CViewManager.h"
 #include "Collision/CCollisionManager.h"
+#include "Header/Base/scntypes.h"
 
 class CViewInteraction :
 	public CView
@@ -34,11 +35,13 @@ public:
 
 
 protected:
-	static void updateVisbility(CGameObject* obj, bool state, bool bbCollision);
-	static void checkVisbility();
+	static void updateObjectVisbility(CGameObject* obj, bool state, bool bbCollision);
+	static void updateVisbility();
 	static void deselectAll(CGameObject* current);
 	static void updateEntityPos(core::vector3df);
 	static void resetSolid();
-	static void getClosestVertex(core::vector3df);
-	static void getSelectedVertex();
+	static void updateNearestVert(core::vector3df);
+	static void updateSelectedVert();
+	static void getNearestDistVert(core::vector3df pos, core::array<indexedVec3df_t> verts, indexedVec3df_t& closest, float& minDistSq);
+	static void moveBounds(bool reset);
 };

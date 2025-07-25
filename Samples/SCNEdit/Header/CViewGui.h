@@ -25,6 +25,9 @@ protected:
 	static inline UI::CUITextBox* m_textSection3a;
 	static inline UI::CUITextBox* m_textSection3b;
 	static inline UI::CUITextBox* m_textSection3c;
+	static inline bool isSection1Set = false;
+	static inline bool isSection2Set = false;
+
 
 	static inline UI::CUIButton* m_quitButton;
 	static inline UI::CUIButton* m_saveButton;
@@ -56,13 +59,13 @@ protected:
 	void openFile();
 	void openTextures();
 	void saveFile();
+	void helpDialog();
 	void exportFile();
 	void closeFile();
 	void quit();
 	void onGUI();
 	void drawTooltip();
 	static void updateSections();
-	static void resetSections();
 	//The 'nuclear option' is for mass editing all details of a object
 	static void updateSolidInfo(); 
 	static void updatePortalInfo();

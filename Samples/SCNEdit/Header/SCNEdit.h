@@ -20,6 +20,7 @@ class SCNEdit : public IApplicationEventReceiver
 private:
 	CScnArguments* m_arguments = nullptr;
 	inline static std::ofstream* output=0;
+	inline static io::path outputPath= "";
 	inline static CScn* scn;
 protected:
 
@@ -56,10 +57,10 @@ public:
 
 	static void proccessQuit();
 
-	static bool saveSCN(io::path path, bool bExtra);
-	static inline void exportSCN(bool bExtra) {
+	static bool saveSCN();
+	static inline void exportSCN() {
 		scnExportObj(scn, "exported");
-		scnExport3ds(scn->getAllSolids(), scn->getSolidSize(bExtra), "exported");
+		scnExport3ds(scn->getAllSolids(), scn->getSolidSize(true), "exported");
 		scnExportMap(scn, "exported");
 	}
 	inline static CScn* getSCN() {

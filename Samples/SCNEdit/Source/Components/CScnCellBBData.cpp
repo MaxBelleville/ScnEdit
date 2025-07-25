@@ -3,10 +3,7 @@
 #include "Header/Components/CScnCellBBData.h"
 
 CScnCellBBData::CScnCellBBData() :
-	MeshBuffer(NULL)
-{
-
-}
+	MeshBuffer(NULL){}
 
 CScnCellBBData::~CScnCellBBData()
 {
@@ -32,94 +29,11 @@ void CScnCellBBData::initMesh(CScnSolid* solid, u32 currCellindx)
 		core::vector3df start = leaf->bb_verts[0]; // Removes z-indexing
 		core::vector3df end= leaf->bb_verts[1]; // at cost of accuracy
 		backup_bb.push_back(new core::vector3df[2]{ start,end });
-		MeshBuffer = new CMeshBuffer<S3DVertex>(driver->getVertexDescriptor(EVT_STANDARD), EIT_16BIT);
-		IIndexBuffer* ib = MeshBuffer->getIndexBuffer();
-		IVertexBuffer* vb = MeshBuffer->getVertexBuffer();
 		// Create vertices
 		video::SColor clr(255, 0, 0, 0);
 
-		vb->reallocate(12);
+		IMeshBuffer* MeshBuffer =generate_cube_mesh_buff(start,end,clr);
 
-		video::S3DVertex Vertices[] = {
-			// back
-			video::S3DVertex(start.X, start.Y, start.Z, 0, 0, -1, clr, 0, 1),
-			video::S3DVertex(end.X, start.Y, start.Z, 0, 0, -1, clr, 1, 1),
-			video::S3DVertex(end.X, end.Y, start.Z, 0, 0, -1, clr, 1, 0),
-			video::S3DVertex(start.X, end.Y, start.Z, 0, 0, -1, clr, 0, 0),
-
-			// front
-			video::S3DVertex(start.X, start.Y, end.Z, 0, 0, 1, clr, 1, 1),
-			video::S3DVertex(end.X, start.Y, end.Z, 0, 0, 1, clr, 0, 1),
-			video::S3DVertex(end.X, end.Y, end.Z, 0, 0, 1, clr, 0, 0),
-			video::S3DVertex(start.X, end.Y, end.Z, 0, 0, 1, clr, 1, 0),
-
-			// bottom
-			video::S3DVertex(start.X, start.Y, start.Z, 0, -1, 0, clr, 0, 1),
-			video::S3DVertex(start.X, start.Y, end.Z, 0, -1, 0, clr, 1, 1),
-			video::S3DVertex(end.X, start.Y, end.Z, 0, -1, 0, clr, 1, 0),
-			video::S3DVertex(end.X, start.Y, start.Z, 0, -1, 0, clr, 0, 0),
-
-			// top
-			video::S3DVertex(start.X, end.Y, start.Z, 0, 1, 0, clr, 0, 1),
-			video::S3DVertex(start.X, end.Y, end.Z, 0, 1, 0, clr, 1, 1),
-			video::S3DVertex(end.X, end.Y, end.Z, 0, 1, 0, clr, 1, 0),
-			video::S3DVertex(end.X, end.Y, start.Z, 0, 1, 0, clr, 0, 0),
-
-			// left
-			video::S3DVertex(end.X, start.Y, start.Z, 1, 0, 0, clr, 0, 1),
-			video::S3DVertex(end.X, start.Y, end.Z, 1, 0, 0, clr, 1, 1),
-			video::S3DVertex(end.X, end.Y, end.Z, 1, 0, 0, clr, 1, 0),
-			video::S3DVertex(end.X, end.Y, start.Z, 1, 0, 0, clr, 0, 0),
-
-			// right
-			video::S3DVertex(start.X, start.Y, start.Z, -1, 0, 0, clr, 1, 1),
-			video::S3DVertex(start.X, start.Y, end.Z, -1, 0, 0, clr, 0, 1),
-			video::S3DVertex(start.X, end.Y, end.Z, -1, 0, 0, clr, 0, 0),
-			video::S3DVertex(start.X, end.Y, start.Z, -1, 0, 0, clr, 1, 0),
-		};
-
-		for (u32 i = 0; i < 24; ++i)
-		{
-					
-			vb->addVertex(&Vertices[i]);
-		}
-
-		// cube mesh
-		// Create indices
-		const u16 u[36] =
-		{
-			// back
-			0,2,1,
-			0,3,2,
-
-			// front
-			4,5,6,
-			4,6,7,
-
-			// bottom
-			8,10,9,
-			8,11,10,
-
-			// top
-			12,13,14,
-			12,14,15,
-
-			// left
-			16,18,17,
-			16,19,18,
-
-			// right
-			20,21,22,
-			20,22,23
-		};
-
-		ib->set_used(36);
-
-		for (u32 i = 0; i < 36; ++i)
-			ib->setIndex(i, u[i]);
-
-		// recalc bbox
-		MeshBuffer->recalculateBoundingBox();
 		MeshBuffer->getMaterial().Wireframe = true;
 		// add cube mesh buffer to mesh
 		RenderMesh->addMeshBuffer(MeshBuffer, "cellbb", nullptr);
@@ -139,9 +53,8 @@ void CScnCellBBData::initMesh(CScnSolid* solid, u32 currCellindx)
 int CScnCellBBData::getIndexFromCellBB(CScnSolid* solid, scnCellData_t* celldata) {
 	for (u32 l = 0; l < solid->rawcells[cellindx].leafnode.size(); l++) {//TODO Abstract
 		scnCellData_t* leaf = solid->rawcells[cellindx].leafnode[l];
-		if (leaf == celldata) {
+		if (leaf == celldata)
 			return l;
-		}
 	}
 	return -1;
 }
@@ -169,25 +82,29 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 			for (int v = 0; v < surfi->vertidxlen; v++) {
 				u32 vertidx = solid->vertidxs[surfi->vertidxstart + v];
 				core::vector3df compareVert = solid->verts[vertidx];
-				minVert.X = min(minVert.X, compareVert.X);
-				minVert.Y = min(minVert.Y, compareVert.Y);
-				minVert.Z = min(minVert.Z, compareVert.Z);
 
-				maxVert.X = max(maxVert.X, compareVert.X);
-				maxVert.Y = max(maxVert.Y, compareVert.Y);
-				maxVert.Z = max(maxVert.Z, compareVert.Z);
+				minVert = min(minVert, compareVert);
+				maxVert =max(maxVert, compareVert);
 			}
-			//1. If diference is 1.5ish and is flat.
+			//1. If diference is less then or equal 1.5ish and is flat, set current bb to maxVert.
 			if (!reset) {
-				if (maxVert.X < max.X && maxVert.X >= max.X - 1.1) {
+				if (maxVert.X < max.X && maxVert.X >= max.X - 1.1) 
 					max.X = maxVert.X;
-				}
-				if (maxVert.Y < max.Y && maxVert.Y >= max.Y - 1.1) max.Y = maxVert.Y;
-				if (maxVert.Z < max.Z && maxVert.Z >= max.Z - 1.1) max.Z = maxVert.Z;
+				
+				if (maxVert.Y < max.Y && maxVert.Y >= max.Y - 1.1) 
+					max.Y = maxVert.Y;
 
-				if (minVert.X > min.X && minVert.X <= min.X + 1.1) min.X = minVert.X;
-				if (minVert.Y > min.Y && minVert.Y <= min.Y + 1.1) min.Y = minVert.Y;
-				if (minVert.Z > min.Z && minVert.Z <= min.Z + 1.1) min.Z = minVert.Z;
+				if (maxVert.Z < max.Z && maxVert.Z >= max.Z - 1.1) 
+					max.Z = maxVert.Z;
+
+				if (minVert.X > min.X && minVert.X <= min.X + 1.1) 
+					min.X = minVert.X;
+
+				if (minVert.Y > min.Y && minVert.Y <= min.Y + 1.1) 
+					min.Y = minVert.Y;
+
+				if (minVert.Z > min.Z && minVert.Z <= min.Z + 1.1) 
+					min.Z = minVert.Z;
 			}
 			//2. If reset check if contains backup_bb.
 			if (reset && indx != -1) {
@@ -207,14 +124,21 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 		}
 		else {
 			//In the cases of vert being beyond bounding box.
-			if (vert.pos.X < min.X) min.X = vert.pos.X;
-			if (vert.pos.Y < min.Y) min.Y = vert.pos.Y;
-			if (vert.pos.Z < min.Z) min.Z = vert.pos.Z;
+			if (vert.pos.X < min.X) 
+				min.X = vert.pos.X;
+			if (vert.pos.Y < min.Y) 
+				min.Y = vert.pos.Y;
+			if (vert.pos.Z < min.Z) 
+				min.Z = vert.pos.Z;
 
-			if (vert.pos.X > max.X) max.X = vert.pos.X;
-			if (vert.pos.Y > max.Y) max.Y = vert.pos.Y;
-			if (vert.pos.Z > max.Z) max.Z = vert.pos.Z;
+			if (vert.pos.X > max.X) 
+				max.X = vert.pos.X;
+			if (vert.pos.Y > max.Y) 
+				max.Y = vert.pos.Y;
+			if (vert.pos.Z > max.Z) 
+				max.Z = vert.pos.Z;
 		}
+
 		celldata->bb_verts[0] = min;
 		celldata->bb_verts[1] = max;
 	}

@@ -17,7 +17,7 @@ public:
 	void setMesh(CScn*, CScnSolid*, CScnArguments*);
 
 	void setLightmapVisible(bool);
-	std::pair<int, int> select(CScn* scn, core::triangle3df, bool);
+	solidSelect_t select(CScn* scn, core::triangle3df, bool);
 	void deselect();
 	void hide(bool shared);
 	void show();

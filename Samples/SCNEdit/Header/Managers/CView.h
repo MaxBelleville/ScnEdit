@@ -5,29 +5,31 @@ class CView
 protected:
 
 public:
-	CView();
+	CView() {};
 
-	virtual ~CView();
+	virtual ~CView() {};
 
-	virtual void onInit();
+	virtual void onInit() {};
 
-	virtual void onData();
+	virtual void onData() {};
 
-	virtual void onDestroy();
+	virtual void onDestroy() {};
 
-	virtual void onActive();
+	virtual void onActive() {};
 
-	virtual void onDeactive();
+	virtual void onDeactive() {};
 
-	virtual void onUpdate();
+	virtual void onUpdate() {};
 
-	virtual void onRender();
+	virtual void onRender() {};
 
-	virtual void onPostRender();
+	virtual void onPostRender() {};
 
-	virtual void onResume();
+	virtual void onResume() {};
 
-	virtual void onPause();
+	virtual void onPause() {};
 
-	virtual bool onBack();
+	virtual bool onBack() {
+		return false;
+	}
 };

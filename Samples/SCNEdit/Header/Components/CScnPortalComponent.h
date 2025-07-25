@@ -16,7 +16,7 @@ public:
 
 	virtual void updateComponent();
 
-	std::pair<u32, s32> select();
+	portalSelect_t select();
 
 	void deselect();
 };

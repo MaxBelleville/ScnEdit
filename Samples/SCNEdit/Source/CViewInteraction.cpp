@@ -19,70 +19,95 @@ CViewInteraction::CViewInteraction(CScnArguments* args)
 
 CViewInteraction::~CViewInteraction()
 {
+	CContext* context = CContext::getInstance();
+	CCollisionManager* collisionMgr = context->getCollisionManager();
+	collisionMgr->clear();
 	m_hidePortal.clear();
 	m_hideEntity.clear();
 	m_hideSolids.clear();
 	m_rebuildRequired = false;
+
 }
 
 void CViewInteraction::onInit()
 {
+	//On the start set the camera pos according to swat start orgin.
+	//Also get the needed values and singletons used later.
+
+
 	CContext* context = CContext::getInstance();
 	CCamera* camera = context->getActiveCamera();
-	if (SCNEdit::getSCN()) {
-		if (!SCNEdit::getSCN()->swt_start) {
+
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	bool isFlipped = m_arguments->isFlippedUV();
+	CScn* scn = SCNEdit::getSCN();
+
+	if (scn) {
+		if (!scn->swt_start) 
 			camera->setPosition(core::vector3df(0.0f, 4.0f, 0.0f));
-		}
 		else {
-			const char* str = SCNEdit::getSCN()->swt_start->getField("Origin");
+			const char* str = scn->swt_start->getField("Origin");
 
 			core::vector3df tmp = convert_vec3(str) + core::vector3df(0,4,0);
 			camera->setPosition(tmp);
 
 		}
 	}
-	CScene* scene = context->getScene();
-	
-	CInteractionManager* interaction = CInteractionManager::getInstance();
-	bool isFlipped = m_arguments->isFlippedUV();
+
+
 	interaction->OnKeyEvent([interaction, isFlipped](key_pair pair) {
-		if (!SCNEdit::getSCN()) return;
+		//If no scn or no selected item then ignore key input for interactions.
+		CScn* scn = SCNEdit::getSCN();
+		if (!scn) return;
 		if (!interaction->getSelectObj()) return;
+
+		//Only really care when key is down
+		if (!interaction->getKeyState(make_pair(pair.first, pair.second)))
+			return;
+
+		//Get singletons and other values 
 		CContext* context = CContext::getInstance();
 		CCamera* camera = context->getActiveCamera();
 		CZone* zone = context->getActiveZone();
 		CCollisionManager* collisionMgr = context->getCollisionManager();
-		if (interaction->findKeyState({ make_pair(KEY_KEY_H, KeyAugment::None),
-			make_pair(KEY_KEY_H, KeyAugment::Shift),
-			})) {
-			if (interaction->findSelectedType(SelectedType::Entity, SelectedType::Portal)) {
-				collisionMgr->removeCollision(interaction->getSelectObj());
-				collisionMgr->build(false);
-				interaction->getSelectObj()->setVisible(false);
-			}
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				interaction->getSelectObj()->getComponent<CScnMeshComponent>()->hide(pair.second == KeyAugment::Shift);
-				m_hideSolids.push_back(interaction->getSelectObj());
-				collisionMgr->removeCollision(interaction->getSelectObj());
-				collisionMgr->addComponentCollision(interaction->getSelectObj());
+		CGameObject* selected = interaction->getSelectObj();
+		core::vector3df pos = core::vector3df(0);
+	
+		// If h or shift h pressed then hide the currently selected item(remove collision as well)
+		if (interaction->findKeyState({ make_pair(KEY_KEY_H, KeyAugment::None),make_pair(KEY_KEY_H, KeyAugment::Shift)})) {
+			//Hide entity and portal
+			if (interaction->selTypeLayer().find(SelectedType::Entity, SelectedType::Portal)) {
+				selected->setVisible(false);
+
+				collisionMgr->removeCollision(selected);
 				collisionMgr->build(false);
 			}
-			if (interaction->getSelectedType() == SelectedType::Entity) {
-				m_hideEntity.push_back(interaction->getSelectObj());
+			//Hide solid and extras
+			if (interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra)) {
+				selected->getComponent<CScnMeshComponent>()->hide(pair.second == KeyAugment::Shift);
+				//The only way to update the solid surf is currnetly to remove the collision, then readd it (with hidden section)
+				collisionMgr->removeCollision(selected);
+				collisionMgr->addComponentCollision(selected);
+				collisionMgr->build(false);
+
+				m_hideSolids.push_back(selected);
 			}
-			else if (interaction->getSelectedType() == SelectedType::Portal) {
-				m_hidePortal.push_back(interaction->getSelectObj());
-			}
+			//add portal and entity to hideEntity list.
+			if (interaction->selTypeLayer().get() == SelectedType::Entity)
+				m_hideEntity.push_back(selected);
+			else if (interaction->selTypeLayer().get() == SelectedType::Portal)
+				m_hidePortal.push_back(selected);
 		}
+		// If ctrl + h pressed then unhide all items. (Goes through each item and sets visible and adds collision
 		if (interaction->getKeyState(make_pair(KEY_KEY_H, KeyAugment::Ctrl))) {
-			
 			for (int i = 0; i < m_hideEntity.size(); i++) {
-				collisionMgr->addBBComponentCollision(m_hideEntity[i]);
 				m_hideEntity[i]->setVisible(true);
+				collisionMgr->addBBComponentCollision(m_hideEntity[i]);
 			}
+
 			for (int i = 0; i < m_hidePortal.size(); i++) {
-				collisionMgr->addComponentCollision(m_hidePortal[i]);
 				m_hidePortal[i]->setVisible(true);
+				collisionMgr->addComponentCollision(m_hidePortal[i]);
 			}
 
 			for (int i = 0; i < m_hideSolids.size(); i++) {
@@ -90,165 +115,80 @@ void CViewInteraction::onInit()
 				collisionMgr->removeCollision(m_hideSolids[i]);
 				collisionMgr->addComponentCollision(m_hideSolids[i]);
 			}
+
 			collisionMgr->build(false);
-			m_hideSolids.clear();
-			m_hidePortal.clear();
-			m_hideEntity.clear();
+			m_hideSolids.clear(); m_hidePortal.clear(); m_hideEntity.clear();
 		}
-		if (interaction->getKeyState(make_pair(pair.first, pair.second)) && 
-			pair.first >= KEY_LEFT && pair.first <= KEY_DOWN) {
-			int posX = 0;
-			int posY = 0;
-			int posZ = 0;
-			if (pair.first == KEY_DOWN || pair.first == KEY_UP) {
-				if(pair.second == KeyAugment::Ctrl) posY = 39 - pair.first;
-				else posX = 39 - pair.first;
-			}
-			else posZ = 38- pair.first;
-			if (interaction->getSelectedType() == SelectedType::Entity) {
-				if (pair.second == KeyAugment::Shift || 
-					pair.second == KeyAugment::Ctrl)updateEntityPos(core::vector3df(posX, posY, posZ));
-			}
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				if (pair.second == KeyAugment::Shift || 
-					pair.second == KeyAugment::Ctrl) {
-					CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-					interaction->updateVertPos(
-						meshcomp->updateVert(SCNEdit::getSCN(),interaction->getMoveableVert(), 
-							core::vector3df(posX, posY, posZ)));
-					interaction->VertexCallback();
-					collisionMgr->removeCollision(interaction->getSelectObj());
-					collisionMgr->addComponentCollision(interaction->getSelectObj());
-					collisionMgr->build(false);
-					if (interaction->getMoveableVert().solidindx == 0) {
-						CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
-						if (group_bb) {
-						
-							for (int i = 0; i < group_bb->getChilds()->size(); i++) {
-								CScnCellBBComponent* cellbb = group_bb->getChilds()->at(i)->getComponent<CScnCellBBComponent>();
-								cellbb->updateBB(SCNEdit::getSCN(), interaction->getMoveableVert(), false);
-							}
-						}
-					}
-				}
-				else {
-					CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-					meshcomp->updateUV(SCNEdit::getSCN(), interaction->getUVMode(),
-						core::vector2df(posZ, posX)*interaction->getUVScalar());
-				}
-			}
+		//Update pos based on arrow keys and agument.
+
+		if (pair.first == KEY_DOWN || pair.first == KEY_UP) {
+			if (pair.second == KeyAugment::Ctrl) pos.Y = 39 - pair.first;
+			else pos.X = 39 - pair.first;
 		}
+		else if (pair.first == KEY_RIGHT || pair.first == KEY_LEFT) pos.Z = 38 - pair.first;
+
+		//Since Key left = 37, key up = 38, key right = 39 and key down = 40 can get all arrow keys
+		//And update position for entity(reason why shift or ctrl is that it's consistent with moving vert.
+		if (interaction->selTypeLayer().get() == SelectedType::Entity) {
+			if (pair.first >= KEY_LEFT && pair.first <= KEY_DOWN) {
+				if (interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift))
+					updateEntityPos(pos);
+			}
+			//Reset entity position.
+			if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::Ctrl)))
+				updateEntityPos(core::vector3df(0)); //Reset
+		}
+
+		//Make it so the next portion is solid only interactions (simplifies compares)
+		if (!interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra))
+			return;
+
+		indexedVec3df_t moveable= interaction->getMoveableVert();
+		CScnMeshComponent* meshcomp = selected->getComponent<CScnMeshComponent>();
+		UVMode uvmode = interaction->getUVMode();
+		float uvscale = interaction->getUVScalar();
+		
+		//Move or reset uv.
+		if(pair.first >= KEY_LEFT && pair.first <= KEY_DOWN && pair.second == KeyAugment::None)
+			meshcomp->updateUV(scn, uvmode, core::vector2df(pos.Z, pos.X) * uvscale);
+
+		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::None)))
+			meshcomp->resetUV(scn);
+
+		//Move solid vertex and then update bounding box
+		if (pair.first >= KEY_LEFT && pair.first <= KEY_DOWN && interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift)) {
+			interaction->updateVertPos(meshcomp->updateVert(scn, moveable, pos));
+			interaction->VertexCallback();
+			collisionMgr->removeCollision(selected);
+			collisionMgr->addComponentCollision(selected);
+			collisionMgr->build(false);
+
+			//Todo implement this part as a function(probably static).
+			CViewInteraction::moveBounds(false);
+		}
+		//Reset vert (only works for current game when you save you cant reset)
+		//Might change in future to have a history using imgui.ini or something idk.
 		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::Ctrl))) {
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-				interaction->updateVertPos(meshcomp->resetVert(SCNEdit::getSCN(), interaction->getMoveableVert()));
-				interaction->VertexCallback();
-				collisionMgr->removeCollision(interaction->getSelectObj());
-				collisionMgr->addComponentCollision(interaction->getSelectObj());
-				collisionMgr->build(false);
-				if (interaction->getMoveableVert().solidindx == 0) {
-				CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
-				if (group_bb) {
-					for (int i = 0; i < group_bb->getChilds()->size(); i++) {
-						CScnCellBBComponent* cellbb = group_bb->getChilds()->at(i)->getComponent<CScnCellBBComponent>();
-						cellbb->updateBB(SCNEdit::getSCN(), interaction->getMoveableVert(), true);
-					}
-				}
-				}
+			interaction->updateVertPos(meshcomp->resetVert(scn, moveable));
+			interaction->VertexCallback();
+			collisionMgr->removeCollision(selected);
+			collisionMgr->addComponentCollision(selected);
+			collisionMgr->build(false);
 
-			}
-			if(interaction->findSelectedType(SelectedType::Entity)) updateEntityPos(core::vector3df(0, 0, 0)); //Reset
-		}
-		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::None))) {
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-				meshcomp->resetUV(SCNEdit::getSCN());
-			}
-		}
-		if (interaction->getKeyState(make_pair(KEY_KEY_X, KeyAugment::None)) && isFlipped) {
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-				meshcomp->updateUV(SCNEdit::getSCN(),UVMode::FlipH,core::vector2df(0,0));
-			}
-		}
-		if (interaction->getKeyState(make_pair(KEY_KEY_V, KeyAugment::None)) && isFlipped) {
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				CScnMeshComponent* meshcomp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-				meshcomp->updateUV(SCNEdit::getSCN(), UVMode::FlipV, core::vector2df(0, 0));
-			}
-		}
-		if (interaction->findKeyAugment(KeyAugment::Ctrl, KeyAugment::Shift)) {
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				interaction->VertexCallback();
-			}
-		}
-		else if (interaction->getKeyAugment() == KeyAugment::None) {
-			if (interaction->findSelectedType(SelectedType::Solid, SelectedType::SolidExtra)) {
-				interaction->VertexCallback();
-			}
+			CViewInteraction::moveBounds(true);
 		}
 
-		if (interaction->getKeyState(make_pair(KEY_OEM_2,KeyAugment::Shift))) {
-			//In the future might want to make a dialog box.
-			os::Printer::log("Controls:");
-			os::Printer::log("H (ANY SELECTED): Hides element from editor");
-			os::Printer::log("SHIFT+H (SOLID SELECTED): Hides shared and selected surfaces");
-			os::Printer::log("CTRL+H: Unhides hidden elements");
+		if (interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift, KeyAugment::None))
+			interaction->VertexCallback();
 
-			os::Printer::log("X (SOLID SELECTED & -flip): Flips selected texture horizontally");
-			os::Printer::log("V (SOLID SELECTED & -flip): Flips selected texture vertically");
-			os::Printer::log("T (SOLID SELECTED): Change texture using file dialog.");
+		if (interaction->getKeyState(make_pair(KEY_KEY_X, KeyAugment::None)) && isFlipped) 
+			meshcomp->updateUV(scn,UVMode::FlipH,core::vector2df(0,0));
+		
+		if (interaction->getKeyState(make_pair(KEY_KEY_V, KeyAugment::None)) && isFlipped) 
+			meshcomp->updateUV(scn, UVMode::FlipV, core::vector2df(0, 0));
 
-			os::Printer::log("Ctrl+T (SOLID SELECTED): Change alpha of selected surface");
-			os::Printer::log("CTRL+F (SOLID SELECTED): Change flags of selected surface");
-
-			os::Printer::log("F: Change face uv mode");
-			os::Printer::log("Q: Decrease UV Scalar");
-			os::Printer::log("E: Increase UV Scalar");
-
-			os::Printer::log("CTRL+R (SOLID/ENTITY SELECTED): Reset position");
-			os::Printer::log("R (SOLID SELECTED): Reset uv");
-
-			os::Printer::log("CTRL or SHIFT (SOLID): Select vertex to move");
-			os::Printer::log("SHIFT+UP (SOLID/ENTITY SELECTED): Move X+");
-			os::Printer::log("SHIFT+DOWN (SOLID/ENTITY SELECTED): Move X-");
-			os::Printer::log("SHIFT+LEFT (SOLID/ENTITY SELECTED): Move Z+");
-			os::Printer::log("SHIFT+RIGHT (SOLID/ENTITY SELECTED): Move Z-");
-			os::Printer::log("CTRL+UP (SOLID/ENTITY SELECTED): Move Y+");
-			os::Printer::log("CTRL+DOWN (SOLID/ENTITY SELECTED): Move Y-");
-
-			os::Printer::log("UP (SOLID SELECTED): Change UV v+");
-			os::Printer::log("DOWN (SOLID SELECTED): Change UV v-");
-			os::Printer::log("LEFT (SOLID SELECTED): Change UV u+");
-			os::Printer::log("RIGHT (SOLID SELECTED): Change UV v-");
-			
-		}
 	});
-	if (SCNEdit::getSCN()) CViewInteraction::checkVisbility();
-}
-
-void CViewInteraction::onDestroy()
-{
-}
-
-void CViewInteraction::updateEntityPos(core::vector3df addpos) {
-	CContext* context = CContext::getInstance();
-	CInteractionManager* interaction = CInteractionManager::getInstance();
-	CScnEntityComponent* entcomp = interaction->getSelectObj()->getComponent<CScnEntityComponent>();
-	CCollisionManager* collisionMgr = context->getCollisionManager();
-	CScnEnt* ent = SCNEdit::getSCN()->getEnt(interaction->getEntityISelected());
-	if (addpos != core::vector3df(0, 0, 0)) {
-		core::vector3df pos = convert_vec3(ent->getField("origin")) + addpos;
-		ent->setField("Origin", format("{} {} {}", pos.X, pos.Y, pos.Z).c_str());
-	}
-	else {
-		ent->setField("Origin", entcomp->getResetPos().c_str());
-	}
-	entcomp->updateMesh(ent);
-	collisionMgr->removeCollision(interaction->getSelectObj());
-	collisionMgr->addBBComponentCollision(interaction->getSelectObj());
-	collisionMgr->build(false);
-
+	if (scn) CViewInteraction::updateVisbility();
 }
 
 void CViewInteraction::onUpdate()
@@ -260,54 +200,53 @@ void CViewInteraction::onUpdate()
 	CScene* scene = context->getScene();
 	guiSettings_t* gui = interaction->getGuiSettings();
 	CSceneDebug* sceneDebug = CSceneDebug::getInstance();
+	CCamera* active = context->getActiveCamera();
+	CCollisionManager* collisionMgr = context->getCollisionManager();
 
 	if (scene != NULL)
 		scene->update();
 
+	CScn* scn = SCNEdit::getSCN();
+
 	// get view ray from camera to mouse position
 	const core::recti& vp = getVideoDriver()->getViewPort();
-	if (SCNEdit::getSCN()) {
-		core::line3df ray = CProjective::getViewRay(
-			context->getActiveCamera(),
-			mouse.X, mouse.Y,
-			vp.getWidth(), vp.getHeight()
-		);
+	if (scn) {
+		core::line3df ray = CProjective::getViewRay(active,mouse.X, mouse.Y,vp.getWidth(), vp.getHeight());
 
 		float outBestDistanceSquared = 400 * 100; // hit in 300m
 		core::vector3df intersection;
 		core::triangle3df triangle;
 
-		CCollisionManager* collisionMgr = context->getCollisionManager();
 		if (collisionMgr->hasNodes() && 
 			collisionMgr->getCollisionPoint(ray, outBestDistanceSquared, intersection, triangle, interaction->node) 
-			&& !getApplication()->getDevice()->getCursorControl()->isVisible())
-		{
+			&& !interaction->getCursorMode()){
 
 			CCollisionNode* node = interaction->node;
-			if (interaction->isLeftClicked()) deselectAll(node->GameObject);
+			CGameObject* highlighted = node->GameObject;
+			if (interaction->isLeftClicked()) deselectAll(highlighted);
+
 			//Hover over styling
-			if ((str_equals(node->GameObject->getNameA(), "solid") ||
-				str_equals(node->GameObject->getNameA(), "solid_extra"))) {
+			if ((str_equals(highlighted->getNameA(), "solid") ||
+				str_equals(highlighted->getNameA(), "solid_extra"))) {
 				sceneDebug->addTri(triangle, SColor(255, 255, 0, 255));
 			}
-			if (str_equals(node->GameObject->getNameA(), "entity")) {
+			if (str_equals(highlighted->getNameA(), "entity")) {
 				sceneDebug->addBoudingBox(node->Selector->getBBox(), SColor(255, 0, 0, 0));
 			}
-			if (str_equals(node->GameObject->getNameA(), "portal")) {
+			if (str_equals(highlighted->getNameA(), "portal")) {
 				for (int i = 0; i < node->Triangles.size(); i++) {
 					sceneDebug->addTri(node->Triangles[i], SColor(255, 255, 255, 255));
 				}
 			}
-			
 
 			core::vector3df normal = triangle.getNormal();
 			normal.normalize();
 
-			// draw decal projection box
+			// draw projection box will draw white box and xyz lines
 			core::aabbox3df box;
 			float dist = context->getActiveCamera()->getPosition().getDistanceFrom(intersection) / 30.0f;
 			dist = min(max(dist, .3), 6);
-			core::vector3df halfBox = core::vector3df(1.0f * 0.5f, 1.0f * 0.5f, 1.0f * 0.5f);
+			core::vector3df halfBox = core::vector3df(1.0f * 0.5f);
 			box.MinEdge = -halfBox * dist;
 			box.MaxEdge = halfBox * dist;
 
@@ -322,72 +261,88 @@ void CViewInteraction::onUpdate()
 			core::matrix4 bbMatrix = q.getMatrix();
 			bbMatrix.setTranslation(intersection);
 
-
 			sceneDebug->addTransformBBox(box, SColor(255, 0, 255, 0), bbMatrix);
 			sceneDebug->addTransform(bbMatrix, 2.0f * dist);
 
 			//Read click update interaction manager accordingly.
 			if (interaction->isLeftClicked()) {
-
+				
 				CCube* sel =zone->searchObject(L"surf_verts")->getComponent<CCube>();
 				CCube* shared = zone->searchObject(L"shared_verts")->getComponent<CCube>();
 				resetSolid();
-		
-				if ((str_equals(node->GameObject->getNameA(), "solid") ||
-						str_equals(node->GameObject->getNameA(), "solid_extra")))
-				{
-					CScnMeshComponent* meshcomp = node->GameObject->getComponent<CScnMeshComponent>();
-					std::pair<int, int> surfdata = meshcomp->select(SCNEdit::getSCN(), triangle,
-						interaction->getLeftClickAug() == KeyAugment::Shift);
 				
-					interaction->setSurfISelected(surfdata);
-					if (surfdata.second != -1) {
-						if (str_equals(node->GameObject->getNameA(), "solid"))
-							interaction->setSelectedType(SelectedType::Solid);
-						else interaction->setSelectedType(SelectedType::SolidExtra);
-						
-						interaction->setVertData(meshcomp->getVertices(SCNEdit::getSCN()));
-						for (int i = 0; i < interaction->getVerts().size(); i++) {
-							sel->addPrimitive(interaction->getVerts()[i].pos, core::vector3df(0, 0, 0), core::vector3df(2.9, 2.9, 2.9));
-						}
-						for (int i = 0; i < interaction->getSharedVerts().size(); i++) {
-							shared->addPrimitive(interaction->getSharedVerts()[i].pos, core::vector3df(0, 0, 0), core::vector3df(2.9, 2.9, 2.9));
-						}
-					}
-					else interaction->setSelectedType(SelectedType::Empty);
+				//When click and solid is highlighted get the mesh component and select it. 
+				if ((str_equals(highlighted->getNameA(), "solid") || str_equals(highlighted->getNameA(), "solid_extra"))){
+					CScnMeshComponent* meshcomp = highlighted->getComponent<CScnMeshComponent>();
+					solidSelect_t surfdata = meshcomp->select(scn, triangle,
+						interaction->getLeftClickAug() == KeyAugment::Shift);
 			
+					//Set the surf indexed selected.
+					interaction->setSurfISelected(surfdata);
+					if (surfdata.surfsel != -1) {
+						if (str_equals(highlighted->getNameA(), "solid"))
+							interaction->selTypeLayer().set(SelectedType::Solid);
+						else 
+							interaction->selTypeLayer().set(SelectedType::SolidExtra);
+						
+						//Set vert and draw cubes based on vert data.
+						interaction->setVertData(meshcomp->getVertices(scn));
+						for (int i = 0; i < interaction->getVerts().size(); i++) 
+							sel->addPrimitive(interaction->getVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
+
+						for (int i = 0; i < interaction->getSharedVerts().size(); i++) 
+							shared->addPrimitive(interaction->getSharedVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
+						
+					}
+					else 
+						interaction->selTypeLayer().set(SelectedType::Empty);
 				}
 
-				if (str_equals(node->GameObject->getNameA(), "entity")) {
-					int entindx = node->GameObject->getComponent<CScnEntityComponent>()->select();
+				else if (str_equals(highlighted->getNameA(), "entity")) {
+					int entindx = highlighted->getComponent<CScnEntityComponent>()->select();
 					interaction->setEntityISelected(entindx);
-					if (entindx != -1)interaction->setSelectedType(SelectedType::Entity);
-					else interaction->setSelectedType(SelectedType::Empty);
+					if (entindx != -1)
+						interaction->selTypeLayer().set(SelectedType::Entity);
+					else 
+						interaction->selTypeLayer().set(SelectedType::Empty);
 
 				}
-				if (str_equals(node->GameObject->getNameA(), "portal")) {
-					std::pair<int, int> portaldata = node->GameObject->getComponent<CScnPortalComponent>()->select();
+				else if (str_equals(highlighted->getNameA(), "portal")) {
+					portalSelect_t portaldata = highlighted->getComponent<CScnPortalComponent>()->select();
 					interaction->setPortalISelected(portaldata);
-					if (portaldata.second != -1)interaction->setSelectedType(SelectedType::Portal);
-					else interaction->setSelectedType(SelectedType::Empty);
+					if (portaldata.portalidx != -1)
+						interaction->selTypeLayer().set(SelectedType::Portal);
+					else 
+						interaction->selTypeLayer().set(SelectedType::Empty);
 				}
-				interaction->setSelectObj(node->GameObject);
+
+				interaction->setSelectObj(highlighted);
 				interaction->CollisionCallback(triangle, intersection);
+				interaction->resetLeftClick();
 			}
-			if (interaction->getKeyAugment() == KeyAugment::None || interaction->getMoveableVert().pos.equals(core::vector3df(0,0,0),0.5))
-				getClosestVertex(intersection);
-			else if (interaction->findKeyAugment(KeyAugment::Ctrl, KeyAugment::Shift))
-				getSelectedVertex();
-			interaction->resetLeftClick();
+
+			
+			//Update the nearest or selected vert depending on moveable vert
+			if (interaction->selTypeLayer().find(SelectedType::Solid,SelectedType::SolidExtra)) {
+				indexedVec3df_t moveable = interaction->getMoveableVert();
+
+				if (interaction->keyAugLayer().get() == KeyAugment::None || moveable.pos.equals(core::vector3df(0), 0.5))
+					updateNearestVert(intersection);
+				else if (interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift))
+					updateSelectedVert();
+			}
+
 		}
 
-		
-
+		//When you update the imgui settings, update the visiblity according to settings, then update the lightmap.
+		//Also reset the prev gui data(used in ini file).
 		if (interaction->isGuiSettingsUpdated()) {
-			CViewInteraction::checkVisbility();
-			if (m_arguments->isLightmapEnable() && SCNEdit::getSCN()->getLightmap()->hasLightmaps()) {
+			CViewInteraction::updateVisbility();
+
+			if (scn->getLightmap()->hasLightmaps()) {
 				zone->searchObject(L"solid")->getComponent<CScnMeshComponent>()->setLightmapVisible(gui->vis_lightmaps);
 				CContainerObject* group_extra = (CContainerObject*)zone->searchObject(L"group_extra");
+
 				if (group_extra) {
 					for (int i = 0; i < group_extra->getChilds()->size(); i++) 
 						group_extra->getChilds()->at(i)->getComponent<CScnMeshComponent>()->setLightmapVisible(gui->vis_lightmaps);
@@ -396,6 +351,9 @@ void CViewInteraction::onUpdate()
 			interaction->resetPrevGui();
 		}
 	}
+}
+
+void CViewInteraction::onDestroy() {
 }
 
 void CViewInteraction::onRender()
@@ -422,13 +380,41 @@ void CViewInteraction::onRender()
 }
 
 
+void CViewInteraction::updateEntityPos(core::vector3df addpos) {
+	//Get entity variables and singletons
+	CContext* context = CContext::getInstance();
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	CGameObject* selected = interaction->getSelectObj();
+	int entitySelected = interaction->getEntityISelected();
+	CScnEntityComponent* entcomp = selected->getComponent<CScnEntityComponent>();
+	CCollisionManager* collisionMgr = context->getCollisionManager();
+	CScnEnt* ent = SCNEdit::getSCN()->getEnt(entitySelected);
 
+	//Set entity position based on add pos + origin.
+	if (addpos != core::vector3df(0)) {
+		core::vector3df pos = convert_vec3(ent->getField("origin")) + addpos;
+		ent->setField("Origin", format("{} {} {}", pos.X, pos.Y, pos.Z).c_str());
+	}
+	else
+		ent->setField("Origin", entcomp->getResetPos().c_str());
+
+	//Update mesh and rebuild collision.
+	entcomp->updateMesh(ent);
+	collisionMgr->removeCollision(selected);
+	collisionMgr->addBBComponentCollision(selected);
+	collisionMgr->build(false);
+
+}
 
 void CViewInteraction::deselectAll(CGameObject* current) {
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
+
+	//Deselect solid
 	CGameObject* solidObj = zone->searchObject(L"solid");
     if(solidObj !=current)solidObj->getComponent<CScnMeshComponent>()->deselect();
+
+	//Deselect solid extra
 	CContainerObject* group_extra = (CContainerObject*)zone->searchObject(L"group_extra");
 	if (group_extra) {
 		for (int i = 0; i < group_extra->getChilds()->size(); i++) {
@@ -436,6 +422,8 @@ void CViewInteraction::deselectAll(CGameObject* current) {
 				group_extra->getChilds()->at(i)->getComponent<CScnMeshComponent>()->deselect();
 		}
 	}
+
+	//Delselect entity
 	CContainerObject* group_entity = (CContainerObject*)zone->searchObject(L"group_entity");
 	if (group_entity) {
 		for (int i = 0; i < group_entity->getChilds()->size(); i++) {
@@ -444,8 +432,8 @@ void CViewInteraction::deselectAll(CGameObject* current) {
 		}
 	}
 
+	//Deselect portal
 	CContainerObject* group_portal = (CContainerObject*)zone->searchObject(L"group_portal");
-
 	if (group_portal) {
 		core::array<CGameObject*>objs = group_portal->getArrayChilds(false);
 		for (int i = 0; i < objs.size(); i++) {
@@ -457,11 +445,9 @@ void CViewInteraction::deselectAll(CGameObject* current) {
 
 }
 
-void CViewInteraction::onPostRender()
-{
+void CViewInteraction::onPostRender(){}
 
-}
-void CViewInteraction::updateVisbility(CGameObject* obj, bool state, bool bbCollision) {
+void CViewInteraction::updateObjectVisbility(CGameObject* obj, bool state, bool bbCollision) {
 	CContext* context = CContext::getInstance();
 	CCollisionManager* collisionMgr = context->getCollisionManager();
 	if (obj->isVisible() && !state) {
@@ -478,61 +464,62 @@ void CViewInteraction::updateVisbility(CGameObject* obj, bool state, bool bbColl
 
 }
 
-void CViewInteraction::checkVisbility()
+void CViewInteraction::updateVisbility()
 {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	guiSettings_t* gui = interaction->getGuiSettings();
-
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
 	CCollisionManager* collisionMgr = context->getCollisionManager();
+
+	//Given solid or extra selected show all hidden elements for simplicity sake
 	if (gui->vis_scn || gui->vis_doors) {
-		for (int i = 0; i < m_hideSolids.size(); i++) {
+		for (int i = 0; i < m_hideSolids.size(); i++) 
 			m_hideSolids[i]->getComponent<CScnMeshComponent>()->show();
-		}
 
 		m_hideSolids.clear();
 	}
-	if( !gui->vis_scn && interaction->getSelectedType() == SelectedType::Solid) {
+	//Reset solid verts and selected boxes.
+	if( (!gui->vis_scn && interaction->selTypeLayer().get() == SelectedType::Solid) || 
+		(!gui->vis_doors && interaction->selTypeLayer().get() == SelectedType::SolidExtra))
 		resetSolid();
-	}
-	if (!gui->vis_doors && interaction->getSelectedType() == SelectedType::SolidExtra) {
-		resetSolid();
-	}
-	updateVisbility(zone->searchObject(L"solid"), gui->vis_scn, false);
 
+	//Update solid based on imgui
+	updateObjectVisbility(zone->searchObject(L"solid"), gui->vis_scn, false);
+
+	//Update extra based on imgui
 	CContainerObject* group_extra = (CContainerObject*)zone->searchObject(L"group_extra");
 	if (group_extra) {
-		for (int i = 0; i < group_extra->getChilds()->size(); i++) {
-			updateVisbility(group_extra->getChilds()->at(i), gui->vis_doors, false);
-		}
+		for (int i = 0; i < group_extra->getChilds()->size(); i++) 
+			updateObjectVisbility(group_extra->getChilds()->at(i), gui->vis_doors, false);
 	}
+	
+	//Update portal based on imgui
 	CContainerObject* group_portal = (CContainerObject*)zone->searchObject(L"group_portal");
-
 	if (group_portal) {
 		core::array<CGameObject*>objs = group_portal->getArrayChilds(false);
 		for (int i = 0; i < objs.size(); i++) {
-			if (str_equals(objs[i]->getNameA(), "portal")) {
-				updateVisbility(objs[i], gui->vis_portals, true);
-			}
+			if (str_equals(objs[i]->getNameA(), "portal"))
+				updateObjectVisbility(objs[i], gui->vis_portals, true);
 		}
 	}
+	//Update bounding box based on imgui
 	CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
 	if (group_bb) {
-		for (int i = 0; i < group_bb->getChilds()->size(); i++) {
+		for (int i = 0; i < group_bb->getChilds()->size(); i++) 
 			group_bb->getChilds()->at(i)->setVisible(gui->vis_bb);
-		}
 	}
+	
+	//Update entity based on imgui
 	CContainerObject* group_entity = (CContainerObject*)zone->searchObject(L"group_entity");
 	if (group_entity) {
-		for (int i = 0; i < group_entity->getChilds()->size(); i++) {
-			updateVisbility(group_entity->getChilds()->at(i), gui->vis_entities, true);
-		}
+		for (int i = 0; i < group_entity->getChilds()->size(); i++) 
+			updateObjectVisbility(group_entity->getChilds()->at(i), gui->vis_entities, true);
 	}
-
+	//If needed rebuild the collision.
 	if (m_rebuildRequired) {
-		
-		if(collisionMgr->hasNodes())collisionMgr->build(false);
+		if(collisionMgr->hasNodes())
+			collisionMgr->build(false);
 		m_rebuildRequired = false;
 	}
 
@@ -545,60 +532,86 @@ void CViewInteraction::resetSolid() {
 	CCube* surf = zone->searchObject(L"surf_verts")->getComponent<CCube>();
 	CCube* shared = zone->searchObject(L"shared_verts")->getComponent<CCube>();
 	CCube* hover = zone->searchObject(L"hover_vert")->getComponent< CCube>();
+
 	hover->removeAllEntities();
 	sel->removeAllEntities();
 	surf->removeAllEntities();
 	shared->removeAllEntities();
 	interaction->resetSelectObj();
 	interaction->resetVerts();
-
 }
 
-void CViewInteraction::getClosestVertex(core::vector3df pos) {
+void CViewInteraction::updateNearestVert(core::vector3df pos) {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	if (interaction->getSharedVerts().size() > 0 || interaction->getVerts().size() > 0) {
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
-	indexedVec3df_t closest;
-	float minDistanceSq = FLT_MAX;
-	for (int i = 0; i < interaction->getVerts().size(); i++) {
-		core::vector3df point =interaction->getVerts()[i].pos;
-		float distanceSq = pos.getDistanceFromSQ(point); // Squared distance
-		if (distanceSq < minDistanceSq) {
-			minDistanceSq = distanceSq;
-			closest = interaction->getVerts()[i];
-
-		}
-	}
-	for (int i = 0; i < interaction->getSharedVerts().size(); i++) {
-		core::vector3df point = interaction->getSharedVerts()[i].pos;
-		float distanceSq = pos.getDistanceFromSQ(point); // Squared distance
-		if (distanceSq < minDistanceSq) {
-			minDistanceSq = distanceSq;
-			closest = interaction->getSharedVerts()[i];
-		}
-	}
-	CCube* movevert= zone->searchObject(L"hover_vert")->getComponent< CCube>();
-    movevert->removeAllEntities();
+	CScn* scn = SCNEdit::getSCN();
+	CCube* movevert = zone->searchObject(L"hover_vert")->getComponent< CCube>();
 	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
-	selvert->removeAllEntities();
-	movevert->addPrimitive(closest.pos, core::vector3df(0, 0, 0), core::vector3df(3.1, 3.1, 3.1));
+	//Make sure that surf and shared vert exists.
+	if (interaction->getSharedVerts().size() > 0 || interaction->getVerts().size() > 0) {
+		indexedVec3df_t closest;
+		float minDistSq = FLT_MAX;
+		
+		//Gets the nearest Vert for shared surf and surf vert.
+		CViewInteraction::getNearestDistVert(pos, interaction->getVerts(), closest, minDistSq);
+		CViewInteraction::getNearestDistVert(pos, interaction->getSharedVerts(), closest, minDistSq);
 
+		movevert->removeAllEntities();
+		selvert->removeAllEntities();
+		
+		movevert->addPrimitive(closest.pos, core::vector3df(0), core::vector3df(2.6));
+
+		//If closest has changed update the moveable vert and proccess the vertex callback.
 		if (closest.vertindx != interaction->getMoveableVert().vertindx) {
-			CScnSolid* solid = SCNEdit::getSCN()->getSolid(closest.solidindx);
+			CScnSolid* solid = scn->getSolid(closest.solidindx);
 			interaction->setMoveableVert(closest);
 			interaction->VertexCallback();
 		}
 	}
 }
-void CViewInteraction::getSelectedVertex() {
+///Loop through each vert get the squared distance and compare/update current min.
+void CViewInteraction::getNearestDistVert(core::vector3df pos, core::array<indexedVec3df_t> verts,indexedVec3df_t& closest, float& minDistSq) {
+	for (int i = 0; i < verts.size(); i++) {
+		core::vector3df point = verts[i].pos;
+		float distanceSq = pos.getDistanceFromSQ(point); // Squared distance
+
+		if (distanceSq < minDistSq) {
+			minDistSq = distanceSq;
+			closest = verts[i];
+		}
+	}
+}
+
+void CViewInteraction::updateSelectedVert() {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
 	CCube* movevert = zone->searchObject(L"hover_vert")->getComponent< CCube>();
-	movevert->removeAllEntities();
 	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
+	indexedVec3df_t moveable = interaction->getMoveableVert();
+
+	movevert->removeAllEntities();
 	selvert->removeAllEntities();
-	selvert->addPrimitive(interaction->getMoveableVert().pos, 
-		core::vector3df(0, 0, 0), core::vector3df(3.1, 3.1, 3.1));
+
+	selvert->addPrimitive(moveable.pos,core::vector3df(0), core::vector3df(3.1));
+}
+
+void CViewInteraction::moveBounds(bool reset)
+{
+	CScn* scn = SCNEdit::getSCN();
+	CContext* context = CContext::getInstance();
+	CZone* zone = context->getActiveZone();
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	indexedVec3df_t moveable = interaction->getMoveableVert();
+
+	if (moveable.solidindx == 0) {
+		CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
+		if (group_bb) {
+			for (int i = 0; i < group_bb->getChilds()->size(); i++) {
+				CScnCellBBComponent* cellbb = group_bb->getChilds()->at(i)->getComponent<CScnCellBBComponent>();
+				cellbb->updateBB(scn, moveable, true);
+			}
+		}
+	}
 }

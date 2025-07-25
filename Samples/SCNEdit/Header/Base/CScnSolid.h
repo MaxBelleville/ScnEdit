@@ -14,8 +14,9 @@ private:
 	int loadUVPos(std::ifstream *);
 	int loadVertIdxs(std::ifstream *);
 	int loadUVIdxs(std::ifstream *);
-	int loadUnk(std::ifstream *);
+	int loadParamFrames(std::ifstream *);
 	int loadCells(std::ifstream *);
+	int loadNames(std::ifstream* file);
 	int loadPortal(scnPortal_t *, std::ifstream *);
 	int loadCellData(scnRawCell_t *,scnCellData_t * cell_data,std::ifstream * file);
 	scnCellData_t* getBBFromSurf(u16 surfindx, scnCellData_t* cell_data);
@@ -25,18 +26,21 @@ private:
 
 //const static defColor = video::SColor(128,255,255,255);
 public:
-	u32 n_unk1, n_verts, n_uvpos, n_vertidxs, n_planes, n_nodes, n_surfs, n_cells, n_unk2;
+	u32 n_unk1, n_verts, n_uvpos, n_vertidxs, n_planes, n_nodes, n_surfs, n_cells, n_names;
 	u32 offset;
 	u32 length;
 	u32 solididx;
 	int64_t* surfsad;  //array of offset in scn file to each surface i
 	int64_t uvposad;    //offset in file to start of uvpos array
+	int64_t paramsad;   //offset in file to start of param frame array
 	int64_t vertssad; //ofset for vertices
 	int64_t planessad; //ofset for planes
 	scnSurf_t * surfs;
+	scnSurfParamFrame_t* paramFrames;
 	scnPlane_t * planes;
 	core::vector3df	* verts;
 	core::vector2df * uvpos;
+	core::array<const char*> names;
 	u32 * vertidxs;
 	u32 * uvidxs;
 	CScnBSPTree * tree;
@@ -44,7 +48,7 @@ public:
 	bool firstVal;
 	//all texture names in the solid, each only once
 	std::vector<std::string> textures;
-
+	
 	//constructor - do nothing for now
 	CScnSolid ();
 	~CScnSolid();

@@ -47,9 +47,8 @@ void scnExportObj(CScn* scn, const char* name)
             u32 vstart = solid->surfs[i].vertidxstart;
 
             for (u16 j = 0; j < solid->surfs[i].vertidxlen; j++)
-            {
                 fprintf(obj, "%u/%u ", solid->vertidxs[vstart + j] + 1 + nvp, solid->uvidxs[vstart + j] + 1 + nuvp);
-            }
+            
             fprintf(obj, "\n");
         }
 
@@ -67,7 +66,6 @@ void scnExportObj(CScn* scn, const char* name)
 
         for (i = 0; i < solid->textures.size(); i++)
         {
-
             fprintf(mtl, "newmtl %s\n", solid->textures[i].c_str());
             fprintf(mtl, "map_Kd textures/%s.bmp\n", solid->textures[i].c_str());
         }
@@ -188,59 +186,6 @@ void scnExport3ds(CScnSolid* mesh, u32 totalSize, const char* name)
     os::Printer::log("\tdone.");
 }
 
-/*core::vector3df crossProduct(core::vector3df a,core::vector3df b)
-{
-    core::vector3df res;
-    res.x = (a.y)*(b.z) - (a.z)*(b.y);
-    res.y = (a.z)*(b.x) - (a.x)*(b.z);
-    res.z = (a.x)*(b.y) - (a.y)*(b.x);
-    return res;
-}
-
-core::vector3df subtract(core::vector3df a, core::vector3df b)
-{
-    core::vector3df res;
-    res.x = a.x-b.x;
-    res.y = a.y-b.y;
-    res.z = a.z-b.z;
-    return res;
-}
-core::vector3df add(core::vector3df a, core::vector3df b)
-{
-    core::vector3df res;
-    res.x = a.x+b.x;
-    res.y = a.y+b.y;
-    res.z = a.z+b.z;
-    return res;
-}*/
-/*core::vector3df normalize(core::vector3df a)
-{
-    f32 mod = sqrt((a.x)*(a.x) + (a.y)*(a.y) + (a.z)*(a.z));
-    core::vector3df res;
-    if (mod == 0.0)
-    {
-        res.x = 0.0;
-        res.y = 0.0;
-        res.z = 0.0;
-        error(true,"normalize mod is zero!");
-    }
-    else
-    {
-        res.x = a.x/mod;
-        res.y = a.y/mod;
-        res.z = a.z/mod;
-    }
-    return res;
-
-}*/
-
-
-/*core::vector3df getNormalFrom3pts(core::vector3df a,core::vector3df b,core::vector3df c)
-{
-    return normalize(crossProduct(subtract(b,a),subtract(c,a)));
-}*/
-
-
 using namespace irr;
 using namespace core;
 
@@ -298,12 +243,6 @@ void scnExportMap(CScn* scn, const char* name)
             normal = vector3df(plane->a, plane->b, plane->c);
             dp = normal * width;
 
-            /*
-            if (!((dp.X == 0 && dp.Y == 0 && dp.Z!=0) ||
-                  (dp.X == 0 && dp.Y != 0 && dp.Z==0) ||
-                  (dp.X != 0 && dp.Y == 0 && dp.Z==0)))
-                continue;*/
-
             r1 = (b - a);
             r2 = r1.crossProduct(normal);
             c = a + r2;
@@ -311,7 +250,7 @@ void scnExportMap(CScn* scn, const char* name)
             r2.normalize();
 
             fprintf(map, "{\n");
-            writeMapLine(map, c, b, a, r1, r2, surfi->texture);                                          //plane A
+            writeMapLine(map, c, b, a, r1, r2, surfi->texture); //plane A
             writeMapLine(map, a - dp, b - dp, c - dp, r1, r2, surfi->texture); //plane B
 
             lastr1 = zero;
@@ -329,9 +268,10 @@ void scnExportMap(CScn* scn, const char* name)
                 b = vec2irrvec(solid->verts[solid->vertidxs[idxs[1]]]);
                 c = b - dp;
                 r1 = (b - a);
-                if (lastr1 != zero)
+                if (lastr1 != zero) {
                     if (r1.crossProduct(lastr1).equals(zero)) //if lastr1 and r1 are collinear skip this plane (we already have it)
                         continue;
+                }
 
                 r2 = r1.crossProduct(normal);
                 r1.normalize();
@@ -339,7 +279,6 @@ void scnExportMap(CScn* scn, const char* name)
                 writeMapLine(map, c, b, a, r1, r2); //plane C...
 
                 lastr1 = r1;
-
 
             } while (j > 0);
 
@@ -353,15 +292,7 @@ void scnExportMap(CScn* scn, const char* name)
     CScnEnt* ent;
     u32 nents = scn->getTotalEnts();
     for (u32 i = 0; i < nents; ++i)
-    {
         ent = scn->getEnt(i);
-
-        // No Entities printed to file
-        // No idea how to access the entity array - SJ
-        //fprintf(map,"I an entity %i\n");
-
-    }
-
 
     fclose(map);
 

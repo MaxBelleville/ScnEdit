@@ -12,6 +12,7 @@ class CViewInit : public CView
 public:
 	enum EInitState
 	{
+		Unload,
 		Start,
 		ReadScn,
 		InitScene,
@@ -23,17 +24,20 @@ public:
 
 protected:
 
-	EInitState m_initState;
+	EInitState m_initState = CViewInit::Start;
+
 	CScnArguments* m_arguments;
-	CGameObject* m_guiObject;
-	CCamera* m_guiCamera;
-	CCamera* m_camera;
-	CGameObject* m_skyObject;
-	CSkyBox* m_skyBox;
-	CGlyphFont* m_font;
-	CGUIText* m_textInfo;
 	u32 m_start;
-	core::array<CDecals*> m_decals;
+
+	CGameObject* m_guiObject = NULL;
+	CCamera* m_guiCamera = NULL;
+	CCamera* m_camera = NULL;
+	CGameObject* m_skyObject = NULL;
+	CSkyBox* m_skyBox = NULL;
+	CGlyphFont* m_font = NULL;
+	CGUIText* m_textInfo = NULL;
+	core::array<CDecals*> m_decals = NULL;
+
 protected:
 	io::path getBuiltInPath(const char* name);
 

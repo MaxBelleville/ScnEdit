@@ -11,9 +11,11 @@ using namespace irr;
 
 
 core::array<std::string> str_split(const char* charStr, const char* delmChar);
-int str_equals(const char *one, const char *two);
-int str_nequals(const char *one, const char *two,int n);
-int str_equiv(const char *one, const char *two);
+int str_equals_lim(const char* one, const char* two, int lim);
+int str_equiv_lim(const char* one, const char* two, int lim);
+int str_equals(const char* one, const char* two);
+int str_equiv(const char* one, const char* two);
+
 
 void error(bool fatal, const char* message, ...);
 
@@ -33,13 +35,16 @@ f32 read_f32(std::ifstream* file);
 
 bool is_number(const char* str);
 
-bool CopyFile_(const char * existfile, const char * newfile);
+bool copy_file(const char * existfile, const char * newfile);
 
 bool can_open(const char * path);
 
 SColor convert_color(const char* pos);
 core::vector3df convert_vec3(const char* pos);
 core::vector2df convert_vec2(const char* pos);
+std::string vec2_to_str(core::vector2df pos, int decimals);
+
+std::string vec3_to_str(core::vector3df pos, int decimals);
 
 core::array<std::string> search_dir(std::string dir, const char* file);
 
@@ -49,4 +54,6 @@ core::array<ITexture*> get_decals(const char* file);
 
 ITexture* convert_image(io::path file);
 
-
+video::S3DVertex* get_cube_vertices(core::vector3df start, core::vector3df end, SColor clr);
+IMeshBuffer* generate_cube_mesh_buff(core::vector3df start, core::vector3df end, SColor clr);
+const u16* get_cube_indices();

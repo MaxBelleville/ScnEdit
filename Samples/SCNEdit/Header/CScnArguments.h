@@ -20,10 +20,10 @@ class CScnArguments {
 			for (u32 i = 0; i < argv.size(); i++) {
 				if (argv[i] == " " || argv[i] == "") {}
 				else if (argv[i] == "-brief" ||
-					argv[i] == "-br") {}
+					argv[i] == "-br") {
+				}
 				else if (argv[i] == "-portal" ||
 					argv[i] == "-p") {
-					bPortal = true;
 				}
 				else if (argv[i] == "-directx" ||
 					argv[i] == "-dx") {
@@ -50,11 +50,9 @@ class CScnArguments {
 					bFullscreen = true;
 				}
 				else if (argv[i] == "-all") {
-					bEntity = true;
-					bPortal = true;
-					bCellBVH = true;
-					bLoadExtra = true;
-					bLoadLightmaps = true;
+					bVertInfo = true;
+					bLoadInbuiltDebugger = true;
+					bDebug = false;
 					m_Alpha = 125;
 				}
 				else if (argv[i] == "-map") {
@@ -88,19 +86,22 @@ class CScnArguments {
 				}
 				else if (argv[i] == "-entity" ||
 					argv[i] == "-e") {
-					bEntity = true;
+					
+				}
+				else if (argv[i] == "-vi" ||
+					argv[i] == "-vertexinfo") {
+					bVertInfo = true;
 				}
 				else if (argv[i] == "-movevertex" ||
 					argv[i] == "-mv") {
-					bMoveVertex = true;
 				}
 				else if (argv[i] == "-es" ||
 					argv[i] == "-extrasolids") {
-					bLoadExtra = true;
+					
 				}
 				else if (argv[i] == "-bb" ||
 					argv[i] == "-boundingbox") {
-					bCellBVH = true;
+
 				}
 				else if(argv[i] == "-decals") {
 					bDecal = true;
@@ -110,7 +111,7 @@ class CScnArguments {
 				}
 				else if (argv[i] == "-l" ||
 					argv[i] == "-lightmap") {
-					bLoadLightmaps = true;
+				
 				}
 				else if (argv[i] == "-nodebug" || argv[i] == "-nd") {
 					bDebug = false;
@@ -136,14 +137,10 @@ class CScnArguments {
 						"   -vd,-viewdistance <dist>         Set view distance. Default is 20\n"
 						"   -fov <fov>                       Set camera fov. Default is 60\n"
 						"   -fa, -forcealpha                 Forces showing transparent materials.\n"
-						"   -p, -portal                      Displays portals\n"
-						"   -e, -entity                      Displays entites\n"
 						"   -flip							 Flip the texture UV's (WIP)\n"
 						"   -decals							 Visually display a rough idea of what decals will look like(WIP)\n"
-						"   -all							 Will load every component with lightmaps(same as -l -es -e -p -bb -fa)\n"
-						"   -es, -extrasolids                Load extra solids(ex: doors) instead of just the base geometry\n"
-						"   -bb, -boundingbox                Displays a gray box around all of the cell collison bounding boxes\n"
-						"   -l, -lightmap                    Visually shows lightmaps(Warning: slower loading times)\n"
+						"   -vi -vertexinfo                  When Vertex is selected, via CTRL or SHIFT detail boxes change."
+						"   -all							 Helper that will enable mutiple flags(same as -fa -vi -nd -i)\n"
 						);
 				}
 			}
@@ -164,16 +161,11 @@ class CScnArguments {
 		inline bool isDefault() { return bResDefault; }
 		inline bool isMouseInvert() { return bInvertMouse; }
 		inline bool isDecalEnabled() { return bDecal; }
-		inline bool isPortalEnabled() { return bPortal; }
-		inline bool isBBEnabled() { return bCellBVH; }
-		inline bool isEntityEnabled() { return bEntity; }
 		inline bool isFlippedUV() { return bFlipUV; }
-		inline bool isExtrasEnabled() { return bLoadExtra; }
-		inline bool isLightmapEnable() { return bLoadLightmaps; }
 		inline bool isDebugEnabled() { return bDebug; }
 		inline bool isInternalDebug() { return bLoadInbuiltDebugger; }
-		inline bool isVertMoveable() { return bMoveVertex; }
 		inline bool isBorderless() { return bBorderless; }
+		inline bool isVertInfo() { return bVertInfo; }
 		inline bool isResizeable() { return bResizeable; }
 		inline bool isFullscreen() { return bFullscreen; }
 		inline bool getScnLoaded() { return bLoaded; }
@@ -183,15 +175,10 @@ class CScnArguments {
 	private:
 		bool bResDefault = true;
 		bool bInvertMouse = false;
-		bool bPortal = false;
-		bool bCellBVH = false;
-		bool bEntity = false;
-		bool bLoadExtra = false;
-		bool bLoadLightmaps = false;
+		bool bVertInfo = false;
 		bool bLoadInbuiltDebugger = false;
 		bool bLoaded = false;
 		bool bDebug = true;
-		bool bMoveVertex = false;
 		bool bBorderless = false;
 		bool bFullscreen = false;
 		bool bFlipUV = false;

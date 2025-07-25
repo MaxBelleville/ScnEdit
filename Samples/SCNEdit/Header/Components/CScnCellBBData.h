@@ -10,7 +10,7 @@ public:
 	IMeshBuffer *MeshBuffer;
 
 	core::array<core::vector3df*> backup_bb;
-	int cellindx;
+	int cellindx= -1;
 public:
 	CScnCellBBData();
 

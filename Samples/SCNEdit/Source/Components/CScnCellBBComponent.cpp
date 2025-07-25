@@ -4,20 +4,13 @@
 #include "Header/Components/CScnCellBBData.h"
 
 
-CScnCellBBComponent::CScnCellBBComponent()
-{
+CScnCellBBComponent::CScnCellBBComponent(){}
 
-}
-
-CScnCellBBComponent::~CScnCellBBComponent()
-{
-
-}
+CScnCellBBComponent::~CScnCellBBComponent(){}
 
 void CScnCellBBComponent::initComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
-
 
 	// add culling
 	CCullingData* culling = entity->addData<CCullingData>();
@@ -36,7 +29,8 @@ void CScnCellBBComponent::updateBB(CScn* scn, indexedVec3df_t vert, bool reset)
 {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnCellBBData* cellbb = entity->getData<CScnCellBBData>();
-	if (cellbb) cellbb->updateBB(scn,vert,reset);
+	if (cellbb) 
+		cellbb->updateBB(scn,vert,reset);
 }
 
 
@@ -44,5 +38,6 @@ void CScnCellBBComponent::updateComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnCellBBData* cellbb = entity->getData<CScnCellBBData>();
-	if(cellbb) cellbb->setVisible(true);
+	if(cellbb) 
+		cellbb->setVisible(true);
 }

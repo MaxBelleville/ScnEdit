@@ -4,20 +4,13 @@
 #include "Header/Components/CScnEntityData.h"
 
 
-CScnEntityComponent::CScnEntityComponent()
-{
+CScnEntityComponent::CScnEntityComponent(){}
 
-}
-
-CScnEntityComponent::~CScnEntityComponent()
-{
-
-}
+CScnEntityComponent::~CScnEntityComponent(){}
 
 void CScnEntityComponent::initComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
-
 
 	// add culling
 	CCullingData* culling = entity->addData<CCullingData>();
@@ -51,7 +44,8 @@ int CScnEntityComponent::select() {
 	if (entData) {
 		selected ? entData->deselect() : entData->select();
 		selected = !selected;
-		if(selected) return entData->getEntityIndx();
+		if(selected)
+			return entData->getEntityIndx();
 	}
 	return -1;
 }
@@ -72,13 +66,15 @@ void CScnEntityComponent::updateComponent()
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->getData<CScnEntityData>();
 
-	if(entData) entData->setVisible(true);
+	if(entData) 
+		entData->setVisible(true);
 }
 
 std::string CScnEntityComponent::getResetPos() {
 
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->getData<CScnEntityData>();
-	if (entData) { return entData->m_origin;  }
+	if (entData) 
+		return entData->m_origin;  
 	return "";
 }

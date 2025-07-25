@@ -282,6 +282,7 @@ namespace Skylicht
 		case EET_MOUSE_INPUT_EVENT:
 			if (evt.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
 				m_leftMousePress = true;
+
 			if (evt.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
 				m_leftMousePress = false;
 			if (evt.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN)
@@ -300,9 +301,6 @@ namespace Skylicht
 				m_mayaRightMousePress = true;
 				m_centerCursor = m_cursorControl->getRelativePosition();
 				m_cursorPos = m_centerCursor;
-				if (m_controlStyle == FPS&& m_camera->isEnable()) {
-					m_cursorControl->setVisible(!m_cursorControl->isVisible());
-				}
 			}
 			else if (evt.MouseInput.Event == EMIE_MMOUSE_PRESSED_DOWN)
 			{

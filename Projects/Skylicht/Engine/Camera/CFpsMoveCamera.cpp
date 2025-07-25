@@ -90,7 +90,7 @@ namespace Skylicht
 	{
 		if (m_camera && !m_camera->isInputReceiverEnabled())
 			return false;
-
+		
 		switch (evt.EventType)
 		{
 		case EET_KEY_INPUT_EVENT:

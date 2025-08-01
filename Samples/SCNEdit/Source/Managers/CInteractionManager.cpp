@@ -5,7 +5,6 @@ IMPLEMENT_SINGLETON(CInteractionManager);
 
 CInteractionManager::CInteractionManager()
 {
-	m_logs.push_back(new ImGuiAl::BufferedLog<81920>());
 	CEventManager::getInstance()->registerEvent("InteractionManager",this);
 	// Register custom INI settings handler
 	ImGuiSettingsHandler ini_handler;
@@ -32,11 +31,9 @@ CInteractionManager::~CInteractionManager() {
 	resetVerts();
 	m_selectedType = SelectedType::Empty;
 	m_guiState = GUIState::Default;
-	m_logs.clear();
 	m_surfselected = solidSelect_t(-1, -1);
 	m_portalselected = portalSelect_t(-1, -1);
 	m_entityselected = -1;
-	page = 0;
 }
 
 void* CInteractionManager::readOpen(ImGuiContext*, ImGuiSettingsHandler* handler, const char* name) {
@@ -83,31 +80,28 @@ bool CInteractionManager::OnEvent(const SEvent& event)
 {
 	m_augment = KeyAugment::None;
 	if (event.EventType == EET_LOG_TEXT_EVENT) {
-		if (getLog()->available() < 50) {
-			m_logs.push_back(new ImGuiAl::BufferedLog<81920>());
-			page += 1;
-		}
+
 		for (int i = 0; i < m_LogEvents.size(); i++) {
 			m_LogEvents[i](event.LogEvent.Text);
 		}
-		if (event.LogEvent.Level == ELOG_LEVEL::ELL_INFORMATION) {
-			getLog()->info(event.LogEvent.Text);
+		if (event.LogEvent.Level == ELL_INFORMATION) {
+			m_logger.AddLog("#ffffff %s\n",event.LogEvent.Text);
 			return true;
 		}
-		if (event.LogEvent.Level == ELOG_LEVEL::ELL_DEBUG) {
-			getLog()->debug(event.LogEvent.Text);
+		if (event.LogEvent.Level == ELL_DEBUG) {
+			m_logger.AddLog("#ffff00 %s\n", event.LogEvent.Text);
 			return true;
 		}
-		if (event.LogEvent.Level == ELOG_LEVEL::ELL_ERROR) {
-			getLog()->error(event.LogEvent.Text);
+		if (event.LogEvent.Level == ELL_ERROR) {
+			m_logger.AddLog("#6666ff %s\n", event.LogEvent.Text);
 			return true;
 		}
-		if (event.LogEvent.Level == ELOG_LEVEL::ELL_WARNING) {
-			getLog()->warning(event.LogEvent.Text);
+		if (event.LogEvent.Level == ELL_WARNING) {
+			m_logger.AddLog("#00ffff %s\n", event.LogEvent.Text);
 			return true;
 		}
-		if (event.LogEvent.Level == ELOG_LEVEL::ELL_NONE) {
-			getLog()->debug(event.LogEvent.Text);
+		if (event.LogEvent.Level == ELL_NONE) {
+			m_logger.AddLog("#aaaaaa %s\n", event.LogEvent.Text);
 			return true;
 		}
 		
@@ -255,8 +249,10 @@ bool CInteractionManager::ToggleButton(const char* str_id, bool* v)
 
 void CInteractionManager::swapCursorMode(bool isRightClick)
 {
+	if (m_blockCursor) return;
 	gui::ICursorControl* cursor = getApplication()->getDevice()->getCursorControl();
 	cursor->setVisible(!cursor->isVisible());
+
 	if (!cursor->isVisible()) 
 		resetLeftClick();
 	for (int i = 0; i < m_CursorModeEvents.size(); i++)
@@ -265,6 +261,7 @@ void CInteractionManager::swapCursorMode(bool isRightClick)
 
 void CInteractionManager::setCursorMode(bool state)
 {
+	if (m_blockCursor) return;
 	gui::ICursorControl* cursor = getApplication()->getDevice()->getCursorControl();
 	cursor->setVisible(state);
 	if (!state)
@@ -277,13 +274,13 @@ void CInteractionManager::setCursorMode(bool state)
 void CInteractionManager::updateVertPos(indexedVec3df_t vert) {
 	moveablevert.pos = vert.pos;
 	for (int i = 0; i < getVerts().size(); i++) {
-		if (getVerts()[i].vertindx == vert.vertindx) {
+		if (getVerts()[i].vertidxidx == vert.vertidxidx) {
 			vertexdata.first[i].pos = vert.pos;
 			return;
 		}
 	}
 	for (int i = 0; i < getSharedVerts().size(); i++) {
-		if (getSharedVerts()[i].vertindx == moveablevert.vertindx) {
+		if (getSharedVerts()[i].vertidxidx == moveablevert.vertidxidx) {
 			vertexdata.second[i].pos = vert.pos;
 			return;
 		}

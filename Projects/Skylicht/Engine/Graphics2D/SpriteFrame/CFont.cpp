@@ -22,27 +22,48 @@ https://github.com/skylicht-lab/skylicht-engine
 !#
 */
 
-#pragma once
-
-#include "CSpriteFrame.h"
+#include "pch.h"
+#include "CFont.h"
 
 namespace Skylicht
 {
-	class SKYLICHT_API IFont
+	void CFont::getListModule(const wchar_t* string, std::vector<int>& format, std::vector<SModuleOffset*>& output, std::vector<int>& outputFormat)
 	{
-	public:
-		IFont() {}
+		output.clear();
+		outputFormat.clear();
 
-		virtual ~IFont() {}
+		int i = 0;
+		while (string[i] != 0)
+		{
+			SModuleOffset* module = getCharacterModule(string[i]);
+			if (module)
+			{
+				module->Character = (wchar_t)string[i];
 
-		virtual SModuleOffset* getCharacterModule(int character) = 0;
+				outputFormat.push_back(format[i]);
+				output.push_back(module);
+			}
+			i++;
+		}
+	}
 
-		virtual void getListModule(const wchar_t* string, std::vector<int>& format, std::vector<SModuleOffset*>& output, std::vector<int>& outputFormat);
+	void CFont::updateFontTexture()
+	{
 
-		virtual void updateFontTexture();
+	}
 
-		virtual bool dropFont();
+	bool CFont::dropFont()
+	{
+		IReferenceCounted* ref = dynamic_cast<IReferenceCounted*>(this);
+		if (ref)
+			return ref->drop();
+		return false;
+	}
 
-		virtual void grabFont();
-	};
+	void CFont::grabFont()
+	{
+		IReferenceCounted* ref = dynamic_cast<IReferenceCounted*>(this);
+		if (ref)
+			ref->grab();
+	}
 }

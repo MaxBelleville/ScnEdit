@@ -39,9 +39,9 @@ struct scnHeader_t
 };
 struct scnSurf_t
 {
-	//IMPORTANT: keep order, we rely on it to read
+	//IMPORTANT: keep order, we rely on it to read, 72 bytes
 	char texture[32];
-	f32 unk[2]; // Some sort offset,
+	f32 unk[2]; // Some sort offset, 
 	u8 flag1, flag2;
 	u16 alpha;
 	u16 lmsize_h, lmsize_v;
@@ -50,9 +50,8 @@ struct scnSurf_t
 	u16 planeidx;
 	u16 vertidxlen;
 	u16 hasVertexColors;
-	char stuff2[10];
+	char stuff2[38]; // There are some potential surface flags here maybe material too?.
 	u8 * shading;
-//	char extra[?]	??
 };
 
 //#surface flags :
@@ -202,10 +201,10 @@ struct vertProp_t
 struct indexedVec3df_t
 {
 	core::vector3df pos;
-	u32 vertindx = 0;
-	u32 solidindx = 0;
-	u32 surfindx = 0;
-	u32 surf_vertindx = 0;
+	u32 vertidxidx = 0;
+	u32 solididx = 0;
+	u32 surfidx = 0;
+	u32 surf_vertidx = 0;
 	bool bShared;
 	core::array<u32> sharesWith;
 };

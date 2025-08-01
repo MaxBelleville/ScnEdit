@@ -6,6 +6,7 @@ include_directories(
 	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty/freetype2/include
 	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty/libmpg123
 	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty/kdtree
+
 )
 
 if (BUILD_OPENSSL)
@@ -19,6 +20,25 @@ file(GLOB_RECURSE aes_gladman_source
 	./aesGladman/**.c 
 	./aesGladman/**.h)
 setup_project_group("${aes_gladman_source}" ${CMAKE_CURRENT_SOURCE_DIR})
+
+
+#pfd
+file(GLOB_RECURSE pfd_source
+	./pfd/**.cpp 
+	./pfd/*.hpp 
+	./pfd/**.c 
+	./pfd/**.h)
+setup_project_group("${pfd_source}" ${CMAKE_CURRENT_SOURCE_DIR})
+
+#utf8lib
+file(GLOB_RECURSE utf8_source
+	./utf8/**.cpp 
+	./utf8/*.hpp 
+	./utf8/**.c 
+	./utf8/**.h)
+setup_project_group("${utf8_source}" ${CMAKE_CURRENT_SOURCE_DIR})
+
+
 
 #bzip2
 file(GLOB_RECURSE bzip2_source 
@@ -138,6 +158,8 @@ add_library(ThirdParty ${ENGINE_SHARED_OR_STATIC_LIB}
 	${freetype_source}
 	${libmpg123_source}
 	${kdtree_source}
+	${pfd_source}
+	${utf8_source}
 )
 
 set_target_properties(ThirdParty PROPERTIES VERSION ${SKYLICHT_VERSION})

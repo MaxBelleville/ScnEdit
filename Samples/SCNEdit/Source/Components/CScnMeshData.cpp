@@ -44,11 +44,12 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 			//TODO: instead of using the base directory to load the textures consider loading
 			//all general textures first then we don't need to load them here
 	
-			CMaterial* material = new CMaterial((to_string(mesh->solididx) + "-" + to_string(i)).c_str(), "TextureColor2Layer.xml");
+			CMaterial* material = new CMaterial((to_string(mesh->solididx) + "-" + to_string(i)).c_str(), 
+				"TextureColor2Layer.xml");
 
 			if (try_load_texture(t, cantFind, "./textures/%s.bmp", nullptr, mesh->surfs[i].texture,istga)||
-				try_load_texture(t, cantFind, "%S/general/%s.bmp", args->getBaseDirectory(), mesh->surfs[i].texture, istga)||
-				try_load_texture(t, cantFind, "./textures/%s.tga", nullptr, mesh->surfs[i].texture, istga)||
+				try_load_texture(t, cantFind, "%S/general/%s.bmp", args->getBaseDirectory(), mesh->surfs[i].texture, istga)
+				||try_load_texture(t, cantFind, "./textures/%s.tga", nullptr, mesh->surfs[i].texture, istga)||
 				try_load_texture(t, cantFind, "%S/general/%s.tga", args->getBaseDirectory(), mesh->surfs[i].texture,istga)) 
 			{ 
 				//Load in lightmap atlas pos (ie where in the lightmap texture the solid surface currently is.)
@@ -58,7 +59,8 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 					core::vector3di atpos = lmap->getAtlasPos(mesh->solididx, i);
 					if (atpos.Z != currAtlas) {
 						currAtlas = atpos.Z;
-						lt = getVideoDriver()->addTexture(("lmAtlas" + to_string(atpos.Z)).c_str(), lmap->getAtlas(atpos.Z));
+						lt = getVideoDriver()->addTexture(("lmAtlas" + to_string(atpos.Z)).c_str(), 
+							lmap->getAtlas(atpos.Z));
 					}
 				}
 				//If tga assume material is transparent.
@@ -80,7 +82,8 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 				}
 				//If it's transparent use the texture color 2 layer + alpha instead of just the regular texture color 2 layer. 
 				if (isTransparent) 
-					material = new CMaterial((to_string(mesh->solididx) + "-" + to_string(i)).c_str(), "TextureColor2LayerAlpha.xml");
+					material = new CMaterial((to_string(mesh->solididx) + "-" + to_string(i)).c_str(), 
+						"TextureColor2LayerAlpha.xml");
 				
 
 				material->setTexture(0, t);
@@ -107,7 +110,8 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 
 			mesh->calcSurfVertices(i, lmap->getMults(mesh->solididx, i), vbuff, args->getAlpha());
 			mesh->calcSurfIndices(i, ibuff);
-
+			MeshBuffer->recalculateBoundingBox();
+		
 			RenderMesh->addMeshBuffer(MeshBuffer, (to_string(mesh->solididx) + "-" + to_string(i)).c_str(), material);
 
 
@@ -130,6 +134,7 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 		}
 	RenderMesh->recalculateBoundingBox();
 	RenderMesh->setHardwareMappingHint(EHM_STATIC);
+	
 }
 
 bool CScnMeshData::try_load_texture(video::ITexture*& t, std::set<std::string>& findSet, 
@@ -150,7 +155,8 @@ bool CScnMeshData::try_load_texture(video::ITexture*& t, std::set<std::string>& 
 		if (t == 0) 
 			findSet.insert(tmp);
 		istga = hasFileExtension(file, "tga");
-		//May set to true in the case were can't convert tga but that shouldn't matter due to the fact we only care when it does work.
+		//May set to true in the case were can't convert tga but that shouldn't matter due to 
+		// the fact we only care when it does work.
 	}
 	
 	return t!=0;
@@ -197,12 +203,12 @@ solidSelect_t CScnMeshData::getSurfaceIndx(CScn* scn, core::triangle3df tri) {
 	return solidSelect_t(solidindx, -1);
 }
 
-core::array<int> CScnMeshData::getSharedSurface(CScn* scn, core::array<int>sindices) {
+core::array<int> CScnMeshData::getUVSharedSurface(CScn* scn, core::array<int>sindices) {
 	//Loop through all surfaces indices, get the shared surface of each indivual surface
 	// Then compare to check if shared surface isn't included in the surface indice and isn't already included in final.
 	core::array<int> final;
 	for (int i = 0; i < sindices.size(); i++) {
-		core::array<int> shared=getSharedSurface(scn,sindices[i]);
+		core::array<int> shared= getUVSharedSurface(scn,sindices[i]);
 		for (int j = 0; j < shared.size(); j++) {
 			if (final.linear_search(shared[j]) == -1 && sindices.linear_search(shared[j]) == -1)
 				final.push_back(shared[j]);
@@ -238,9 +244,10 @@ core::array<vertProp_t> CScnMeshData::getSurfVertProps(CScn* scn, int si) {
 
 		for (u32 k = 0; k < c_uvidxs->size(); k++)          //run through all of these uvidxs
 		{
-			c_surfs = &solid->uvidxs_caller[(*c_uvidxs)[k]]; //array with the indexes of surfs that have this uvidx
+			c_surfs = &solid->uvvertidxs_caller[(*c_uvidxs)[k]]; //array with the indexes of surfs that have this uvidx
 
-			//i don't think it ever happened where the same uvidx is called by more than one surface (ie, c_surfs->size() is always 1)
+			//i don't think it ever happened where the same uvidx is called by more than one surface 
+			// (ie, c_surfs->size() is always 1)
 			//although that would make much more sense, mr swat3 dev.
 			for (u32 m = 0; m < c_surfs->size(); m++)
 			{
@@ -255,7 +262,8 @@ core::array<vertProp_t> CScnMeshData::getSurfVertProps(CScn* scn, int si) {
 			} 
 		}
 
-		//CONTINUE: boxes should be drawn on all surfaces! And straight lines joining the dots if they are different in space 
+		//CONTINUE: boxes should be drawn on all surfaces! And straight lines joining the dots if 
+		// they are different in space 
 		// implementing, in main, retexturing of selected surf, affects blue surfaces.
 
 		vprops.push_back(vp);
@@ -264,9 +272,7 @@ core::array<vertProp_t> CScnMeshData::getSurfVertProps(CScn* scn, int si) {
 	return vprops;
 }
 //Same as getSurfVertProps but only for figuring out the shared index. 
-core::array<int> CScnMeshData::getSharedSurface(CScn* scn, int si) {
-	f32 dx = 1.0, dy = 1.0, dz = 1.0;
-
+core::array<int> CScnMeshData::getUVSharedSurface(CScn* scn, int si) {
 	CScnSolid* solid = scn->getSolid(solidindx);
 	scnSurf_t* surfi = &solid->surfs[si];
 
@@ -276,25 +282,20 @@ core::array<int> CScnMeshData::getSharedSurface(CScn* scn, int si) {
 
 
 	//run through vertices, to see how many are shared
-	bool bShared;
-
 	for (u32 j = 0; j < surfi->vertidxlen; j++)
 	{
-		bShared = false; //assume vertex is not shared
-
 		u32 uvidx = solid->uvidxs[surfi->vertidxstart + j]; //uvidx of this vertex
 
 		c_uvidxs = &solid->uvpos_caller[uvidx];             //array with the uvidxs that point to this uvpos vertex
 
 		for (u32 k = 0; k < c_uvidxs->size(); k++)          //run through all of these uvidxs
 		{
-			c_surfs = &solid->uvidxs_caller[(*c_uvidxs)[k]]; //array with the indexes of surfs that have this uvidx
+			c_surfs = &solid->uvvertidxs_caller[(*c_uvidxs)[k]]; //array with the indexes of surfs that have this uvidx
 			for (u32 m = 0; m < c_surfs->size(); m++)
 			{
 				u32 cs = (*c_surfs)[m]; //caller surface index
 				if (cs != si && shared.linear_search(cs) == -1)
 				{
-					bShared = true; //this means this vertex is shared
 					shared.push_back(cs); //add surface to list of shared surfaces
 				}
 
@@ -302,6 +303,37 @@ core::array<int> CScnMeshData::getSharedSurface(CScn* scn, int si) {
 		} //k
 
 	} //j
+
+	return shared;
+}
+
+core::array<int> CScnMeshData::getVertSharedSurface(CScn* scn, int si, int vertidx) {
+	CScnSolid* solid = scn->getSolid(solidindx);
+	scnSurf_t* surfi = &solid->surfs[si];
+
+	core::array<u32>* c_vertidxs;
+	core::array<u32>* c_surfs;
+	core::array<int> shared(16); //shared surfaces of si (not including si)
+
+
+	//run through vertices, to see how many are shared
+
+	c_vertidxs = &solid->vertpos_caller[vertidx];             //array with the vertidx that point to this uvpos vertex
+
+	for (u32 k = 0; k < c_vertidxs->size(); k++)          //run through all of these uvidxs
+	{
+		c_surfs = &solid->uvvertidxs_caller[(*c_vertidxs)[k]]; //array with the indexes of surfs that have this uvidx
+		for (u32 m = 0; m < c_surfs->size(); m++)
+		{
+			u32 cs = (*c_surfs)[m]; //caller surface index
+			if (cs != si && shared.linear_search(cs) == -1)
+			{
+				shared.push_back(cs); //add surface to list of shared surfaces
+			}
+
+		} //m
+	} //k
+
 
 	return shared;
 }
@@ -332,7 +364,8 @@ indexed_vertices CScnMeshData::getVertices(CScn* scn,core::array<int> selsurf, c
 		u32 r = selsurf[i];
 		core::array<vertProp_t> vprops = getSurfVertProps(scn, r);
 
-		//Loop through all of the verts getting the indexed version of the vert and split it depending on if it's shared or not.
+		//Loop through all of the verts getting the indexed version of the vert and split it depending on 
+		// if it's shared or not.
 		for (u32 v = 0; v < vprops.size(); v++) {
 			
 			vertProp_t vp = vprops[v];
@@ -480,30 +513,53 @@ void CScnMeshData::updatePlane(CScn* scn, int si) {
 indexedVec3df_t CScnMeshData::updateVert(CScn* scn, indexedVec3df_t vert, core::vector3df add) {
 	//Update indexed verts, solid verts, and mesh verts.
 	CScnSolid* solid = scn->getSolid(solidindx);
+	
 	vert.pos += add;
-	int si = vert.surfindx;
-	solid->verts[solid->vertidxs[vert.vertindx]] = vert.pos;
+	solid->verts[solid->vertidxs[vert.vertidxidx]] = vert.pos;
 
-	IVertexBuffer* vb = RenderMesh->getMeshBuffer(si)->getVertexBuffer();
-	video::S3DVertex2TCoords* vertices = static_cast<video::S3DVertex2TCoords*>(vb->getVertices());
-	RenderMesh->getMeshBuffer(si)->setHardwareMappingHint(EHM_NEVER);
+	u32 vertidx = solid->vertidxs[vert.vertidxidx]; //vertidx of this vertex
 
-	vertices[vert.surf_vertindx].Pos = vert.pos;
-	vis_backup[si].vertices[vert.surf_vertindx] = vertices[vert.surf_vertindx];
-	updatePlane(scn, si);
+	core::array<int> shared = getVertSharedSurface(scn,vert.surfidx, vertidx);
+
+	updateMeshVert(vert.surfidx, vert.surf_vertidx, vert.pos);
+	updatePlane(scn, vert.surfidx);
+
+	for (int j = 0; j < shared.size(); j++) {
+		int si = shared[j];
+		scnSurf_t* surf = &solid->surfs[si];
+		u32 surf_vertidx = -1;
+		for (u32 j = 0; j < surf->vertidxlen; j++) {
+			if (solid->vertidxs[surf->vertidxstart + j] == vertidx) {
+				surf_vertidx = j;
+				break;
+			}
+		}
+		updateMeshVert(si, surf_vertidx, vert.pos);
+		updatePlane(scn, si);
+	}
+
 	return vert;
 }
+
 indexedVec3df_t CScnMeshData::resetVert(CScn* scn, indexedVec3df_t vert) {
-	int si = vert.surfindx;
-	video::S3DVertex2TCoords vertex = vert_backup[si].vertices[vert.surf_vertindx];
+	int si = vert.surfidx;
+	video::S3DVertex2TCoords vertex = vert_backup[si].vertices[vert.surf_vertidx];
 	if (vert.pos == vertex.Pos) 
 		return vert;
 
 	vert.pos = vertex.Pos;
 	indexedVec3df_t newvert= updateVert(scn, vert, core::vector3df(0));
-	updatePlane(scn, si);
 	return newvert;
 }
+void CScnMeshData::updateMeshVert(int si, int surf_vertidx, core::vector3df pos) {
+	IVertexBuffer* vb = RenderMesh->getMeshBuffer(si)->getVertexBuffer();
+	video::S3DVertex2TCoords* vertices = static_cast<video::S3DVertex2TCoords*>(vb->getVertices());
+	RenderMesh->getMeshBuffer(si)->setHardwareMappingHint(EHM_NEVER);
+
+	vertices[surf_vertidx].Pos = pos;
+	vis_backup[si].vertices[surf_vertidx] = vertices[surf_vertidx];
+}
+
 void CScnMeshData::updateMeshUV(CScn* scn, core::array < int > surf) {
 	CScnSolid* solid = scn->getSolid(solidindx);
 	CScnLightmap* lmap = scn->getLightmap();
@@ -589,20 +645,13 @@ void CScnMeshData::updateUV(CScn* scn, core::array<int> selsurf, core::array<int
 		else if (uvmode == 2) {
 			paramFrame->u_axis *= -1;
 			paramFrame->origin+=2 * avg.X * paramFrame->u_axis;
-			if (mults) {
-				mults[0] = -mults[0]; //ugh linear algbra.
-				mults[2] = 2 * avg.X * (-mults[0]) + mults[2];
-			}
+	
 		}
 			
 		else {
 			paramFrame->v_axis *= -1;
 			paramFrame->origin += 2 * avg.Y * paramFrame->v_axis;
 			
-			if (mults) {
-				mults[1] = -mults[1];
-				mults[3] = 2 * avg.Y * (-mults[1]) + mults[3];
-			}
 		}
 		
 	}

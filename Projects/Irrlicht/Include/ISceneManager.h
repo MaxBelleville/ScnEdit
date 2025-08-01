@@ -34,7 +34,7 @@ namespace io
 
 namespace gui
 {
-	class IGUIFont;
+	class IGUCFont;
 	class IGUIEnvironment;
 } // end namespace gui
 

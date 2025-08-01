@@ -20,6 +20,7 @@ void CScnMeshComponent::setMesh(CScn* scn, CScnSolid* solid, CScnArguments* args
 	CEntity* entity = m_gameObject->getEntity();
 	CScnMeshData* scnMesh = entity->addData<CScnMeshData>(DATA_TYPE_INDEX(CRenderMeshData));
 	scnMesh->initMesh(scn,solid, args);
+	solididx = solid->solididx;
 	scnMesh->setVisible(true);
 
 }
@@ -59,7 +60,7 @@ solidSelect_t CScnMeshComponent::select(CScn* scn, core::triangle3df tri, bool b
 				selsurfs.push_back(scndata.surfsel);
 		}
 		//calculate shared using selsurf array.
-		sharedsurfs = scnMesh->getSharedSurface(scn, selsurfs);
+		sharedsurfs = scnMesh->getUVSharedSurface(scn, selsurfs);
 		
 		for (int i = 0; i < selsurfs.size(); i++) { // Red
 			if(selsurfs[i]>=0)
@@ -139,18 +140,13 @@ indexed_vertices CScnMeshComponent::getVertices(CScn* scn) {
 		return scnMesh->getVertices(scn, selsurfs,sharedsurfs);
 }
 
+
 indexedVec3df_t CScnMeshComponent::updateVert(CScn* scn, indexedVec3df_t vert, core::vector3df add) {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
-	if (scnMesh) {
-		indexedVec3df_t pos = scnMesh->updateVert(scn, vert, add);
+	if (scnMesh)
+		return scnMesh->updateVert(scn, vert, add);
 
-		for (int i = 0; i < vert.sharesWith.size(); i++) {
-			indexedVec3df_t sharedVert= scnMesh->getVertexFromPos(scn, vert.sharesWith[i], vert.vertindx);
-			scnMesh->updateVert(scn, sharedVert, core::vector3df(0));
-		}
-		return pos;
-	}
 }
 
 indexedVec3df_t CScnMeshComponent::resetVert(CScn* scn, indexedVec3df_t vert) {

@@ -59,7 +59,7 @@ namespace Skylicht
 			m_font->dropFont();
 	}
 
-	IFont* CFontSource::initFont()
+	CFont* CFontSource::initFont()
 	{
 		m_revision++;
 

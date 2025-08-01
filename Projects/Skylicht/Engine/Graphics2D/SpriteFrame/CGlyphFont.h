@@ -24,7 +24,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
-#include "IFont.h"
+#include "CFont.h"
 
 #include "Graphics2D/Atlas/CAtlas.h"
 #include "CSpriteFrame.h"
@@ -45,7 +45,7 @@ namespace Skylicht
 	/// @endcode
 	class SKYLICHT_API CGlyphFont :
 		public CSpriteFrame,
-		public IFont
+		public CFont
 	{
 	protected:
 		float m_fontSizePt;

@@ -59,8 +59,13 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 
 		for (u32 j = 0; j < solids[i].n_surfs; j++) {
 			scnLMapHeader_t hlmap = hlmaps[i][j];
-			tmp_mults.push_back(hlmap.uv_mults);
+			f32* tmp_ptr = new f32[4];
+			for (int k = 0; k < 4; k++) {
+				tmp_ptr[k] = hlmap.uv_mults[k];
+			}
+			tmp_mults.push_back(tmp_ptr);
 		}
+
 		omults.push_back(tmp_mults);
 	}
 

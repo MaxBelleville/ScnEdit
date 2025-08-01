@@ -88,6 +88,8 @@ void ImGui_Impl_Skylicht_NewFrame()
 	// Setup time step
 	ImGuiIO& io = ImGui::GetIO();
 	io.DeltaTime = Skylicht::getTimeStep() / 1000.0f;
+	io.ClearInputKeys();
+	io.ClearInputCharacters();
 
 	// Start the frame
 	ImGui::NewFrame();
@@ -202,12 +204,12 @@ void ImGui_Impl_Skylicht_RenderDrawData(ImDrawData* draw_data)
 					material.ZBuffer = video::ECFN_ALWAYS;
 					material.ZWriteEnable = false;
 
-					if (pcmd->TextureId == NULL)
+					if (pcmd->GetTexID() == NULL)
 						material.MaterialType = g_vertexColorShader;
 					else
 					{
 						material.MaterialType = g_textureColorShader;
-						material.setTexture(0, (ITexture*)pcmd->TextureId);
+						material.setTexture(0, (ITexture*)pcmd->GetTexID());
 					}
 
 					driver->setMaterial(material);
@@ -253,24 +255,157 @@ void ImGui_Impl_Skylicht_MouseWheelFunc(int dir, int x, int y)
 void ImGui_Impl_Skylicht_CharFunc(unsigned int c)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	if (c >= 32)
-		io.AddInputCharacter(c);
+	io.AddInputCharacter(c);
 }
+
+
+ 
 
 void ImGui_Impl_Skylicht_KeyPressedFunc(int key, bool ctrl, bool shift, bool alt)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	io.AddKeyEvent(ImGuiKey(key), true); // Notify ImGui about the key press
+	io.AddKeyEvent(translateKey(key), true); // Notify ImGui about the key press
 	io.AddKeyEvent(ImGuiMod_Ctrl, ctrl); // Update modifier state
 	io.AddKeyEvent(ImGuiMod_Shift, shift);
 	io.AddKeyEvent(ImGuiMod_Alt, alt);
+
 }
 
 void ImGui_Impl_Skylicht_KeyReleasedFunc(int key, bool ctrl, bool shift, bool alt)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	io.AddKeyEvent(ImGuiKey(key), false); // Notify ImGui about the key release
+	io.AddKeyEvent(translateKey(key), false); // Notify ImGui about the key release
 	io.AddKeyEvent(ImGuiMod_Ctrl, ctrl); // Update modifier state
 	io.AddKeyEvent(ImGuiMod_Shift, shift);
 	io.AddKeyEvent(ImGuiMod_Alt, alt);
+}
+
+ImGuiKey translateKey(int code)
+{
+	switch (code)
+	{
+	case KEY_TAB: return ImGuiKey_Tab;
+	case KEY_LEFT: return ImGuiKey_LeftArrow;
+	case KEY_RIGHT: return ImGuiKey_RightArrow;
+	case KEY_UP: return ImGuiKey_UpArrow;
+	case KEY_DOWN: return ImGuiKey_DownArrow;
+	case KEY_PRIOR: return ImGuiKey_PageUp;
+	case KEY_NEXT: return ImGuiKey_PageDown;
+	case KEY_HOME: return ImGuiKey_Home;
+	case KEY_END: return ImGuiKey_End;
+	case KEY_INSERT: return ImGuiKey_Insert;
+	case KEY_DELETE: return ImGuiKey_Delete;
+	case KEY_BACK: return ImGuiKey_Backspace;
+	case KEY_SPACE: return ImGuiKey_Space;
+	case KEY_RETURN: return ImGuiKey_Enter;
+	case KEY_ESCAPE: return ImGuiKey_Escape;
+
+	case KEY_SHIFT:
+	case KEY_LSHIFT: return ImGuiKey_LeftShift;
+	case KEY_RSHIFT: return ImGuiKey_RightShift;
+
+	case KEY_CONTROL:
+	case KEY_LCONTROL: return ImGuiKey_LeftCtrl;
+	case KEY_RCONTROL: return ImGuiKey_RightCtrl;
+
+	case KEY_MENU:
+	case KEY_LMENU: return ImGuiKey_LeftAlt;
+	case KEY_RMENU: return ImGuiKey_RightAlt;
+
+	case KEY_KEY_0: return ImGuiKey_0;
+	case KEY_KEY_1: return ImGuiKey_1;
+	case KEY_KEY_2: return ImGuiKey_2;
+	case KEY_KEY_3: return ImGuiKey_3;
+	case KEY_KEY_4: return ImGuiKey_4;
+	case KEY_KEY_5: return ImGuiKey_5;
+	case KEY_KEY_6: return ImGuiKey_6;
+	case KEY_KEY_7: return ImGuiKey_7;
+	case KEY_KEY_8: return ImGuiKey_8;
+	case KEY_KEY_9: return ImGuiKey_9;
+
+	case KEY_KEY_A: return ImGuiKey_A;
+	case KEY_KEY_B: return ImGuiKey_B;
+	case KEY_KEY_C: return ImGuiKey_C;
+	case KEY_KEY_D: return ImGuiKey_D;
+	case KEY_KEY_E: return ImGuiKey_E;
+	case KEY_KEY_F: return ImGuiKey_F;
+	case KEY_KEY_G: return ImGuiKey_G;
+	case KEY_KEY_H: return ImGuiKey_H;
+	case KEY_KEY_I: return ImGuiKey_I;
+	case KEY_KEY_J: return ImGuiKey_J;
+	case KEY_KEY_K: return ImGuiKey_K;
+	case KEY_KEY_L: return ImGuiKey_L;
+	case KEY_KEY_M: return ImGuiKey_M;
+	case KEY_KEY_N: return ImGuiKey_N;
+	case KEY_KEY_O: return ImGuiKey_O;
+	case KEY_KEY_P: return ImGuiKey_P;
+	case KEY_KEY_Q: return ImGuiKey_Q;
+	case KEY_KEY_R: return ImGuiKey_R;
+	case KEY_KEY_S: return ImGuiKey_S;
+	case KEY_KEY_T: return ImGuiKey_T;
+	case KEY_KEY_U: return ImGuiKey_U;
+	case KEY_KEY_V: return ImGuiKey_V;
+	case KEY_KEY_W: return ImGuiKey_W;
+	case KEY_KEY_X: return ImGuiKey_X;
+	case KEY_KEY_Y: return ImGuiKey_Y;
+	case KEY_KEY_Z: return ImGuiKey_Z;
+
+	case KEY_F1: return ImGuiKey_F1;
+	case KEY_F2: return ImGuiKey_F2;
+	case KEY_F3: return ImGuiKey_F3;
+	case KEY_F4: return ImGuiKey_F4;
+	case KEY_F5: return ImGuiKey_F5;
+	case KEY_F6: return ImGuiKey_F6;
+	case KEY_F7: return ImGuiKey_F7;
+	case KEY_F8: return ImGuiKey_F8;
+	case KEY_F9: return ImGuiKey_F9;
+	case KEY_F10: return ImGuiKey_F10;
+	case KEY_F11: return ImGuiKey_F11;
+	case KEY_F12: return ImGuiKey_F12;
+
+	case KEY_CAPITAL: return ImGuiKey_CapsLock;
+	case KEY_SCROLL: return ImGuiKey_ScrollLock;
+	case KEY_NUMLOCK: return ImGuiKey_NumLock;
+
+	case KEY_SNAPSHOT: return ImGuiKey_PrintScreen;
+	case KEY_PAUSE: return ImGuiKey_Pause;
+
+	case KEY_NUMPAD0: return ImGuiKey_Keypad0;
+	case KEY_NUMPAD1: return ImGuiKey_Keypad1;
+	case KEY_NUMPAD2: return ImGuiKey_Keypad2;
+	case KEY_NUMPAD3: return ImGuiKey_Keypad3;
+	case KEY_NUMPAD4: return ImGuiKey_Keypad4;
+	case KEY_NUMPAD5: return ImGuiKey_Keypad5;
+	case KEY_NUMPAD6: return ImGuiKey_Keypad6;
+	case KEY_NUMPAD7: return ImGuiKey_Keypad7;
+	case KEY_NUMPAD8: return ImGuiKey_Keypad8;
+	case KEY_NUMPAD9: return ImGuiKey_Keypad9;
+
+	case KEY_DECIMAL: return ImGuiKey_KeypadDecimal;
+	case KEY_DIVIDE: return ImGuiKey_KeypadDivide;
+	case KEY_MULTIPLY: return ImGuiKey_KeypadMultiply;
+	case KEY_SUBTRACT: return ImGuiKey_KeypadSubtract;
+	case KEY_ADD: return ImGuiKey_KeypadAdd;
+
+	case KEY_PLUS: return ImGuiKey_Equal;
+	case KEY_MINUS: return ImGuiKey_Minus;
+	case KEY_COMMA: return ImGuiKey_Comma;
+	case KEY_PERIOD: return ImGuiKey_Period;
+	case KEY_OEM_1: return ImGuiKey_Semicolon;
+	case KEY_OEM_2: return ImGuiKey_Slash;
+	case KEY_OEM_3: return ImGuiKey_GraveAccent;
+	case KEY_OEM_4: return ImGuiKey_LeftBracket;
+	case KEY_OEM_5: return ImGuiKey_Backslash;
+	case KEY_OEM_6: return ImGuiKey_RightBracket;
+	case KEY_OEM_7: return ImGuiKey_Apostrophe;
+
+	case KEY_LBUTTON: return ImGuiKey_MouseLeft;
+	case KEY_RBUTTON: return ImGuiKey_MouseRight;
+	case KEY_MBUTTON: return ImGuiKey_MouseMiddle;
+	case KEY_XBUTTON1: return ImGuiKey_MouseX1;
+	case KEY_XBUTTON2: return ImGuiKey_MouseX2;
+
+	default:
+		return ImGuiKey_None;
+	}
 }

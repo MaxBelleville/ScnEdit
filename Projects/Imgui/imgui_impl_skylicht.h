@@ -38,6 +38,8 @@ IMGUI_IMPL_API void     ImGui_Impl_Skylicht_MouseMoveFunc(int x, int y);
 IMGUI_IMPL_API void     ImGui_Impl_Skylicht_MouseButtonFunc(int button, int state, int x, int y);
 IMGUI_IMPL_API void     ImGui_Impl_Skylicht_MouseWheelFunc(int dir, int x, int y);
 IMGUI_IMPL_API void     ImGui_Impl_Skylicht_CharFunc(unsigned int c);
+
 IMGUI_IMPL_API void     ImGui_Impl_Skylicht_KeyPressedFunc(int key, bool ctrl, bool shift, bool alt);
 IMGUI_IMPL_API void     ImGui_Impl_Skylicht_KeyReleasedFunc(int key, bool ctrl, bool shift, bool alt);
 
+ImGuiKey translateKey(int code);

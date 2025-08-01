@@ -51,7 +51,7 @@ void CScnCellBBData::initMesh(CScnSolid* solid, u32 currCellindx)
 }
 
 int CScnCellBBData::getIndexFromCellBB(CScnSolid* solid, scnCellData_t* celldata) {
-	for (u32 l = 0; l < solid->rawcells[cellindx].leafnode.size(); l++) {//TODO Abstract
+	for (u32 l = 0; l < solid->rawcells[cellindx].leafnode.size(); l++) {
 		scnCellData_t* leaf = solid->rawcells[cellindx].leafnode[l];
 		if (leaf == celldata)
 			return l;
@@ -60,10 +60,10 @@ int CScnCellBBData::getIndexFromCellBB(CScnSolid* solid, scnCellData_t* celldata
 }
 
 void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
-	CScnSolid* solid= scn->getSolid(vert.solidindx);
+	CScnSolid* solid= scn->getSolid(vert.solididx);
 	scnCellData_t* celldata;
-	celldata = solid->getBBFromSurf(vert.surfindx, cellindx);
-	
+	celldata = solid->getBBFromSurf(vert.surfidx, cellindx);
+	//This math may be wrong lol
 	if (celldata) {
 		core::vector3df min = celldata->bb_verts[0];
 		core::vector3df max = celldata->bb_verts[1];
@@ -78,7 +78,7 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 			bool flatY = true;
 			bool flatZ = true;
 		
-			scnSurf_t* surfi = &solid->surfs[vert.surfindx];
+			scnSurf_t* surfi = &solid->surfs[vert.surfidx];
 			for (int v = 0; v < surfi->vertidxlen; v++) {
 				u32 vertidx = solid->vertidxs[surfi->vertidxstart + v];
 				core::vector3df compareVert = solid->verts[vertidx];
@@ -141,6 +141,21 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 
 		celldata->bb_verts[0] = min;
 		celldata->bb_verts[1] = max;
+		updateMeshBB(scn, celldata, indx);
 	}
-	//TODO Visually update the bb
+
+}
+void CScnCellBBData::updateMeshBB(CScn* scn, scnCellData_t* celldata, int leafindx) {
+	core::vector3df start = celldata->bb_verts[0]; // Removes z-indexing
+	core::vector3df end = celldata->bb_verts[1]; // at cost of accuracy
+	video::SColor clr(255, 0, 0, 0);
+
+	IMeshBuffer* MeshBuffer = generate_cube_mesh_buff(start, end, clr);
+
+	MeshBuffer->getMaterial().Wireframe = true;
+	RenderMesh->replaceMeshBuffer(leafindx, MeshBuffer);
+	MeshBuffer->drop();
+
+	// Update bounding box of full mesh
+	RenderMesh->recalculateBoundingBox();
 }

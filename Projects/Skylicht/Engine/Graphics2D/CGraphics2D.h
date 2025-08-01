@@ -200,11 +200,11 @@ namespace Skylicht
 
 		void draw2DRectangleOutline(const core::vector3df& upleft, const core::vector3df& lowerright, const SColor& color);
 
-		void drawText(const core::position2df& pos, IFont* font, const SColor& color, const std::wstring& string, int materialID, CMaterial* material = NULL);
+		void drawText(const core::position2df& pos, CFont* font, const SColor& color, const std::wstring& string, int materialID, CMaterial* material = NULL);
 
-		float measureCharWidth(IFont* font, wchar_t c);
+		float measureCharWidth(CFont* font, wchar_t c);
 
-		core::dimension2df measureText(IFont* font, const std::wstring& string);
+		core::dimension2df measureText(CFont* font, const std::wstring& string);
 
 		video::SMaterial& getMaterial()
 		{

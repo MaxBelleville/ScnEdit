@@ -105,14 +105,14 @@ namespace Skylicht
 		m_arrayCharRender.push_back(modules);
 	}
 
-	void CRenderTextData::setText(IFont* font, const char* text)
+	void CRenderTextData::setText(CFont* font, const char* text)
 	{
 		m_font = font;
 		m_text = CStringImp::convertUTF8ToUnicode(text).c_str();
 		init();
 	}
 
-	void CRenderTextData::setText(IFont* font, const wchar_t* text)
+	void CRenderTextData::setText(CFont* font, const wchar_t* text)
 	{
 		m_font = font;
 		m_text = text;
@@ -205,7 +205,7 @@ namespace Skylicht
 		return addText(position, text, m_defaultFont);
 	}
 
-	CRenderTextData* CTextBillboardManager::addText(const core::vector3df& position, const char* text, IFont* font)
+	CRenderTextData* CTextBillboardManager::addText(const core::vector3df& position, const char* text, CFont* font)
 	{
 		if (font == NULL)
 			return NULL;
@@ -223,7 +223,7 @@ namespace Skylicht
 		return t;
 	}
 
-	CRenderTextData* CTextBillboardManager::addText(const core::vector3df& position, const wchar_t* text, IFont* font)
+	CRenderTextData* CTextBillboardManager::addText(const core::vector3df& position, const wchar_t* text, CFont* font)
 	{
 		if (font == NULL)
 			return NULL;

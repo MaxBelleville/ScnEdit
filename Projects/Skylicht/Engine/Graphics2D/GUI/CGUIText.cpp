@@ -31,7 +31,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 namespace Skylicht
 {
-	CGUIText::CGUIText(CCanvas* canvas, CGUIElement* parent, IFont* font) :
+	CGUIText::CGUIText(CCanvas* canvas, CGUIElement* parent, CFont* font) :
 		CGUIElement(canvas, parent),
 		TextVertical(EGUIVerticalAlign::Top),
 		TextHorizontal(EGUIHorizontalAlign::Left),
@@ -61,7 +61,7 @@ namespace Skylicht
 		init();
 	}
 
-	CGUIText::CGUIText(CCanvas* canvas, CGUIElement* parent, const core::rectf& rect, IFont* font) :
+	CGUIText::CGUIText(CCanvas* canvas, CGUIElement* parent, const core::rectf& rect, CFont* font) :
 		CGUIElement(canvas, parent, rect),
 		TextVertical(EGUIVerticalAlign::Top),
 		TextHorizontal(EGUIHorizontalAlign::Left),
@@ -106,7 +106,7 @@ namespace Skylicht
 
 	}
 
-	void CGUIText::initFont(IFont* font)
+	void CGUIText::initFont(CFont* font)
 	{
 		// get text height
 		SModuleOffset* moduleCharA = font->getCharacterModule((int)'A');
@@ -117,7 +117,7 @@ namespace Skylicht
 		}
 	}
 
-	IFont* CGUIText::getCurrentFont()
+	CFont* CGUIText::getCurrentFont()
 	{
 		if (m_customfont)
 			return m_customfont;
@@ -413,7 +413,7 @@ namespace Skylicht
 		std::vector<SModuleOffset*>	listModule;
 		std::vector<int> listFormat;
 
-		IFont* font = getCurrentFont();
+		CFont* font = getCurrentFont();
 		if (font == NULL)
 			return stringWidth;
 
@@ -447,7 +447,7 @@ namespace Skylicht
 		std::vector<SModuleOffset*>	listModule;
 		std::vector<int> listFormat;
 
-		IFont* font = getCurrentFont();
+		CFont* font = getCurrentFont();
 		if (font == NULL)
 			return stringWidth;
 
@@ -712,7 +712,7 @@ namespace Skylicht
 
 	void CGUIText::render(CCamera* camera)
 	{
-		IFont* font = getCurrentFont();
+		CFont* font = getCurrentFont();
 
 		if (!font || getColor().getAlpha() == 0)
 		{

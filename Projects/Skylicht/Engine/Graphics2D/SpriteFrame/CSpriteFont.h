@@ -24,7 +24,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #pragma once
 
-#include "IFont.h"
+#include "CFont.h"
 #include "CSpriteFrame.h"
 
 namespace Skylicht
@@ -35,7 +35,7 @@ namespace Skylicht
 	/// @ingroup Graphics2D
 	class SKYLICHT_API CSpriteFont :
 		public CSpriteFrame,
-		public IFont
+		public CFont
 	{
 	protected:
 		int* m_moduleMap;

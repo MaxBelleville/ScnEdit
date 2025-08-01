@@ -130,7 +130,7 @@ namespace Skylicht
 
 	void CGlyphFont::getListModule(const wchar_t* string, std::vector<int>& format, std::vector<SModuleOffset*>& output, std::vector<int>& outputFormat)
 	{
-		IFont::getListModule(string, format, output, outputFormat);
+		CFont::getListModule(string, format, output, outputFormat);
 
 		for (SImage* img : m_images)
 		{

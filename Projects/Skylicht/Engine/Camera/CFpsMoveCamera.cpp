@@ -4,6 +4,7 @@
 #include "GameObject/CGameObject.h"
 #include "Scene/CScene.h"
 
+
 namespace Skylicht
 {
 	CFpsMoveCamera::CFpsMoveCamera() :
@@ -22,6 +23,7 @@ namespace Skylicht
 
 		for (u32 i = 0; i < DirectionCount; i++)
 			m_input[i] = false;
+		m_cursorControl = getIrrlichtDevice()->getCursorControl();
 	}
 
 	CFpsMoveCamera::~CFpsMoveCamera()
@@ -51,6 +53,9 @@ namespace Skylicht
 		if (!m_camera->isInputReceiverEnabled())
 			return;
 
+		if (m_cursorControl->isVisible())
+			return;
+
 		f32 timeDiff = getTimeStep();
 
 		// skip lag
@@ -68,6 +73,7 @@ namespace Skylicht
 		f32 speed = m_moveSpeed;
 		if (m_shiftKeyDown) speed= m_moveSpeed*m_shiftSpeed;
 		
+
 		if (m_input[MoveForward])
 			pos += movedir * timeDiff * speed;
 

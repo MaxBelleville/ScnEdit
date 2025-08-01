@@ -39,7 +39,6 @@ void CViewInteraction::onInit()
 	CCamera* camera = context->getActiveCamera();
 
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	bool isFlipped = m_arguments->isFlippedUV();
 	CScn* scn = SCNEdit::getSCN();
 
 	if (scn) {
@@ -55,7 +54,7 @@ void CViewInteraction::onInit()
 	}
 
 
-	interaction->OnKeyEvent([interaction, isFlipped](key_pair pair) {
+	interaction->OnKeyEvent([interaction](key_pair pair) {
 		//If no scn or no selected item then ignore key input for interactions.
 		CScn* scn = SCNEdit::getSCN();
 		if (!scn) return;
@@ -163,7 +162,6 @@ void CViewInteraction::onInit()
 			collisionMgr->addComponentCollision(selected);
 			collisionMgr->build(false);
 
-			//Todo implement this part as a function(probably static).
 			CViewInteraction::moveBounds(false);
 		}
 		//Reset vert (only works for current game when you save you cant reset)
@@ -181,10 +179,10 @@ void CViewInteraction::onInit()
 		if (interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift, KeyAugment::None))
 			interaction->VertexCallback();
 
-		if (interaction->getKeyState(make_pair(KEY_KEY_X, KeyAugment::None)) && isFlipped) 
+		if (interaction->getKeyState(make_pair(KEY_KEY_X, KeyAugment::None))) 
 			meshcomp->updateUV(scn,UVMode::FlipH,core::vector2df(0,0));
 		
-		if (interaction->getKeyState(make_pair(KEY_KEY_V, KeyAugment::None)) && isFlipped) 
+		if (interaction->getKeyState(make_pair(KEY_KEY_V, KeyAugment::None))) 
 			meshcomp->updateUV(scn, UVMode::FlipV, core::vector2df(0, 0));
 
 	});
@@ -267,8 +265,6 @@ void CViewInteraction::onUpdate()
 			//Read click update interaction manager accordingly.
 			if (interaction->isLeftClicked()) {
 				
-				CCube* sel =zone->searchObject(L"surf_verts")->getComponent<CCube>();
-				CCube* shared = zone->searchObject(L"shared_verts")->getComponent<CCube>();
 				resetSolid();
 				
 				//When click and solid is highlighted get the mesh component and select it. 
@@ -287,12 +283,7 @@ void CViewInteraction::onUpdate()
 						
 						//Set vert and draw cubes based on vert data.
 						interaction->setVertData(meshcomp->getVertices(scn));
-						for (int i = 0; i < interaction->getVerts().size(); i++) 
-							sel->addPrimitive(interaction->getVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
-
-						for (int i = 0; i < interaction->getSharedVerts().size(); i++) 
-							shared->addPrimitive(interaction->getSharedVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
-						
+						updateSurfaceVertCube();
 					}
 					else 
 						interaction->selTypeLayer().set(SelectedType::Empty);
@@ -528,17 +519,32 @@ void CViewInteraction::resetSolid() {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
-	CCube* sel = zone->searchObject(L"sel_vert")->getComponent<CCube>();
+	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent<CCube>();
 	CCube* surf = zone->searchObject(L"surf_verts")->getComponent<CCube>();
 	CCube* shared = zone->searchObject(L"shared_verts")->getComponent<CCube>();
-	CCube* hover = zone->searchObject(L"hover_vert")->getComponent< CCube>();
+	CCube* movevert = zone->searchObject(L"hover_vert")->getComponent< CCube>();
 
-	hover->removeAllEntities();
-	sel->removeAllEntities();
+	movevert->removeAllEntities();
+	selvert->removeAllEntities();
 	surf->removeAllEntities();
 	shared->removeAllEntities();
 	interaction->resetSelectObj();
 	interaction->resetVerts();
+}
+void CViewInteraction::updateSurfaceVertCube() {
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	CContext* context = CContext::getInstance();
+	CZone* zone = context->getActiveZone();
+	CCube* shared = zone->searchObject(L"shared_verts")->getComponent<CCube>();
+	CCube* surf = zone->searchObject(L"surf_verts")->getComponent<CCube>();
+	surf->removeAllEntities();
+	shared->removeAllEntities();
+	for (int i = 0; i < interaction->getVerts().size(); i++)
+		surf->addPrimitive(interaction->getVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
+
+	for (int i = 0; i < interaction->getSharedVerts().size(); i++)
+		shared->addPrimitive(interaction->getSharedVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
+
 }
 
 void CViewInteraction::updateNearestVert(core::vector3df pos) {
@@ -558,15 +564,20 @@ void CViewInteraction::updateNearestVert(core::vector3df pos) {
 		CViewInteraction::getNearestDistVert(pos, interaction->getSharedVerts(), closest, minDistSq);
 
 		movevert->removeAllEntities();
-		selvert->removeAllEntities();
-		
 		movevert->addPrimitive(closest.pos, core::vector3df(0), core::vector3df(2.6));
 
 		//If closest has changed update the moveable vert and proccess the vertex callback.
-		if (closest.vertindx != interaction->getMoveableVert().vertindx) {
-			CScnSolid* solid = scn->getSolid(closest.solidindx);
+		if (closest.vertidxidx != interaction->getMoveableVert().vertidxidx) {
+			
+			CScnSolid* solid = scn->getSolid(closest.solididx);
 			interaction->setMoveableVert(closest);
 			interaction->VertexCallback();
+		}
+
+		if (selvert->getEntityCount() > 0) {
+			updateSurfaceVertCube();
+			interaction->VertexCallback();
+			selvert->removeAllEntities();
 		}
 	}
 }
@@ -590,8 +601,9 @@ void CViewInteraction::updateSelectedVert() {
 	CCube* movevert = zone->searchObject(L"hover_vert")->getComponent< CCube>();
 	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
 	indexedVec3df_t moveable = interaction->getMoveableVert();
-
-	movevert->removeAllEntities();
+	if (movevert->getEntityCount() > 0) 
+		movevert->removeAllEntities();
+	
 	selvert->removeAllEntities();
 
 	selvert->addPrimitive(moveable.pos,core::vector3df(0), core::vector3df(3.1));
@@ -605,7 +617,7 @@ void CViewInteraction::moveBounds(bool reset)
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	indexedVec3df_t moveable = interaction->getMoveableVert();
 
-	if (moveable.solidindx == 0) {
+	if (moveable.solididx == 0) {
 		CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
 		if (group_bb) {
 			for (int i = 0; i < group_bb->getChilds()->size(); i++) {

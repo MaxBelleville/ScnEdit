@@ -36,7 +36,8 @@ namespace Skylicht
 
 	protected:
 		core::dimension2du m_viewport;
-
+		bool control;
+		bool shift;
 	public:
 		CImguiManager();
 

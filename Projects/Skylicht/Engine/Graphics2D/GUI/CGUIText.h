@@ -25,7 +25,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #pragma once
 
 #include "CGUIElement.h"
-#include "Graphics2D/SpriteFrame/IFont.h"
+#include "Graphics2D/SpriteFrame/CFont.h"
 
 #define MAX_FORMATCOLOR 32
 
@@ -42,7 +42,7 @@ namespace Skylicht
 	/// 
 	/// @code
 	/// CFontSource* fontSource = CFontManager::getInstance()->loadFontSource("SampleGUI/Fonts/Roboto.font");
-	/// IFont* font = NULL;
+	/// CFont* font = NULL;
 	/// if (fontSource)
 	/// {
 	/// 	fontSource->initFont();
@@ -62,8 +62,8 @@ namespace Skylicht
 		typedef std::vector<SModuleOffset*> ArrayModuleOffset;
 
 	protected:
-		IFont* m_font;
-		IFont* m_customfont;
+		CFont* m_font;
+		CFont* m_customfont;
 
 		int m_charPadding;
 		int m_charSpacePadding;
@@ -114,8 +114,8 @@ namespace Skylicht
 #endif
 
 	protected:
-		CGUIText(CCanvas* canvas, CGUIElement* parent, IFont* font);
-		CGUIText(CCanvas* canvas, CGUIElement* parent, const core::rectf& rect, IFont* font);
+		CGUIText(CCanvas* canvas, CGUIElement* parent, CFont* font);
+		CGUIText(CCanvas* canvas, CGUIElement* parent, const core::rectf& rect, CFont* font);
 
 		virtual void renderText(ArrayModuleOffset& string, ArrayInt& format, int posX, int posY, int line);
 
@@ -283,8 +283,8 @@ namespace Skylicht
 
 		void getClosestCharacter(float posX, int x, int y, int line, const core::matrix4& world, int& character);
 
-		void initFont(IFont* font);
+		void initFont(CFont* font);
 
-		IFont* getCurrentFont();
+		CFont* getCurrentFont();
 	};
 }

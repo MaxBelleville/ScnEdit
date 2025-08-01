@@ -468,25 +468,25 @@ namespace Skylicht
 	* Text constructor
 	*/
 
-	CGUIText* CCanvas::createText(IFont* font)
+	CGUIText* CCanvas::createText(CFont* font)
 	{
 		CGUIText* element = new CGUIText(this, m_root, m_rect, font);
 		return element;
 	}
 
-	CGUIText* CCanvas::createText(const core::rectf& r, IFont* font)
+	CGUIText* CCanvas::createText(const core::rectf& r, CFont* font)
 	{
 		CGUIText* element = new CGUIText(this, m_root, r, font);
 		return element;
 	}
 
-	CGUIText* CCanvas::createText(CGUIElement* e, IFont* font)
+	CGUIText* CCanvas::createText(CGUIElement* e, CFont* font)
 	{
 		CGUIText* element = new CGUIText(this, e, e->getRect(), font);
 		return element;
 	}
 
-	CGUIText* CCanvas::createText(CGUIElement* e, const core::rectf& r, IFont* font)
+	CGUIText* CCanvas::createText(CGUIElement* e, const core::rectf& r, CFont* font)
 	{
 		CGUIText* element = new CGUIText(this, e, r, font);
 		return element;

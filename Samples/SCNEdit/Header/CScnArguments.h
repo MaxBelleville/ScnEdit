@@ -52,7 +52,6 @@ class CScnArguments {
 				else if (argv[i] == "-all") {
 					bVertInfo = true;
 					bLoadInbuiltDebugger = true;
-					bDebug = false;
 					m_Alpha = 125;
 				}
 				else if (argv[i] == "-map") {
@@ -106,9 +105,6 @@ class CScnArguments {
 				else if(argv[i] == "-decals") {
 					bDecal = true;
 				}
-				else if (argv[i] == "-flip") {
-					bFlipUV = true;
-				}
 				else if (argv[i] == "-l" ||
 					argv[i] == "-lightmap") {
 				
@@ -127,7 +123,7 @@ class CScnArguments {
 					errorMessage += (std::format("\nUnknown option {}. \nAvailable options are:\n", argv[i].c_str()).c_str());
 					errorMessage += ("   -res <width> <height>            Set screen resolution.\n"
 						"   -f, -fullscreen                  Run in full screen mode.\n"
-						"   -borderless                      Run in borderless mode.(Windows only)\n"
+						"   -borderless                      Run in borderless mode.\n"
 						"   -resize                          Allow the window to be resizeable\n"
 						"   -nd, -nodebug                    Disabled debug console window.\n"
 						"   -internal                        Gui-based console debug output, useful for fullscreen.\n"
@@ -137,10 +133,9 @@ class CScnArguments {
 						"   -vd,-viewdistance <dist>         Set view distance. Default is 20\n"
 						"   -fov <fov>                       Set camera fov. Default is 60\n"
 						"   -fa, -forcealpha                 Forces showing transparent materials.\n"
-						"   -flip							 Flip the texture UV's (WIP)\n"
 						"   -decals							 Visually display a rough idea of what decals will look like(WIP)\n"
 						"   -vi -vertexinfo                  When Vertex is selected, via CTRL or SHIFT detail boxes change."
-						"   -all							 Helper that will enable mutiple flags(same as -fa -vi -nd -i)\n"
+						"   -all							 Helper that will enable mutiple flags(same as -fa -vi -i)\n"
 						);
 				}
 			}
@@ -161,7 +156,6 @@ class CScnArguments {
 		inline bool isDefault() { return bResDefault; }
 		inline bool isMouseInvert() { return bInvertMouse; }
 		inline bool isDecalEnabled() { return bDecal; }
-		inline bool isFlippedUV() { return bFlipUV; }
 		inline bool isDebugEnabled() { return bDebug; }
 		inline bool isInternalDebug() { return bLoadInbuiltDebugger; }
 		inline bool isBorderless() { return bBorderless; }
@@ -181,7 +175,6 @@ class CScnArguments {
 		bool bDebug = true;
 		bool bBorderless = false;
 		bool bFullscreen = false;
-		bool bFlipUV = false;
 		bool bResizeable = false;
 		bool bDecal = false;
 		std::string errorMessage = "";

@@ -57,7 +57,7 @@ public:
 	int loadSolid(std::ifstream*,u32);
 	s16 getCellAtPos(core::vector3df pos) const;
 	scnCellData_t* getBBFromSurf(u16 surfindx, u16 cellindx);
-
+	scnNode_t getNodeAtPos(core::vector3df pos) const;
 	
 
 #ifdef __IRRLICHT_H_INCLUDED__
@@ -75,8 +75,10 @@ public:
 	void calcSurfIndices(u32 surfidx, scene::IIndexBuffer*);
 	core::array<u32> * uvpos_caller;  //for uvpos[i], this array contains the index of uvidxs that points to it,
 									//ie, uvpos[uvidx[uvpos_caller[i][j]]] = uvpos[i], for all j
+	core::array<u32>* vertpos_caller;  //for uvpos[i], this array contains the index of uvidxs that points to it,
+	//ie, uvpos[uvidx[uvpos_caller[i][j]]] = uvpos[i], for all j
 
-	core::array<u32> * uvidxs_caller; //same phylosophy. Also, for scn files, each uvidx is pointed by only one surface,
+	core::array<u32> * uvvertidxs_caller; //same phylosophy. Also, for scn files, each uvidx is pointed by only one surface,
 										//so, really no point in using an array<u32>[i], could use u32[i]
 
 

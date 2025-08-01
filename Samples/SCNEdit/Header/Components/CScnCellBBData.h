@@ -19,5 +19,6 @@ public:
 	void initMesh(CScnSolid* solid, u32 cellindx);
 
 	void updateBB(CScn* scn, indexedVec3df_t vert, bool);
+	void updateMeshBB(CScn* scn, scnCellData_t* celldata, int leafindx);
 	int getIndexFromCellBB(CScnSolid* solid, scnCellData_t* celldata);
 };

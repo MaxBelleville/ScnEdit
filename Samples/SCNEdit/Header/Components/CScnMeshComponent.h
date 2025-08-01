@@ -7,6 +7,7 @@ class CScnMeshComponent : public CComponentSystem
 public:
 	core::array<int> selsurfs;
 	core::array<int> sharedsurfs;
+	int solididx;
 public:
 	CScnMeshComponent();
 

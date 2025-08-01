@@ -92,9 +92,11 @@ CScnSolid::~CScnSolid()
 	//Deletes uv postion caller
    if (uvpos_caller)
 	  delete [] uvpos_caller;
+   if (vertpos_caller)
+	   delete[] vertpos_caller;
 	//Deletes uv id caller
-   if (uvidxs_caller)
-	  delete [] uvidxs_caller;
+   if (uvvertidxs_caller)
+	  delete [] uvvertidxs_caller;
 
 }
 
@@ -222,7 +224,7 @@ int CScnSolid::loadCellData(scnRawCell_t* rawcell,scnCellData_t * celldata,std::
 		celldata->surfsidxs = new u16[celldata->n_surfs];
 		for (u16 i = 0; i < celldata->n_surfs; i++)
 		{
-			celldata->surfsidxs[i] = read_u16(file);   //read the usual 72 first bytes
+			celldata->surfsidxs[i] = read_u16(file);   
 			bool found = false;
 			for (u16 j = 0; j < rawcell->naivesurfs.size(); j++) {
 				if (rawcell->naivesurfs[j] == celldata->surfsidxs[i])//Add if exists
@@ -331,18 +333,20 @@ int CScnSolid::loadUVIdxs(std::ifstream * file)
 
 void CScnSolid::buildBackTree()
 {
-	//sets number of uv indexes to number of vertex indexes
-	u32 n_uvidxs = n_vertidxs;
 
-	uvpos_caller = new core::array<u32>[n_uvpos];
+	uvpos_caller = new core::array<u32>[n_vertidxs];
 	//build backtree
-	for (u32 i=0; i< n_uvidxs ;i++)
+	for (u32 i=0; i< n_vertidxs;i++)
 		uvpos_caller[uvidxs[i]].push_back(i);
 
-	uvidxs_caller = new core::array<u32>[n_uvidxs];
+	vertpos_caller = new core::array<u32>[n_vertidxs];
+	for (u32 i = 0; i < n_vertidxs; i++)
+		vertpos_caller[vertidxs[i]].push_back(i);
+
+	uvvertidxs_caller = new core::array<u32>[n_vertidxs];
 	for (u32 i = 0; i < n_surfs; i++) {
 		for (u32 j = 0; j < surfs[i].vertidxlen; j++)
-			uvidxs_caller[surfs[i].vertidxstart + j].push_back(i);
+			uvvertidxs_caller[surfs[i].vertidxstart + j].push_back(i);
 	}
 }
 

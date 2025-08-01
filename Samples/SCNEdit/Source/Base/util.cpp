@@ -201,6 +201,16 @@ SColor convert_color(const char* pos) {
 	
 }
 
+std::string str_join(const core::array<u32> arr) {
+	std::string result = "[";
+	for (size_t i = 0; i < arr.size(); ++i) {
+		result += std::format("{}", arr[i]);
+		if (i + 1 < arr.size()) result += ",";
+	}
+	result += "]";
+	return result;
+}
+
 ITexture* convert_image(io::path file) {
 	ITexture* t = getVideoDriver()->findTexture(file);
 	if (t)

@@ -45,6 +45,7 @@ public:
 		if (hslmaps && loaded) {
 			for(int i=0;i<4;i++)
 				hlmaps[solidindx][surfindx].uv_mults[i] = omults[solidindx][surfindx][i];
+		
 		}
 	}
 	inline f32* getMults(u32 solidindx, u32 surfindx) {

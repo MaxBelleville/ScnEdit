@@ -33,8 +33,9 @@ public:
 	void initMesh(CScn* scn, CScnSolid* solid, CScnArguments*);
 	void setLightmapVisible(bool);
 	solidSelect_t getSurfaceIndx(CScn* scn, core::triangle3df);
-	core::array<int> getSharedSurface(CScn* scn, core::array<int>sindices);
-	core::array<int> getSharedSurface(CScn* scn, int si);
+	core::array<int> getUVSharedSurface(CScn* scn, core::array<int>sindices);
+	core::array<int> getUVSharedSurface(CScn* scn, int si);
+	core::array<int> getVertSharedSurface(CScn* scn, int si, int vertidx);
 	core::array<vertProp_t> getSurfVertProps(CScn* scn, int si);
 
 	void select(int si, bool bShared);
@@ -46,6 +47,7 @@ public:
 
 	void setTexture(CScn* scn, const char* path,int si);
 	indexedVec3df_t updateVert(CScn* scn, indexedVec3df_t vert, core::vector3df);
+	void updateMeshVert(int si, int surf_vertidx, core::vector3df pos);
 	indexedVec3df_t resetVert(CScn* scn, indexedVec3df_t vert);
 	indexed_vertices getVertices(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf);
 	indexedVec3df_t getVertexFromPos(CScn* scn, u32 si, u32 vertindx);

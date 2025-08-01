@@ -57,6 +57,7 @@ namespace Skylicht
 
 		bool m_input[DirectionCount];
 		bool m_shiftKeyDown = false;
+		gui::ICursorControl* m_cursorControl;
 		f32 m_moveSpeed;
 		f32 m_shiftSpeed;
 	public:

@@ -25,7 +25,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #pragma once
 
 #include "Utils/CSingleton.h"
-#include "Graphics2D/SpriteFrame/IFont.h"
+#include "Graphics2D/SpriteFrame/CFont.h"
 #include "Graphics2D/SpriteFrame/CSpriteFrame.h"
 #include "Material/CMaterial.h"
 
@@ -64,7 +64,7 @@ namespace Skylicht
 	protected:
 		std::wstring m_text;
 
-		IFont* m_font;
+		CFont* m_font;
 		std::vector<std::vector<SModuleOffset*>> m_arrayCharRender;
 
 		float m_textHeight;
@@ -79,9 +79,9 @@ namespace Skylicht
 
 		void init();
 
-		void setText(IFont* font, const char* text);
+		void setText(CFont* font, const char* text);
 
-		void setText(IFont* font, const wchar_t* text);
+		void setText(CFont* font, const wchar_t* text);
 
 		void setText(const char* text);
 
@@ -131,7 +131,7 @@ namespace Skylicht
 	protected:
 		core::array<CRenderTextData*> m_texts;
 
-		IFont* m_defaultFont;
+		CFont* m_defaultFont;
 
 		int m_defaultShader;
 
@@ -152,9 +152,9 @@ namespace Skylicht
 
 		CRenderTextData* addText(const core::vector3df& position, const wchar_t* text);
 
-		CRenderTextData* addText(const core::vector3df& position, const char* text, IFont* font);
+		CRenderTextData* addText(const core::vector3df& position, const char* text, CFont* font);
 
-		CRenderTextData* addText(const core::vector3df& position, const wchar_t* text, IFont* font);
+		CRenderTextData* addText(const core::vector3df& position, const wchar_t* text, CFont* font);
 
 		void initDefaultFont();
 

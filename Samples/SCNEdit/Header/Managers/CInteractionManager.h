@@ -5,9 +5,10 @@
 #include "Header/Base/util.h"
 #include "Header/Base/scntypes.h"
 #include "UserInterface/CUITextBox.h"
+#include "Header/CGUILogger.h"
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <term/imguial_term.h>
+
 struct guiSettings_t
 {
 	bool vis_scn = true;
@@ -33,16 +34,10 @@ enum GUIState
 	EditAll,
 	EditFlags,
 	EditAlpha,
-	EditShading
+	EditHasShading,
+	EditShading,
 };
 
-enum GUIInfoMode
-{
-	Basic,
-	Edit,
-	Dialog,
-	Vertex
-};
 enum SelectedType {
 	Empty,
 	Solid,
@@ -78,20 +73,17 @@ protected:
 	GUIState m_guiState= GUIState::Default;
 	SelectedType m_selectedType = SelectedType::Empty;
 	KeyAugment m_augment= KeyAugment::None;
-	GUIInfoMode m_guiInfo = GUIInfoMode::Basic;
-	
+
 	CInteractionEnumLayer<GUIState> stateLayer = CInteractionEnumLayer(m_guiState);
-	CInteractionEnumLayer<GUIInfoMode> infoLayer= CInteractionEnumLayer(m_guiInfo);
 	CInteractionEnumLayer<SelectedType> selectedTypeLayer= CInteractionEnumLayer(m_selectedType);
 	CInteractionEnumLayer<KeyAugment> augmentLayer = CInteractionEnumLayer(m_augment);
-
+	CGUILogger m_logger;
 	float m_uvScalar = 0.01;
-	std::vector<ImGuiAl::Log*> m_logs;
-	u16 page =0;
+
 	solidSelect_t m_surfselected = solidSelect_t(-1, -1);
 	portalSelect_t m_portalselected = portalSelect_t(-1, -1);
 	int m_entityselected = -1;
-
+	bool m_blockCursor = false;
 
 	std::vector<std::function<void(key_pair)>> m_KeyEvents;
 	std::vector<std::function<void()>> m_MouseMoveEvents;
@@ -126,11 +118,15 @@ public:
 	inline void resetLeftClick() {
 		m_leftToggle = std::make_pair(false, KeyAugment::None);
 	}
-	inline core::array<indexedVec3df_t> getSharedVerts() {
-		return vertexdata.second;
+
+	inline void setBlockCursor(bool block) {
+		m_blockCursor = block;
 	}
 	inline core::array<indexedVec3df_t> getVerts() {
 		return vertexdata.first;
+	}
+	inline core::array<indexedVec3df_t> getSharedVerts() {
+		return vertexdata.second;
 	}
 	inline void setVertData(indexed_vertices verts) {
 		vertexdata = verts;
@@ -145,9 +141,7 @@ public:
 	inline CInteractionEnumLayer<KeyAugment> keyAugLayer() {
 		return augmentLayer;
 	}
-	inline CInteractionEnumLayer<GUIInfoMode> infoModeLayer() {
-		return infoLayer;
-	}
+	
 	inline CInteractionEnumLayer<SelectedType> selTypeLayer() {
 		return selectedTypeLayer;
 	}
@@ -168,18 +162,20 @@ public:
 		moveablevert = obj;
 	}
 
-	inline bool getKeyState(key_pair key) {
+	inline bool getKeyState(key_pair key) { 
 		if (key.second == KeyAugment::AnyKey) 
-			key.second = KeyAugment::None;
+			key.second = m_augment;
+		
 		return m_keyMap.find(key) != m_keyMap.end();
 	}
+
+
 	inline void resetKeyState() {
 		m_keyMap.clear();
 	}
 	inline void removeKeyState(key_pair key) {
 		m_keyMap.erase(key);
 	}
-
 
 	inline bool isLeftClicked() {
 		return m_leftToggle.first;
@@ -201,6 +197,10 @@ public:
 	}
 	inline guiSettings_t* getGuiSettings() {
 		return gui;
+	}
+
+	inline void drawLog(const char* title, bool * open) {
+		m_logger.Draw(title, open);
 	}
 
 	void swapCursorMode(bool isRightClick);
@@ -229,18 +229,6 @@ public:
 	}
 	inline int getEntityISelected() {
 		return m_entityselected;
-	}
-	inline ImGuiAl::Log* getLog() {
-		return m_logs[page];
-	}
-	inline size_t getLogSize() {
-		return m_logs.size();
-	}
-	inline u16 getCurrentLogPage() {
-		return page;
-	}
-	inline void setLogPage(u16 current) {
-		page= current;
 	}
 
 	inline float getUVScalar() { 

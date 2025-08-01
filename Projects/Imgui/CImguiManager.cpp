@@ -29,6 +29,7 @@ https://github.com/skylicht-lab/skylicht-engine
 #include "Control/CTouchManager.h"
 #include "imgui_impl_skylicht.h"
 
+
 namespace Skylicht
 {
 	IMPLEMENT_SINGLETON(CImguiManager);
@@ -45,7 +46,7 @@ namespace Skylicht
 		// scale in the big screen size
 		style.ScaleAllSizes(4.0f);
 #endif
-
+		
 		ImGui_Impl_Skylicht_Init();
 		CEventManager::getInstance()->registerProcessorEvent("ImguiManager", this);
 	}
@@ -145,10 +146,10 @@ namespace Skylicht
 			unsigned int keyChar = (unsigned int)event.KeyInput.Char;
 			bool control = event.KeyInput.Control;
 			bool shift = event.KeyInput.Shift;
-
+			
 			if (keyChar != 0)
 				ImGui_Impl_Skylicht_CharFunc(keyChar);
-
+		
 			if (event.KeyInput.PressedDown == true)
 				ImGui_Impl_Skylicht_KeyPressedFunc((int)event.KeyInput.Key, control, shift, false);
 			else

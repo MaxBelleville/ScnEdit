@@ -34,7 +34,7 @@ SCNEdit::SCNEdit(CScnArguments* options)
 {
 	m_arguments = options;
 
-	CContext::createGetInstance();
+
 	CViewManager::createGetInstance()->initViewLayer(2);
 }
 
@@ -55,7 +55,14 @@ void SCNEdit::onInitApp()
 	CInteractionManager::createGetInstance();
 	UI::CUIEventManager::createGetInstance();
 
+
 	CBaseApp* app = getApplication();
+	os::Printer::Logger->setLogLevel(ELL_DEBUG);
+	//Reprint data so inline console also reads it.
+	os::Printer::log(format("Irrlicht Engine version {}",app->getDevice()->getVersion()).c_str(), ELL_NONE);
+	os::Printer::log(app->getDriver()->getName(), ELL_NONE);
+	os::Printer::log(format("Driver Vendor: {}",app->getDriver()->getVendorInfo().c_str()).c_str(), ELL_NONE);
+	os::Printer::log(format("Shader Lang: {}",app->getDriver()->getDriverType() == EDT_DIRECT3D11? "HLSL" :"GLSL").c_str(), ELL_NONE);
 	//Load in sedata which contains all the resources needed for the app including font and shaders. 
 	app->getFileSystem()->addFileArchive(app->getBuiltInPath("sedata.res"), true, true, io::EFAT_ZIP);
 
@@ -126,6 +133,7 @@ void SCNEdit::onQuitApp()
 ///Release instance data and close the file.
 void SCNEdit::proccessQuit() {
 	if (CInteractionManager::getInstance()) CInteractionManager::releaseInstance();
+	Sleep(250);
 	CViewManager::getInstance()->getLayer(1)->destroyAllView();
 	CViewManager::getInstance()->getLayer(0)->destroyAllView();
 	CViewManager::getInstance()->releaseAllLayer();

@@ -26,7 +26,7 @@ https://github.com/skylicht-lab/skylicht-engine
 
 #include "CTextBillboardManager.h"
 #include "Graphics2D/CGraphic2DRenderer.h"
-#include "Graphics2D/SpriteFrame/IFont.h"
+#include "Graphics2D/SpriteFrame/CFont.h"
 
 namespace Skylicht
 {

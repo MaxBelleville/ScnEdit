@@ -54,7 +54,7 @@ namespace Skylicht
 	/// @code
 	/// // in load font function
 	/// CFontSource* fontSource = CFontManager::getInstance()->loadFontSource("SampleGUI/Fonts/Roboto.font");
-	/// IFont* font = NULL;
+	/// CFont* font = NULL;
 	/// if (fontSource)
 	/// {
 	/// 	fontSource->initFont();
@@ -87,7 +87,7 @@ namespace Skylicht
 		CFloatProperty FontSizePt;
 
 	protected:
-		IFont* m_font;
+		CFont* m_font;
 
 		std::string m_path;
 		std::string m_source;
@@ -100,9 +100,9 @@ namespace Skylicht
 
 		virtual ~CFontSource();
 
-		IFont* initFont();
+		CFont* initFont();
 
-		inline IFont* getFont()
+		inline CFont* getFont()
 		{
 			return m_font;
 		}

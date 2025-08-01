@@ -46,6 +46,8 @@ std::string vec2_to_str(core::vector2df pos, int decimals);
 
 std::string vec3_to_str(core::vector3df pos, int decimals);
 
+std::string str_join(const core::array<u32> arr);
+
 core::array<std::string> search_dir(std::string dir, const char* file);
 
 core::array<ITexture*> get_skybox(const char* file);

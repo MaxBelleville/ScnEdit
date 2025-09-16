@@ -56,6 +56,7 @@ public:
 	inline size_t getHLOffset() const { return hl_offset; }
 	inline size_t getOffset() const { return offset; }
 	inline bool hasLightmaps() { return loaded; }
-	inline scnLMapHeader_t* getHLmap(int i) { return hlmaps[i]; }
+	inline scnLMapHeader_t getHLmap(u32 solidindx, u32 surfindx) { return hlmaps[solidindx][surfindx]; }
+	inline scnSwitchableLMapHeader_t getHSLmap(u32 extralight) { return hslmaps[extralight]; }
 };
 #endif

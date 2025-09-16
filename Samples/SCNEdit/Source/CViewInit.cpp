@@ -78,6 +78,7 @@ void CViewInit::onUpdate()
 		io::path filename = m_arguments->getSCNPath();
 		if (!filename.empty()) {
 			SCNEdit::loadScnFile(filename);
+
 			m_arguments->setScnLoaded(true);
 			m_textInfo->setText("Initializing Mission Scene...");
 		}
@@ -93,6 +94,7 @@ void CViewInit::onUpdate()
 	{
 		initScene();
 		if (SCNEdit::getSCN()) {
+
 			m_initState = CViewInit::BuildScnComponents;
 			m_textInfo->setText("Building SCN Mesh...");
 		}
@@ -157,15 +159,16 @@ void CViewInit::initScene()
 	CEditorCamera* editorCam = camObj->addComponent<CEditorCamera>();
 	//Part of the camera that handles rotation
 	editorCam->setControlStyle(CEditorCamera::EControlStyle::FPS);
-	editorCam->setMoveSpeed(8.0f);
+	editorCam->setMoveSpeed(0.0f);
 	editorCam->setRotateSpeed(24.0f);
-	editorCam->setZoomSpeed(8.0f);
+	editorCam->setZoomSpeed(2.0f);
 	editorCam->setInvert(m_arguments->isMouseInvert());
 
 	//Part of the camera that handles movement.
 	CFpsMoveCamera* fpsMoveCam = camObj->addComponent<CFpsMoveCamera>();
 	fpsMoveCam->setMoveSpeed(150.0f);
 	fpsMoveCam->setShiftSpeed(2.5f);
+	fpsMoveCam->setCtrlSpeed(0.5f);
 	m_camera->setFOV(m_arguments->getFov());
 	m_camera->setFarValue(m_arguments->getViewDist() * 100.0f);
 	m_camera->setPosition(core::vector3df(0.0f, 4.0f, 0.0f));
@@ -188,12 +191,6 @@ void CViewInit::initScene()
 	m_skyObject->setVisible(false);
 	//m_skyObject->setStatic(true);
 
-	//Create cubes for verts, shared verts, hover vert and selected vert.
-	initShapeCollection<CCube>(SColor(255, 255, 0, 0), "surf_verts");
-	initShapeCollection<CCube>(SColor(255, 255, 0, 255), "shared_verts");
-	initShapeCollection<CCube>(SColor(255, 0, 0, 0), "hover_vert");
-	initShapeCollection<CCube>(SColor(255, 255, 255, 255), "sel_vert");
-
 	context->initSimpleRenderPipeline(app->getWidth(), app->getHeight());
 	context->setActiveZone(zone);
 	context->setActiveCamera(m_camera);
@@ -202,16 +199,15 @@ void CViewInit::initScene()
 
 
 template<class T>
-void CViewInit::initShapeCollection(SColor color, const char* name) {
+void CViewInit::initShapeCollection(SColor color, CContainerObject* parent, const char* name) {
 	CContext* context = CContext::getInstance();
 
 	CScene* scene = context->getScene();
 	CZone* zone = scene->getZone(0);
-	CGameObject* shapeObj = zone->createEmptyObject();
+	CGameObject* shapeObj = parent->createEmptyObject(name);
 	T* shape = shapeObj->addComponent<T>();
 	shape->setColor(color);
 	shape->removeAllEntities();
-	shapeObj->setName(name); //hover over 
 	zone->registerObjectInSearchList(shapeObj);
 }
 
@@ -226,6 +222,7 @@ void CViewInit::buildScnComponents() {
 
 	CScnSolid* solid = scn->getSolid(0);
 	//Will try to get the first skybox in the scn and set the skybox to that.
+
 	const char* skyName = "";
 	for (int i = 0; solid->n_cells; i++) {
 		if (!str_equiv(solid->rawcells[i].skyname, "")) {
@@ -250,6 +247,14 @@ void CViewInit::buildScnComponents() {
 
 	//Define body and solid and set mesh and collision for solid.
 	CContainerObject* body = zone->createContainerObject("body");
+
+
+	//Create cubes for verts, shared verts, hover vert and selected vert.
+	initShapeCollection<CCube>(SColor(255, 255, 0, 0), body, "surf_verts");
+	initShapeCollection<CCube>(SColor(255, 255, 0, 255), body, "shared_verts");
+	initShapeCollection<CCube>(SColor(255, 0, 0, 0), body, "hover_vert");
+	initShapeCollection<CCube>(SColor(255, 255, 255, 255), body, "sel_vert");
+
 	CGameObject* scnObj = body->createEmptyObject("solid");
 
 	zone->registerObjectInSearchList(body);

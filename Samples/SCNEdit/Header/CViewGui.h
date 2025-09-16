@@ -8,6 +8,8 @@
 #include "UserInterface/CUIButton.h"
 #include "UserInterface/CUITextBox.h"
 #include "CScnArguments.h"
+#include <imguial_msgbox.h>
+#include <FileDialog/ImGuiFileDialog.h>
 
 struct InfoText {
 	std::string section1;
@@ -31,7 +33,8 @@ protected:
 	static inline UI::CUITextBox* m_textSection3c;
 	static inline bool isSection1Set = false;
 	static inline bool isSection2Set = false;
-
+	static inline bool savePressed = false;
+	static inline ImGuiAl::MsgBox m_msgbox;
 
 	static inline UI::CUIButton* m_quitButton;
 	static inline UI::CUIButton* m_saveButton;
@@ -62,6 +65,7 @@ protected:
 
 	void openFile();
 	void openTextures();
+	void scrapeLight();
 	void saveFile();
 	void helpDialog();
 	void openLogger();
@@ -76,7 +80,6 @@ protected:
 	static InfoText getSolidInfo(bool isViInfo = false);
 	static InfoText getPortalInfo();
 	static InfoText getEntityInfo();
-	static void updateUVInfo();
 	static void resetEditText(bool isViInfo=false);
 	static UI::CUITextBox* addTextbox(const char* textPath);
 	static UI::CUIButton* addButton(const char* btnPath);

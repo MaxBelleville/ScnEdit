@@ -6,15 +6,7 @@ IMPLEMENT_SINGLETON(CInteractionManager);
 CInteractionManager::CInteractionManager()
 {
 	CEventManager::getInstance()->registerEvent("InteractionManager",this);
-	// Register custom INI settings handler
-	ImGuiSettingsHandler ini_handler;
-	ini_handler.TypeName = "SCN";
-	ini_handler.TypeHash = ImHashStr("SCN");
-	ini_handler.ReadOpenFn = readOpen;
-	ini_handler.ReadLineFn = readLine;
-	ini_handler.WriteAllFn = writeAll;
-	ini_handler.UserData = gui;
-	ImGui::AddSettingsHandler(&ini_handler);
+	
 }
 CInteractionManager::~CInteractionManager() {
 	CEventManager::getInstance()->unRegisterEvent(this);
@@ -22,18 +14,40 @@ CInteractionManager::~CInteractionManager() {
 	m_ColliderEvents.clear();
 	m_KeyEvents.clear();
 	m_LogEvents.clear();
+	m_CursorModeEvents.clear();
 	m_MouseDownEvents.clear();
 	m_MouseUpEvents.clear();
-	m_VertexUpdateEvents.clear();
+	m_UIUpdateEvents.clear();
 	resetLeftClick();
 	resetPrevGui();
-	resetSelectObj();
+	resetSelected();
 	resetVerts();
 	m_selectedType = SelectedType::Empty;
 	m_guiState = GUIState::Default;
 	m_surfselected = solidSelect_t(-1, -1);
 	m_portalselected = portalSelect_t(-1, -1);
 	m_entityselected = -1;
+}
+
+void CInteractionManager::registerImgui(const wchar_t* dir)
+{
+	// Register custom INI settings handler
+	ImGuiSettingsHandler ini_handler; 
+	ImGuiIO& io = ImGui::GetIO();
+	
+	char tmp[128] = "";
+	sprintf_s(tmp, "%S/scnedit.ini", dir);
+	os::Printer::log(tmp);
+
+	io.IniFilename = strdup(tmp); // change file name
+
+	ini_handler.TypeName = "SCN";
+	ini_handler.TypeHash = ImHashStr("SCN");
+	ini_handler.ReadOpenFn = readOpen;
+	ini_handler.ReadLineFn = readLine;
+	ini_handler.WriteAllFn = writeAll;
+	ini_handler.UserData = gui;
+	ImGui::AddSettingsHandler(&ini_handler);
 }
 
 void* CInteractionManager::readOpen(ImGuiContext*, ImGuiSettingsHandler* handler, const char* name) {
@@ -44,15 +58,30 @@ void* CInteractionManager::readOpen(ImGuiContext*, ImGuiSettingsHandler* handler
 	return nullptr;
 
 }
+
 void CInteractionManager::readLine(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line) {
-	guiSettings_t* settings = static_cast<guiSettings_t*>(entry);
-	sscanf(line, "scn=%d", &settings->vis_scn);
-	sscanf(line, "doors=%d", &settings->vis_doors);
-	sscanf(line, "portals=%d", &settings->vis_portals);
-	sscanf(line, "bb=%d", &settings->vis_bb);
-	sscanf(line, "entities=%d", &settings->vis_entities);
-	sscanf(line, "lightmaps=%d", &settings->vis_lightmaps);
-	settings->scrape_lightmaps = false;
+    guiSettings_t* settings = static_cast<guiSettings_t*>(entry);
+    int temp;
+
+    if (sscanf(line, "scn=%d", &temp) == 1) {
+        settings->vis_scn = temp != 0; // Convert to bool
+    }
+    if (sscanf(line, "doors=%d", &temp) == 1) {
+        settings->vis_doors = temp != 0; // Convert to bool
+    }
+    if (sscanf(line, "portals=%d", &temp) == 1) {
+        settings->vis_portals = temp != 0; // Convert to bool
+    }
+    if (sscanf(line, "bb=%d", &temp) == 1) {
+        settings->vis_bb = temp != 0; // Convert to bool
+    }
+    if (sscanf(line, "entities=%d", &temp) == 1) {
+        settings->vis_entities = temp != 0; // Convert to bool
+    }
+    if (sscanf(line, "lightmaps=%d", &temp) == 1) {
+        settings->vis_lightmaps = temp != 0; // Convert to bool
+    }
+    settings->scrape_lightmaps = false;
 }
 
 void CInteractionManager::writeAll(ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf) {
@@ -66,6 +95,7 @@ void CInteractionManager::writeAll(ImGuiContext*, ImGuiSettingsHandler* handler,
 	buf->appendf("entities=%d\n", settings->vis_entities);
 	buf->appendf("lightmaps=%d\n", settings->vis_lightmaps);
 }
+
 bool CInteractionManager::isGuiSettingsUpdated() {
 	return gui->vis_scn != prevgui->vis_scn ||
 		gui->vis_doors != prevgui->vis_doors ||
@@ -210,13 +240,12 @@ bool CInteractionManager::findKeyState(std::vector<key_pair> keys) {
 	}
 	return false;
 }
-
-bool CInteractionManager::ToggleButton(const char* str_id, bool* v)
+bool CInteractionManager::ToggleButton(const char* str_id, bool* v, ImGuiKey key)
 {
 	ImVec2 p = ImGui::GetCursorScreenPos();
 	ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-	float height = ImGui::GetFrameHeight() *.85f;
+	float height = ImGui::GetFrameHeight() * 0.85f;
 	float width = height * 1.4f;
 	float radius = height * 0.475f;
 
@@ -225,27 +254,47 @@ bool CInteractionManager::ToggleButton(const char* str_id, bool* v)
 
 	ImU32 col_bg;
 	if (ImGui::IsItemHovered())
-		col_bg = ImGui::GetColorU32(ImLerp(ImVec4(0.58f, 0.58f, 0.58f, 1.0f), ImVec4(0.44f, 0.16f, 0.73f, 1.0f), t));
+		col_bg = ImGui::GetColorU32(ImLerp(ImVec4(0.58f, 0.58f, 0.58f, 1.0f),
+			ImVec4(0.44f, 0.16f, 0.73f, 1.0f), t));
 	else
-		col_bg = ImGui::GetColorU32(ImLerp(ImVec4(0.75f, 0.75f, 0.75f, 1.0f), ImVec4(0.58f, 0.24f, 0.73f, 1.0f), t));
+		col_bg = ImGui::GetColorU32(ImLerp(ImVec4(0.75f, 0.75f, 0.75f, 1.0f),
+			ImVec4(0.58f, 0.24f, 0.73f, 1.0f), t));
 
+	bool toggled = false;
+
+	// mouse click
 	if (ImGui::IsItemClicked())
+	{
 		*v = !*v;
-	ImGui::SameLine();
-	ImGui::Text(str_id);
+		toggled = true;
+	}
+	gui::ICursorControl* cursor = getApplication()->getDevice()->getCursorControl();
+	// key press
+	if (key != ImGuiKey_None && ImGui::IsKeyPressed(key) && !cursor->isVisible())
+	{
+		*v = !*v;
+		toggled = true;
+	}
 
-	
+	ImGui::SameLine();
+	ImGui::TextUnformatted(str_id);
+
 	ImGuiContext& g = *GImGui;
 	float ANIM_SPEED = 0.08f;
-	if (g.LastActiveId == g.CurrentWindow->GetID(str_id))// && g.LastActiveIdTimer < ANIM_SPEED)
+	if (g.LastActiveId == g.CurrentWindow->GetID(str_id))
 	{
 		float t_anim = ImSaturate(g.LastActiveIdTimer / ANIM_SPEED);
-		t = *v ? (t_anim) : (1.0f - t_anim);
+		t = *v ? t_anim : (1.0f - t_anim);
 	}
+
 	draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), col_bg, height * 0.5f);
-	draw_list->AddCircleFilled(ImVec2(p.x + radius + t * (width - radius * 2.0f), p.y + radius), radius - 1.5f, IM_COL32(255, 255, 255, 255));
-	return ImGui::IsItemClicked();
+	draw_list->AddCircleFilled(ImVec2(p.x + radius + t * (width - radius * 2.0f), p.y + radius),
+		radius - 1.5f, IM_COL32(255, 255, 255, 255));
+
+	return toggled;
 }
+
+
 
 void CInteractionManager::swapCursorMode(bool isRightClick)
 {
@@ -271,17 +320,16 @@ void CInteractionManager::setCursorMode(bool state)
 }
 
 
-void CInteractionManager::updateVertPos(indexedVec3df_t vert) {
-	moveablevert.pos = vert.pos;
+void CInteractionManager::updateVertPos() {
 	for (int i = 0; i < getVerts().size(); i++) {
-		if (getVerts()[i].vertidxidx == vert.vertidxidx) {
-			vertexdata.first[i].pos = vert.pos;
+		if (getVerts()[i].faceidx == moveablevert->faceidx) {
+			vertexdata.first[i].pos = moveablevert->pos;
 			return;
 		}
 	}
 	for (int i = 0; i < getSharedVerts().size(); i++) {
-		if (getSharedVerts()[i].vertidxidx == moveablevert.vertidxidx) {
-			vertexdata.second[i].pos = vert.pos;
+		if (getSharedVerts()[i].faceidx == moveablevert->faceidx) {
+			vertexdata.second[i].pos = moveablevert->pos;
 			return;
 		}
 	}

@@ -25,6 +25,12 @@ namespace Skylicht
 		m_controlStyle(CEditorCamera::Default)
 	{
 		m_cursorControl = getIrrlichtDevice()->getCursorControl();
+		if (getIrrlichtDevice()->getType() == EDT_DIRECT3D11) {
+			hwnd = reinterpret_cast<HWND>(getIrrlichtDevice()->getVideoDriver()->getExposedVideoData().D3D11.HWnd);
+		}
+		else {
+			hwnd = reinterpret_cast<HWND>(getIrrlichtDevice()->getVideoDriver()->getExposedVideoData().OpenGLWin32.HWnd);
+		}
 	}
 
 	CEditorCamera::~CEditorCamera()
@@ -43,7 +49,6 @@ namespace Skylicht
 		if (m_camera == NULL)
 		{
 			m_camera = m_gameObject->getComponent<CCamera>();
-
 		}
 	}
 
@@ -69,16 +74,13 @@ namespace Skylicht
 
 	void CEditorCamera::endUpdate()
 	{
-		
 		CTransformEuler* transform = m_gameObject->getTransformEuler();
 
 		if (m_camera == NULL || transform == NULL)
 			return;
 
-
 		if (!m_camera->isInputReceiverEnabled())
 			return;
-
 
 		f32 timeDiff = getTimeStep();
 
@@ -143,6 +145,15 @@ namespace Skylicht
 		}
 		else if (m_controlStyle == FPS) {
 			if (!m_cursorControl->isVisible()) {
+
+			
+				RECT rect;
+				if (GetWindowRect(hwnd, &rect)) {
+					core::dimension2du center = getVideoDriver()->getScreenSize() / 2.0;
+					m_fpsPos = core::vector2di(center.Width + rect.left, center.Height + rect.top);
+				}
+				m_cursorControl->setPosition(m_fpsPos);
+
 				if (m_midMousePress)
 					updateInputOffset(offsetPosition, timeDiff);
 				else {
@@ -202,7 +213,15 @@ namespace Skylicht
 
 		if (m_mouseWhell)
 		{
-			pos -= movedir * m_wheel * m_zoomSpeed * timeDiff * 0.1f;
+			if (m_controlStyle == EControlStyle::FPS) {
+				float change = (m_wheel * m_zoomSpeed * 0.1f);
+				if (m_rotateSpeed - change < 32.0 && m_rotateSpeed - change>0.5) 
+					m_rotateSpeed -= change;
+				
+			}
+			else 
+				pos -= movedir * m_wheel * m_zoomSpeed * timeDiff * 0.1f;
+			
 			m_mouseWhell = false;
 		}
 
@@ -245,7 +264,7 @@ namespace Skylicht
 	{
 		const float MaxVerticalAngle = 88;
 		const int MouseYDirection = 1;
-
+	
 		// rotate X
 		relativeRotation.Y -= (m_centerCursor.X - m_cursorPos.X) * m_rotateSpeed * MouseYDirection * timeDiff;
 
@@ -263,6 +282,7 @@ namespace Skylicht
 		{
 			relativeRotation.X = MaxVerticalAngle;
 		}
+
 		m_centerCursor = m_cursorControl->getRelativePosition();
 		m_cursorPos = m_centerCursor;
 	}
@@ -312,9 +332,9 @@ namespace Skylicht
 		}
 
 		pos += moveDir * length;
-
 		m_centerCursor = m_cursorControl->getRelativePosition();
 		m_cursorPos = m_centerCursor;
+	
 	}
 
 	bool CEditorCamera::OnEvent(const SEvent& evt)
@@ -365,7 +385,6 @@ namespace Skylicht
 		case EET_MOUSE_INPUT_EVENT:
 			if (evt.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
 				m_leftMousePress = true;
-
 			if (evt.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
 				m_leftMousePress = false;
 			if (evt.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN)
@@ -407,13 +426,7 @@ namespace Skylicht
 			{
 				if (m_controlStyle == FPS && !m_cursorControl->isVisible()) {
 					m_cursorPos = m_cursorControl->getRelativePosition();
-					core::dimension2du center = getVideoDriver()->getScreenSize() / 2;
-					HWND hwnd = reinterpret_cast<HWND>(getIrrlichtDevice()->getVideoDriver()->getExposedVideoData().OpenGLWin32.HWnd);
-					RECT rect;
-					if (GetWindowRect(hwnd, &rect)) {
-						core::vector2di pos = core::vector2di(center.Width + rect.left, center.Height + rect.top);
-						m_cursorControl->setPosition(pos);
-					}
+				
 					return true;
 				}
 				if (m_controlStyle == Maya)
@@ -424,11 +437,11 @@ namespace Skylicht
 						return true;
 					}
 				}
-				else {
+				else
+				{
 					if (m_leftMousePress || m_rightMousePress || m_midMousePress)
 					{
 						m_cursorPos = m_cursorControl->getRelativePosition();
-
 						return true;
 					}
 				}

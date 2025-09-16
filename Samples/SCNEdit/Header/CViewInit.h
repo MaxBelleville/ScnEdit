@@ -57,7 +57,7 @@ public:
 
 	void buildScnComponents();
 	template<class T>
-	void initShapeCollection(SColor, const char*);
+	void initShapeCollection(SColor, CContainerObject* parent, const char*);
 
 protected:
 

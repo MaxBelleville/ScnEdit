@@ -35,14 +35,14 @@ public:
 
 
 protected:
+	static void moveVertNBounds(bool reset);
 	static void updateObjectVisbility(CGameObject* obj, bool state, bool bbCollision);
 	static void updateVisbility();
 	static void deselectAll(CGameObject* current);
 	static void updateEntityPos(core::vector3df);
 	static void resetSolid();
 	static void updateNearestVert(core::vector3df);
-	static void updateSelectedVert();
+	static void updateSelectedVert(core::vector3df pos);
 	static void updateSurfaceVertCube();
 	static void getNearestDistVert(core::vector3df pos, core::array<indexedVec3df_t> verts, indexedVec3df_t& closest, float& minDistSq);
-	static void moveBounds(bool reset);
 };

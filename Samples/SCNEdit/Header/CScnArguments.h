@@ -27,7 +27,10 @@ class CScnArguments {
 				}
 				else if (argv[i] == "-directx" ||
 					argv[i] == "-dx") {
-					m_DrivType = EDT_DIRECT3D11;
+				}
+				else if (argv[i] == "-opengl" ||
+					argv[i] == "-gl") {
+					m_DrivType = EDT_OPENGL;
 				}
 				else if (argv[i] == "-resize") {
 					bResizeable = true;
@@ -50,8 +53,6 @@ class CScnArguments {
 					bFullscreen = true;
 				}
 				else if (argv[i] == "-all") {
-					bVertInfo = true;
-					bLoadInbuiltDebugger = true;
 					m_Alpha = 125;
 				}
 				else if (argv[i] == "-map") {
@@ -87,9 +88,9 @@ class CScnArguments {
 					argv[i] == "-e") {
 					
 				}
-				else if (argv[i] == "-vi" ||
-					argv[i] == "-vertexinfo") {
-					bVertInfo = true;
+				else if (argv[i] == "-si" ||
+					argv[i] == "-surfinfo") {
+					bVertInfo = false;
 				}
 				else if (argv[i] == "-movevertex" ||
 					argv[i] == "-mv") {
@@ -109,33 +110,35 @@ class CScnArguments {
 					argv[i] == "-lightmap") {
 				
 				}
-				else if (argv[i] == "-nodebug" || argv[i] == "-nd") {
-					bDebug = false;
+				else if (argv[i] == "-debug" || argv[i] == "-d") {
+					bDebug = true;
 				}
-				else if (argv[i] == "-internal") {
-					bLoadInbuiltDebugger = true;
+				else if (argv[i] == "-nointernal" || argv[i] == "-n") {
+					bLoadInbuiltDebugger = false;
 				}
-				else if (argv[i] == "-borderless") {
+				else if (argv[i] == "-borderless" || argv[i] == "-bl") {
 					bBorderless = true;
 				}
 				else {
 					getApplication()->showDebugConsole();
+					bBorderless = false;
+					bFullscreen = false;
+					bDebug = true;
 					errorMessage += (std::format("\nUnknown option {}. \nAvailable options are:\n", argv[i].c_str()).c_str());
 					errorMessage += ("   -res <width> <height>            Set screen resolution.\n"
 						"   -f, -fullscreen                  Run in full screen mode.\n"
-						"   -borderless                      Run in borderless mode.\n"
+						"   -borderless, -bl                 Run in borderless mode.\n"
 						"   -resize                          Allow the window to be resizeable\n"
-						"   -nd, -nodebug                    Disabled debug console window.\n"
-						"   -internal                        Gui-based console debug output, useful for fullscreen.\n"
+						"   -d, -debug                       Enable debug console window.\n"
+						"   -nointernal -ni                  Disable Gui-based console debug output\n"
 						"   -im, -invertmouse                Inverts mouse. Because, you know, we are people too!\n\n"
 						"   -map <mapname>                   Load <mapname> on start.\n"
-						"   -dx, -directx                    Force Direct3d9 mode. Default is OpenGL.\n"
-						"   -vd,-viewdistance <dist>         Set view distance. Default is 20\n"
+						"   -gl, -opengl                     Force OpenGL mode. Default is DirectX.\n"
+						"   -vd,-viewdistance <dist>         Set view distance. Default is 50\n"
 						"   -fov <fov>                       Set camera fov. Default is 60\n"
 						"   -fa, -forcealpha                 Forces showing transparent materials.\n"
 						"   -decals							 Visually display a rough idea of what decals will look like(WIP)\n"
-						"   -vi -vertexinfo                  When Vertex is selected, via CTRL or SHIFT detail boxes change."
-						"   -all							 Helper that will enable mutiple flags(same as -fa -vi -i)\n"
+						"   -si, -surfinfo                   Disabled info change when Vertex is selected"
 						);
 				}
 			}
@@ -152,7 +155,7 @@ class CScnArguments {
 		inline io::path  getSCNPath() { return m_SCNFile; }
 		inline void setSCNPath(io::path path) { m_SCNFile = path; }
 		inline u16  getAlpha() { return m_Alpha; }
-		inline wchar_t* getBaseDirectory() { return m_BaseDirectory; } //Not sure if even needed
+		inline wchar_t* getBaseDirectory() { return m_BaseDirectory; } 
 		inline bool isDefault() { return bResDefault; }
 		inline bool isMouseInvert() { return bInvertMouse; }
 		inline bool isDecalEnabled() { return bDecal; }
@@ -169,19 +172,19 @@ class CScnArguments {
 	private:
 		bool bResDefault = true;
 		bool bInvertMouse = false;
-		bool bVertInfo = false;
-		bool bLoadInbuiltDebugger = false;
+		bool bVertInfo = true;
+		bool bLoadInbuiltDebugger = true;
 		bool bLoaded = false;
-		bool bDebug = true;
+		bool bDebug = false;
 		bool bBorderless = false;
 		bool bFullscreen = false;
 		bool bResizeable = false;
 		bool bDecal = false;
 		std::string errorMessage = "";
-		E_DRIVER_TYPE m_DrivType = EDT_OPENGL;
+		E_DRIVER_TYPE m_DrivType = EDT_DIRECT3D11;
 		core::dimension2du m_Res = core::dimension2du(800,600);
 		core::dimension2du m_Deskres = m_Res;
-		f32 m_Viewdist = 20.0f;
+		f32 m_Viewdist = 50.0f;
 		f32 m_Fov = 60.0f;
 		io::path m_SCNFile = "";
 		u16 m_Alpha = 0;

@@ -36,7 +36,7 @@ f32 read_f32(std::ifstream* file);
 bool is_number(const char* str);
 
 bool copy_file(const char * existfile, const char * newfile);
-
+bool copy_portion(const char* existfile, const char* newfile, int64_t start, int64_t end);
 bool can_open(const char * path);
 
 SColor convert_color(const char* pos);
@@ -59,3 +59,10 @@ ITexture* convert_image(io::path file);
 video::S3DVertex* get_cube_vertices(core::vector3df start, core::vector3df end, SColor clr);
 IMeshBuffer* generate_cube_mesh_buff(core::vector3df start, core::vector3df end, SColor clr);
 const u16* get_cube_indices();
+
+bool solveProjectionFrame(const core::array <std::pair<core::vector3df, core::vector2df>>& samples,
+    core::vector3df& origin_out,
+    core::vector3df& u_axis_out,
+    core::vector3df& v_axis_out);
+
+bool invert3x3(const double src[3][3], double dst[3][3]);

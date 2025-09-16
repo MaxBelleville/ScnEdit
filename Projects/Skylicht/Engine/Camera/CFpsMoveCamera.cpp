@@ -72,6 +72,8 @@ namespace Skylicht
 		movedir.normalize();
 		f32 speed = m_moveSpeed;
 		if (m_shiftKeyDown) speed= m_moveSpeed*m_shiftSpeed;
+
+		else if (m_ctrlKeyDown) speed = m_moveSpeed * m_ctrlSpeed;
 		
 
 		if (m_input[MoveForward])
@@ -111,6 +113,12 @@ namespace Skylicht
 			if (evt.KeyInput.Key == KEY_SHIFT || evt.KeyInput.Key == KEY_LSHIFT ||
 				evt.KeyInput.Key == KEY_RSHIFT) {
 				m_shiftKeyDown = evt.KeyInput.PressedDown;
+				return true;
+			}
+
+			if (evt.KeyInput.Key == KEY_CONTROL || evt.KeyInput.Key == KEY_LCONTROL ||
+				evt.KeyInput.Key == KEY_RCONTROL) {
+				m_ctrlKeyDown = evt.KeyInput.PressedDown;
 				return true;
 			}
 			break;

@@ -120,7 +120,7 @@ int CScnSolid::loadSolid(std::ifstream * file, u32 indx)
 	n_surfs=read_u32(file);
 	n_cells=read_u32(file);
 	n_names=read_u32(file);
-
+	lengthsad = file->tellg();
 	length=read_u32(file);
 	//288 bits of variables in the scn file
 	//must be in this order
@@ -345,8 +345,8 @@ void CScnSolid::buildBackTree()
 
 	uvvertidxs_caller = new core::array<u32>[n_vertidxs];
 	for (u32 i = 0; i < n_surfs; i++) {
-		for (u32 j = 0; j < surfs[i].vertidxlen; j++)
-			uvvertidxs_caller[surfs[i].vertidxstart + j].push_back(i);
+		for (u32 j = 0; j < surfs[i].faceidxlen; j++)
+			uvvertidxs_caller[surfs[i].faceidxstart + j].push_back(i);
 	}
 }
 
@@ -429,12 +429,12 @@ int CScnSolid::loadSurfs(std::ifstream * file)
 		surfsad[i]=file->tellg();
 
 		read_generic(&surfs[i],file,72);   //read the usual 72 first bytes
+		int64_t t = file->tellg();
 
-		
 		if (surfs[i].hasVertexColors==1)  //means there are more bytes - the shading or smoothing or whatever we call it
 		{
-			surfs[i].shading = new u8[4*surfs[i].vertidxlen];     //allocate
-			read_generic(surfs[i].shading,file,4*surfs[i].vertidxlen);
+			surfs[i].shading = new u8[4*surfs[i].faceidxlen];     //allocate
+			read_generic(surfs[i].shading,file,4*surfs[i].faceidxlen);
 			//REMEMBER: because shading is initially set to  a random value, we must
 			//make sure we only try to draw shading only when more is set to !0 or
 			//make constructor to set initial value 0;
@@ -483,13 +483,13 @@ void CScnSolid::calcSurfVertices(u32 surfidx, f32* mults, IVertexBuffer* vbuff, 
 
 	u8 * ps= surfi->shading;
 
-	for (u32 i=0; i < surfi->vertidxlen; i++)
+	for (u32 i=0; i < surfi->faceidxlen; i++)
 	{
-		tVert = getVertice(vertidxs[surfi->vertidxstart+i]);
+		tVert = getVertice(vertidxs[surfi->faceidxstart+i]);
 		  
-		tVert.TCoords = uvpos[uvidxs[surfi->vertidxstart + i]];
+		tVert.TCoords = uvpos[uvidxs[surfi->faceidxstart + i]];
 
-		tVert.TCoords2 = uvpos[uvidxs[surfi->vertidxstart + i]];
+		tVert.TCoords2 = uvpos[uvidxs[surfi->faceidxstart + i]];
 		if(mults) {
 			tVert.TCoords2.X = tVert.TCoords2.X * mults[0] + mults[2];
 			tVert.TCoords2.Y = tVert.TCoords2.Y * mults[1] + mults[3];
@@ -531,7 +531,7 @@ void CScnSolid::calcSurfIndices(u32 surfidx, IIndexBuffer* ibuff)
 	//from then, each new one defines a tringle with the last and the origin (0)
 
 
-	for (u16 j=3; j<surfi->vertidxlen ;j++)
+	for (u16 j=3; j<surfi->faceidxlen ;j++)
 	{
 		ibuff->addIndex(j-1);
 		ibuff->addIndex(j);

@@ -53,6 +53,7 @@ void SCNEdit::onInitApp()
 	//Create essential managers.
 	CImguiManager::createGetInstance();
 	CInteractionManager::createGetInstance();
+	CInteractionManager::registerImgui(m_arguments->getBaseDirectory());
 	UI::CUIEventManager::createGetInstance();
 
 
@@ -133,7 +134,6 @@ void SCNEdit::onQuitApp()
 ///Release instance data and close the file.
 void SCNEdit::proccessQuit() {
 	if (CInteractionManager::getInstance()) CInteractionManager::releaseInstance();
-	Sleep(250);
 	CViewManager::getInstance()->getLayer(1)->destroyAllView();
 	CViewManager::getInstance()->getLayer(0)->destroyAllView();
 	CViewManager::getInstance()->releaseAllLayer();
@@ -150,19 +150,21 @@ bool SCNEdit::loadScnFile(io::path fname) {
 		closeScnFile();
 	s32 pos = fname.findLastChar("\\/", 2); //search for \ or /
 
+
 	if (pos > -1) {
 		//Changes working directory based on the postion
-		app->getFileSystem()->changeWorkingDirectoryTo((fname.subString(0, pos - 1)));
+		app->getFileSystem()->changeWorkingDirectoryTo((fname.subString(0, pos)));
 		//fname=fname.subString(pos+1,fname.size()-pos);
 		//clears path
 		deletePathFromFilename(fname);
 	}
 
+
+
+
 	//Creates the backupfile if not found. Important as without this it will crash.
 	std::filesystem::path backupDir = "backups";
-	if (!std::filesystem::exists(backupDir)) {
-		std::filesystem::create_directory(backupDir);
-	}
+	std::filesystem::create_directory(backupDir);
 
 	ifstream scnFile(fname.c_str(), ios::in | ios::binary);
 
@@ -179,6 +181,7 @@ bool SCNEdit::loadScnFile(io::path fname) {
 	//Allows to set data to file
 	output = new ofstream(fname.c_str(), ios::in | ios::binary | ios::ate);
 	outputPath = fname;
+
 	return false;
 }
 
@@ -195,26 +198,44 @@ bool SCNEdit::saveSCN() {
 
 	//Get time of when saved and store into backup
 	auto now = floor<std::chrono::seconds>(std::chrono::system_clock::now());
-	bakname += format("_{:%Y-%m-%d_%H-%M-%S}.scn", now).c_str();
+	bakname += format("_{:%Y-%m-%d_%H-%M}.scn", now).c_str();
 	io::path backupPath = "backups/";
 	backupPath += bakname.c_str();
 
 	//Record texture names
 	//if file is open
+	if (!output->is_open()) {
+		output = new ofstream(outputPath.c_str(), ios::in | ios::binary | ios::ate);
+	}
+
 	if (output && output->is_open()) {
 		//Save backup before do anything
 		if (!copy_file(outputPath.c_str(), backupPath.c_str())) {
 			error(true, "can't copy from %s to %s", outputPath.c_str(), backupPath.c_str());
 		}
-
+		
 		for (u32 s = 0; s < scn->getSolidSize(true); s++) {
+			u32 sum = 0;
 			CScnSolid* solid = scn->getSolid(s);
+
 			//save textures to file
 			for (u32 i = 0; i < solid->n_surfs; i++) {
 				output->seekp(solid->surfsad[i]);
-				write_generic(&solid->surfs[i], output, 72);
-
+				scnSurf_t* surf = &solid->surfs[i];
+				write_generic(surf, output, 72);
+				u32 start = solid->surfsad[i] + 72;
+				u32 length = 4 * surf->faceidxlen;
+				if(surf->hasVertexColors && surf->shading) {
+					write_generic(surf->shading, output, length);
+				}
 			}
+
+			output->seekp(0);
+			write_generic(scn->header, output, sizeof(scnHeader_t));
+			
+			solid->length -= sum;
+			output->seekp(solid->lengthsad);
+			write_generic(&solid->length, output, sizeof(u32));
 
 			//save planes
 			output->seekp(solid->planessad);
@@ -248,6 +269,7 @@ bool SCNEdit::saveSCN() {
 				}
 			}
 		}
+
 		//save entity data
 		for (u32 e = 0; e < scn->getTotalEnts(); e++) {
 			CScnEnt* ent = scn->getEnt(e);
@@ -265,9 +287,12 @@ bool SCNEdit::saveSCN() {
 			output->close();
 			filesystem::resize_file(outputPath.c_str(), pos);
 		}
+		//Close the file and make the deletion changes required
+		output->close();
+	
 
 		os::Printer::log("Changes saved to file.");
-	
+		
 		return true;
 	}
 	else

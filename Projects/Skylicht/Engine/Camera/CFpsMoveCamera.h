@@ -57,9 +57,11 @@ namespace Skylicht
 
 		bool m_input[DirectionCount];
 		bool m_shiftKeyDown = false;
+		bool m_ctrlKeyDown = false;
 		gui::ICursorControl* m_cursorControl;
 		f32 m_moveSpeed;
-		f32 m_shiftSpeed;
+		f32 m_shiftSpeed = 1.0;
+		f32 m_ctrlSpeed = 1.0;
 	public:
 		CFpsMoveCamera();
 
@@ -89,6 +91,11 @@ namespace Skylicht
 		inline void setShiftSpeed(float s)
 		{
 			m_shiftSpeed = s;
+		}
+
+		inline void setCtrlSpeed(float s)
+		{
+			m_ctrlSpeed = s;
 		}
 	};
 }

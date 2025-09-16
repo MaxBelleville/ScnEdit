@@ -22,13 +22,6 @@ file(GLOB_RECURSE aes_gladman_source
 setup_project_group("${aes_gladman_source}" ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-#pfd
-file(GLOB_RECURSE pfd_source
-	./pfd/**.cpp 
-	./pfd/*.hpp 
-	./pfd/**.c 
-	./pfd/**.h)
-setup_project_group("${pfd_source}" ${CMAKE_CURRENT_SOURCE_DIR})
 
 #utf8lib
 file(GLOB_RECURSE utf8_source
@@ -158,7 +151,6 @@ add_library(ThirdParty ${ENGINE_SHARED_OR_STATIC_LIB}
 	${freetype_source}
 	${libmpg123_source}
 	${kdtree_source}
-	${pfd_source}
 	${utf8_source}
 )
 

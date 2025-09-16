@@ -9,6 +9,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+
 struct guiSettings_t
 {
 	bool vis_scn = true;
@@ -27,6 +28,7 @@ enum GUIState
 	OpenScn,
 	Quit,
 	Save,
+	ScrapeLightSave,
 	OpenTexture,
 	Help,
 	Export,
@@ -34,7 +36,7 @@ enum GUIState
 	EditAll,
 	EditFlags,
 	EditAlpha,
-	EditHasShading,
+	EditSurfShading,
 	EditShading,
 };
 
@@ -60,8 +62,8 @@ public:
 	CCollisionNode* node = NULL;
 
 protected:
-	guiSettings_t* gui =new guiSettings_t();
-	guiSettings_t* prevgui = new guiSettings_t();
+	static inline guiSettings_t* gui =new guiSettings_t();
+	static inline guiSettings_t* prevgui = new guiSettings_t();
 	key_map m_keyMap;
 
 	std::pair<bool,KeyAugment> m_leftDown = std::make_pair(false,KeyAugment::None);
@@ -92,11 +94,11 @@ protected:
 	std::vector<std::function<void(EMOUSE_INPUT_EVENT)>> m_MouseDownEvents;
 	std::vector<std::function<void(EMOUSE_INPUT_EVENT)>> m_MouseUpEvents;
 	std::vector<std::function<void(core::triangle3df, core::vector3df)>> m_ColliderEvents;
-	std::vector<std::function<void()>> m_VertexUpdateEvents;
+	std::vector<std::function<void()>> m_UIUpdateEvents;
 
 	CGameObject* selectobj = NULL;
 	indexed_vertices vertexdata = std::make_pair(core::array<indexedVec3df_t>(), core::array<indexedVec3df_t>());
-	indexedVec3df_t moveablevert;
+	opt_indexedVec3df moveablevert;
 
 public:
 	CInteractionManager();
@@ -105,7 +107,7 @@ public:
 
 	bool OnEvent(const SEvent& event);
 
-	void updateVertPos(indexedVec3df_t vert);
+	void updateVertPos();
 	bool isGuiSettingsUpdated();
 	bool findKeyState(std::vector<key_pair> keys);
 	static void getNumeric(core::array<std::pair<irr::EKEY_CODE, int>>&);
@@ -113,8 +115,8 @@ public:
 	static void getAlphabetic(core::array<std::pair<irr::EKEY_CODE, int>>&);
 	static void activateText(UI::CUITextBox* textbox, core::array<std::pair<irr::EKEY_CODE, int>> accepted, std::string msg, int size);
 	static void resetText(UI::CUITextBox* textbox, int size);
-	static bool ToggleButton(const char* str_id, bool* v);
-
+	static bool ToggleButton(const char* str_id, bool* v, ImGuiKey key);
+	static void registerImgui(const wchar_t* dir);
 	inline void resetLeftClick() {
 		m_leftToggle = std::make_pair(false, KeyAugment::None);
 	}
@@ -152,11 +154,18 @@ public:
 	inline void setSelectObj(CGameObject* obj) {
 		selectobj = obj;
 	}
-	inline void resetSelectObj() {
+	inline void resetSelected() {
 		selectobj = NULL;
+		m_surfselected = solidSelect_t(-1, -1);
+		m_portalselected = portalSelect_t(-1, -1);
+		m_entityselected = -1;
+		moveablevert = {};
 	}
-	inline indexedVec3df_t getMoveableVert() {
-		return moveablevert;
+	inline bool hasMoveableVert() {
+		return moveablevert.has_value();
+	}
+	inline indexedVec3df_t &getMoveableVert() {
+		return moveablevert.value();
 	}
 	inline void setMoveableVert(indexedVec3df_t obj) {
 		moveablevert = obj;
@@ -197,6 +206,10 @@ public:
 	}
 	inline guiSettings_t* getGuiSettings() {
 		return gui;
+	}
+
+	inline guiSettings_t* getPrevGuiSettings() {
+		return prevgui;
 	}
 
 	inline void drawLog(const char* title, bool * open) {
@@ -280,16 +293,16 @@ public:
 	inline void OnCollisionEvent(std::function<void(core::triangle3df, core::vector3df)> func) {
 		m_ColliderEvents.push_back(func);
 	}
-	inline void OnVertexUpdateEvent(std::function<void()> func) {
-		m_VertexUpdateEvents.push_back(func);
+	inline void OnUIUpdateEvent(std::function<void()> func) {
+		m_UIUpdateEvents.push_back(func);
 	}
 	inline void CollisionCallback(core::triangle3df tri, core::vector3df intersection) {
 		for (int i = 0; i < m_ColliderEvents.size(); i++) 
 			m_ColliderEvents[i](tri, intersection);
 	}
-	inline void VertexCallback() {
-		for (int i = 0; i < m_VertexUpdateEvents.size(); i++) 
-			m_VertexUpdateEvents[i]();
+	inline void UICallback() {
+		for (int i = 0; i < m_UIUpdateEvents.size(); i++)
+			m_UIUpdateEvents[i]();
 	}
 
 protected:

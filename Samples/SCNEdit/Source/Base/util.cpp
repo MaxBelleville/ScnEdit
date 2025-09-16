@@ -15,8 +15,9 @@ void error(bool fatal, const char* message, ...)
 	va_end(args);
 
 	printf("\n");
-	if (fatal)
+	if (fatal) {
 		exit(1);
+	}
 }
 
 core::array<std::string> str_split(const char* charStr, const char * delmChar) {
@@ -73,11 +74,16 @@ void read_generic(void * buffer, std::ifstream* file, int nbytes)
 	if (file->is_open())
 	{
 		file->read((char*)buffer,nbytes);
-		if (!file->fail())
+		if (!file->fail()) {
 			return;
+		}
+		
 	}
 	error(true,"read_generic: Error reading {} bytes",nbytes);
+	
+
 }
+
 
 //Reads files characters
 void write_generic(void* buffer, std::ofstream* file, int nbytes)
@@ -145,6 +151,41 @@ bool copy_file(const char * existfile, const char * newfile)
 	ifs.close();
 	ofs.close();
 	return true;
+}
+
+bool copy_portion(const char* existfile, const char* newfile, int64_t start, int64_t end)
+{
+	if (start < 0 || end <= start)
+		return false;
+
+	std::ifstream ifs(existfile, std::ios::in | std::ios::binary);
+	std::ofstream ofs(newfile, std::ios::out | std::ios::app | std::ios::binary);
+
+	if (!ifs.is_open() || !ofs.is_open())
+		return false;
+
+	// Ensure end does not exceed file size
+	ifs.seekg(0, std::ios::end);
+	int64_t filesize = ifs.tellg();
+	if (start >= filesize || end > filesize)
+		return false;
+
+	// Seek to the start position
+	ifs.seekg(start, std::ios::beg);
+
+	const size_t buffer_size = 8192;
+	char buffer[buffer_size];
+	int64_t bytes_to_copy = end - start;
+
+	while (bytes_to_copy > 0) {
+		size_t chunk = static_cast<size_t>(std::min<int64_t>(buffer_size, bytes_to_copy));
+		read_generic(buffer, &ifs, static_cast<int>(chunk));
+		write_generic(buffer, &ofs, static_cast<int>(chunk));
+		bytes_to_copy -= chunk;
+	}
+
+	return true;
+
 }
 
 bool can_open(const char* path) {
@@ -234,14 +275,17 @@ ITexture* convert_image(io::path file) {
 
 core::array<std::string> search_dir(std::string dir, const char* file) {
 	core::array<std::string> found;
+	if (!std::filesystem::exists(dir) || !std::filesystem::is_directory(dir)) {
+		return found;
+	}
 	for (const auto& entry : std::filesystem::directory_iterator(dir)) {
 		std::string data = entry.path().string();
 
-		//Convert each entry in folder to lower case for easy searching.
+		// Convert each entry in folder to lower case for easy searching.
 		std::transform(data.begin(), data.end(), data.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 
-		if (data.find(file) != std::string::npos) 
+		if (data.find(file) != std::string::npos)
 			found.push_back(data);
 	}
 	return found;
@@ -259,7 +303,7 @@ core::array<ITexture*> get_skybox(const char* file) {
 			found = search_dir("textures/Skyboxes/", file);
 	}
 	else 
-		printf("other case %s\n",file);
+		os::Printer::log("other case %s\n",file);
 
 
 	if (found.size() == 0) 
@@ -390,4 +434,97 @@ const u16* get_cube_indices()
 		20,22,23
 	};
 	return cube_index;
+}
+
+bool solveProjectionFrame(const  core::array <std::pair<core::vector3df, core::vector2df>>& samples,
+	core::vector3df& origin_out,
+	core::vector3df& u_axis_out,
+	core::vector3df& v_axis_out)
+{
+	int N = samples.size();
+	if (N < 3) return false;
+	double maxErr = 0.0;
+	double rmsErr = 0.0;
+	// Build M^T * M and M^T * P efficiently
+	// M has rows [1, u, v]
+	double MTM[3][3] = { 0 }; // symmetric
+	double MTP[3][3] = { 0 }; // 3 x 3, columns for X,Y,Z
+
+	for (int i = 0; i < N; ++i) {
+		double u = samples[i].second.X;
+		double v = samples[i].second.Y;
+		core::vector3df fit = origin_out + u_axis_out * u + v_axis_out * v;
+		double err = (samples[i].first - fit).getLength();
+		rmsErr += err * err;
+		maxErr = max(maxErr, err);
+		double row[3] = { 1.0, u, v };
+		// MTM += outer(row, row)
+		for (int a = 0; a < 3; ++a)
+			for (int b = 0; b < 3; ++b)
+				MTM[a][b] += row[a] * row[b];
+
+		// MTP += row^T * P_i  (accumulate for X, Y, Z separately)
+		MTP[0][0] += row[0] * samples[i].first.X;
+		MTP[1][0] += row[1] * samples[i].first.X;
+		MTP[2][0] += row[2] * samples[i].first.X;
+
+		MTP[0][1] += row[0] * samples[i].first.Y;
+		MTP[1][1] += row[1] * samples[i].first.Y;
+		MTP[2][1] += row[2] * samples[i].first.Y;
+
+		MTP[0][2] += row[0] * samples[i].first.Z;
+		MTP[1][2] += row[1] * samples[i].first.Z;
+		MTP[2][2] += row[2] * samples[i].first.Z;
+	}
+
+	// Invert MTM (3x3). Use a robust 3x3 inversion or a small linear algebra helper.
+	double invMTM[3][3];
+	if (!invert3x3(MTM, invMTM)) return false;
+	rmsErr = sqrt(rmsErr / N);
+	printf("rmsErr = %f, maxErr = %f\n", rmsErr, maxErr);
+	// X = inv(MTM) * MTP  (3x3 * 3x3 -> 3x3)
+	double Xmat[3][3] = { 0 };
+	for (int r = 0; r < 3; ++r)
+		for (int c = 0; c < 3; ++c) {
+			double s = 0.0;
+			for (int k = 0; k < 3; ++k) s += invMTM[r][k] * MTP[k][c];
+			Xmat[r][c] = s;
+		}
+
+	// Extract rows
+	origin_out = core::vector3df((float)Xmat[0][0], (float)Xmat[0][1], (float)Xmat[0][2]);
+	u_axis_out = core::vector3df((float)Xmat[1][0], (float)Xmat[1][1], (float)Xmat[1][2]);
+	v_axis_out = core::vector3df((float)Xmat[2][0], (float)Xmat[2][1], (float)Xmat[2][2]);
+
+	return true;
+}
+
+// Helper function to invert a 3x3 matrix.
+   // Returns true if inversion succeeded, false if the matrix is singular.
+bool invert3x3(const double src[3][3], double dst[3][3])
+{
+	// Compute the determinant
+	double det =
+		src[0][0] * (src[1][1] * src[2][2] - src[1][2] * src[2][1]) -
+		src[0][1] * (src[1][0] * src[2][2] - src[1][2] * src[2][0]) +
+		src[0][2] * (src[1][0] * src[2][1] - src[1][1] * src[2][0]);
+
+	if (fabs(det) < 1e-12)
+		return false;
+
+	double invDet = 1.0 / det;
+
+	dst[0][0] = (src[1][1] * src[2][2] - src[1][2] * src[2][1]) * invDet;
+	dst[0][1] = -(src[0][1] * src[2][2] - src[0][2] * src[2][1]) * invDet;
+	dst[0][2] = (src[0][1] * src[1][2] - src[0][2] * src[1][1]) * invDet;
+
+	dst[1][0] = -(src[1][0] * src[2][2] - src[1][2] * src[2][0]) * invDet;
+	dst[1][1] = (src[0][0] * src[2][2] - src[0][2] * src[2][0]) * invDet;
+	dst[1][2] = -(src[0][0] * src[1][2] - src[0][2] * src[1][0]) * invDet;
+
+	dst[2][0] = (src[1][0] * src[2][1] - src[1][1] * src[2][0]) * invDet;
+	dst[2][1] = -(src[0][0] * src[2][1] - src[0][1] * src[2][0]) * invDet;
+	dst[2][2] = (src[0][0] * src[1][1] - src[0][1] * src[1][0]) * invDet;
+
+	return true;
 }

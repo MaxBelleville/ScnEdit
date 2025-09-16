@@ -31,19 +31,21 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 	hslmaps = new (std::nothrow) scnSwitchableLMapHeader_t[n_extralmaps];
 	offset = file->tellg();
 	read_generic(hslmaps, file, sizeof(scnSwitchableLMapHeader_t) * n_extralmaps);
+
 	hl_offset = file->tellg();
 
 	for (u32 i = 0; i < n_solid; i++) {
 		scnLMapHeader_t* tmp_hlmap = new (std::nothrow) scnLMapHeader_t[solids[i].n_surfs];
-
+		
 		read_generic(tmp_hlmap, file, sizeof(scnLMapHeader_t) * solids[i].n_surfs);
+		
 		hlmaps.push_back(tmp_hlmap);
 		if (i == 0) {
 			for (u32 j = 0; j < solids[0].n_cells; j++) {
 				scnLMapLump_t* tmp_lump = new scnLMapLump_t;
 				tmp_lump->size = read_u32(file);
 				tmp_lump->unk = read_s32(file);
-
+				
 				if (tmp_lump->size > 0) {
 					tmp_lump->data = new s8[tmp_lump->size];
 					read_generic(tmp_lump->data, file, sizeof(s8)* tmp_lump->size);
@@ -54,6 +56,7 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
 			lump_offset = file->tellg();
 		}
 	}
+
 	for (u32 i = 0; i < hlmaps.size(); i++) {
 		core::array<f32*> tmp_mults;
 
@@ -121,7 +124,7 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 			core::array<std::string> split = str_split(colorStr.c_str(), " ");
 			int color[3] = { 0,0,0 };
 			for (int c = 0; c < 3; c++)
-				color[c] = round(std::stof(split[c]) * 255);
+				color[c] = clamp(int(round(std::stof(split[c]) * 255))-10,0,255);
 		
 			u16_pair id = getMasterBitmapId(hlmap);
 
@@ -153,6 +156,7 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 						//Fill in all color based on light bitmap and add ambient if not beyond 255.
 						for (int c = 0; c < 3; c++) {
 							bitmap[id][bitmapIndex+c] = min(lbitmap[lbitmapIndex+c], 255);
+							//Add ambiement lighting 
 							if (lbitmap[lbitmapIndex+c] >= 0 && lbitmap[lbitmapIndex+c] + color[c] < 255)
 								bitmap[id][bitmapIndex+c] += color[c];
 						}

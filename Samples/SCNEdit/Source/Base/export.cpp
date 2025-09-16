@@ -44,9 +44,9 @@ void scnExportObj(CScn* scn, const char* name)
 
             fprintf(obj, "usemtl %s\n", solid->surfs[i].texture);
             fprintf(obj, "f ");
-            u32 vstart = solid->surfs[i].vertidxstart;
+            u32 vstart = solid->surfs[i].faceidxstart;
 
-            for (u16 j = 0; j < solid->surfs[i].vertidxlen; j++)
+            for (u16 j = 0; j < solid->surfs[i].faceidxlen; j++)
                 fprintf(obj, "%u/%u ", solid->vertidxs[vstart + j] + 1 + nvp, solid->uvidxs[vstart + j] + 1 + nuvp);
             
             fprintf(obj, "\n");
@@ -99,7 +99,7 @@ void scnExport3ds(CScnSolid* mesh, u32 totalSize, const char* name)
         u16 n_surfs = scn->n_surfs;
         u16 n_polys = 0;
         for (int i = 0; i < n_surfs; i++)
-            n_polys += (scn->surfs[i].vertidxlen - 2);
+            n_polys += (scn->surfs[i].faceidxlen - 2);
         u32 polys_size = n_polys * 8;
 
 
@@ -158,7 +158,7 @@ void scnExport3ds(CScnSolid* mesh, u32 totalSize, const char* name)
         {
 
             scnSurf_t* surfi = &scn->surfs[s];
-            u16 vstart = surfi->vertidxstart;
+            u16 vstart = surfi->faceidxstart;
             u16 idx;
             u16 vis = 6;
             idx = vstart;
@@ -169,7 +169,7 @@ void scnExport3ds(CScnSolid* mesh, u32 totalSize, const char* name)
             memcpy(p, &idx, 2); p += 2;
             memcpy(p, &vis, 2); p += 2;
 
-            for (u16 j = 3; j < surfi->vertidxlen; j++)
+            for (u16 j = 3; j < surfi->faceidxlen; j++)
             {
                 idx = vstart + j - 1;
                 memcpy(p, &idx, 2); p += 2;
@@ -233,8 +233,8 @@ void scnExportMap(CScn* scn, const char* name)
         {
             scnSurf_t* surfi = &solid->surfs[i];
             u32 idxs[3];
-            idxs[0] = surfi->vertidxstart;
-            idxs[1] = surfi->vertidxstart + 1;
+            idxs[0] = surfi->faceidxstart;
+            idxs[1] = surfi->faceidxstart + 1;
             a = vec2irrvec(solid->verts[solid->vertidxs[idxs[0]]]);
             b = vec2irrvec(solid->verts[solid->vertidxs[idxs[1]]]);
 
@@ -257,12 +257,12 @@ void scnExportMap(CScn* scn, const char* name)
             u32 j = 0;
             do
             {
-                idxs[0] = surfi->vertidxstart + j;
+                idxs[0] = surfi->faceidxstart + j;
 
                 j++;
-                if (j == surfi->vertidxlen) j = 0;
+                if (j == surfi->faceidxlen) j = 0;
 
-                idxs[1] = surfi->vertidxstart + j;
+                idxs[1] = surfi->faceidxstart + j;
 
                 a = vec2irrvec(solid->verts[solid->vertidxs[idxs[0]]]);
                 b = vec2irrvec(solid->verts[solid->vertidxs[idxs[1]]]);

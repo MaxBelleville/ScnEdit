@@ -3,6 +3,7 @@
 
 #include <SkylichtEngine.h>
 #include <unordered_set>
+#include <optional>
 //---------------------------------Start of Original SCN TYPES-----------------------------------
 
 struct tempLight_t
@@ -27,7 +28,7 @@ struct scnHeader_t
 /* 0x20 */	u32     solids_length;    //length of all other solids
 /* 0x24 */	u32     unk2;
 /* 0x28 */	u32     ents_offset;
-/* 0x2c */	u32     unk3;
+/* 0x2c */	u32     unk3; //ent length?
 /* 0x30 */	u32     unk4;
 /* 0x34 */	u32     ents_offset2;
 /* 0x38 */	u32     ents_size;
@@ -41,17 +42,18 @@ struct scnSurf_t
 {
 	//IMPORTANT: keep order, we rely on it to read, 72 bytes
 	char texture[32];
-	f32 unk[2]; // Some sort offset, 
+	core::vector2df lmoff; // Some sort of shift related to the offset
 	u8 flag1, flag2;
 	u16 alpha;
 	u16 lmsize_h, lmsize_v;
 	u16 width, height; //width and height of tex, in pixels
-	u32 vertidxstart;
+	u32 faceidxstart;
 	u16 planeidx;
-	u16 vertidxlen;
+	u16 faceidxlen;
 	u16 hasVertexColors;
-	char stuff2[38]; // There are some potential surface flags here maybe material too?.
+	//char stuff2[10]; // There are some potential surface flags here maybe material too?.
 	u8 * shading;
+	//char extra[?]
 };
 
 //#surface flags :
@@ -154,7 +156,8 @@ struct scnPortal_t
 {
 	char name[32];
 	s16 nextcell; //cell idx this portal looks into
-	s16 unk2;
+	u8 unk2;
+	u8 unk3;
 	scnPlane_t plane;
 	f32 unk;        //float ?
 	s32 n_verts;    //number of verts defining the portal
@@ -189,7 +192,7 @@ struct scnRawCell_t //raw cell means it's the cell read not from the entity list
 };
 struct vertProp_t
 {
-	u32 vertidxidx;
+	u32 faceidx;
 	u32 surf_vertidx;
 	bool bShared;
 	core::array<u32> sharesWith;
@@ -201,7 +204,7 @@ struct vertProp_t
 struct indexedVec3df_t
 {
 	core::vector3df pos;
-	u32 vertidxidx = 0;
+	u32 faceidx = 0;
 	u32 solididx = 0;
 	u32 surfidx = 0;
 	u32 surf_vertidx = 0;
@@ -254,5 +257,7 @@ typedef std::pair<irr::EKEY_CODE, KeyAugment> key_pair;
 typedef std::unordered_set<key_pair, pair_hash> key_map; //key is (key code, augment) value is state.
 
 typedef std::pair<core::array<indexedVec3df_t>, core::array<indexedVec3df_t>> indexed_vertices;
+
+typedef std::optional<indexedVec3df_t> opt_indexedVec3df;
 
 #endif

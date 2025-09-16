@@ -141,19 +141,19 @@ indexed_vertices CScnMeshComponent::getVertices(CScn* scn) {
 }
 
 
-indexedVec3df_t CScnMeshComponent::updateVert(CScn* scn, indexedVec3df_t vert, core::vector3df add) {
+void CScnMeshComponent::updateVert(CScn* scn, indexedVec3df_t& vert, core::vector3df add) {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
 	if (scnMesh)
-		return scnMesh->updateVert(scn, vert, add);
+		scnMesh->updateVert(scn, vert, add);
 
 }
 
-indexedVec3df_t CScnMeshComponent::resetVert(CScn* scn, indexedVec3df_t vert) {
+void CScnMeshComponent::resetVert(CScn* scn, indexedVec3df_t& vert) {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnMeshData* scnMesh = entity->getData<CScnMeshData>();
 	if (scnMesh) 
-		return scnMesh->resetVert(scn, vert);
+		scnMesh->resetVert(scn, vert);
 }
 void CScnMeshComponent::updateUV(CScn* scn, int resize, core::vector2df shift) {
 	CEntity* entity = m_gameObject->getEntity();

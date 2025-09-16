@@ -63,6 +63,7 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 	CScnSolid* solid= scn->getSolid(vert.solididx);
 	scnCellData_t* celldata;
 	celldata = solid->getBBFromSurf(vert.surfidx, cellindx);
+
 	//This math may be wrong lol
 	if (celldata) {
 		core::vector3df min = celldata->bb_verts[0];
@@ -71,54 +72,73 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 		if (vert.pos.X >= min.X && vert.pos.X <= max.X &&
 			vert.pos.Y >= min.Y && vert.pos.Y <= max.Y &&
 			vert.pos.Z >= min.Z && vert.pos.Z <= max.Z) {
-			//In the case vert smaller then bounding box.
-			core::vector3df minVert = core::vector3df(FLT_MAX, FLT_MAX, FLT_MAX);
-			core::vector3df maxVert = core::vector3df(FLT_MIN, FLT_MIN, FLT_MIN);
-			bool flatX = true;
-			bool flatY = true;
-			bool flatZ = true;
-		
 			scnSurf_t* surfi = &solid->surfs[vert.surfidx];
-			for (int v = 0; v < surfi->vertidxlen; v++) {
-				u32 vertidx = solid->vertidxs[surfi->vertidxstart + v];
-				core::vector3df compareVert = solid->verts[vertidx];
+
+			core::vector3df minVert = core::vector3df(FLT_MAX, FLT_MAX, FLT_MAX);
+			core::vector3df maxVert = -core::vector3df(FLT_MAX, FLT_MAX, FLT_MAX);
+			
+			const core::vector3df& bbMin = backup_bb[indx][0];
+			const core::vector3df& bbMax = backup_bb[indx][1];
+
+
+			bool allInside = true;
+			bool allInBackup = true;
+
+			for (int f = 0; f < surfi->faceidxlen; f++) {
+				u32 vertidx = solid->vertidxs[surfi->faceidxstart + f];
+				const core::vector3df& compareVert = solid->verts[vertidx];
 
 				minVert = min(minVert, compareVert);
-				maxVert =max(maxVert, compareVert);
+				maxVert = max(maxVert, compareVert);
+
+				if (compareVert.X < min.X || compareVert.X > max.X ||
+					compareVert.Y < min.Y || compareVert.Y > max.Y ||
+					compareVert.Z < min.Z || compareVert.Z > max.Z) {
+					allInside = false;
+				}
+
+				if (compareVert.X < bbMin.X || compareVert.X > bbMax.X ||
+					compareVert.Y < bbMin.Y || compareVert.Y > bbMax.Y ||
+					compareVert.Z < bbMin.Z || compareVert.Z > bbMax.Z) {
+					allInBackup = false;
+
+				}
+
 			}
-			//1. If diference is less then or equal 1.5ish and is flat, set current bb to maxVert.
+
 			if (!reset) {
-				if (maxVert.X < max.X && maxVert.X >= max.X - 1.1) 
-					max.X = maxVert.X;
+				//In the case vert smaller then bounding box.
 				
-				if (maxVert.Y < max.Y && maxVert.Y >= max.Y - 1.1) 
-					max.Y = maxVert.Y;
+				if (allInside) {
+					const float minSize = 0.1f;
+					// Shrink -X
+					if (min.X < bbMin.X && minVert.X > min.X && (max.X - minVert.X) >= minSize)
+						min.X = minVert.X;
+					// Shrink +X
+					if (max.X > bbMax.X && maxVert.X < max.X && (maxVert.X - min.X) >= minSize)
+						max.X = maxVert.X;
 
-				if (maxVert.Z < max.Z && maxVert.Z >= max.Z - 1.1) 
-					max.Z = maxVert.Z;
+					// Shrink -Y
+					if (min.Y < bbMin.Y && minVert.Y > min.Y && (max.Y - minVert.Y) >= minSize)
+						min.Y = minVert.Y;
+					// Shrink +Y
+					if (max.Y > bbMax.Y  && maxVert.Y < max.Y && (maxVert.Y - min.Y) >= minSize)
+						max.Y = maxVert.Y;
 
-				if (minVert.X > min.X && minVert.X <= min.X + 1.1) 
-					min.X = minVert.X;
+					// Shrink -Z
+					if (min.Z < bbMin.Z && minVert.Z > min.Z && (max.Z - minVert.Z) >= minSize)
+						min.Z = minVert.Z;
+					// Shrink +Z
+					if (max.Z > bbMax.Z &&maxVert.Z < max.Z && (maxVert.Z - min.Z) >= minSize)
+						max.Z = maxVert.Z;
+				}
 
-				if (minVert.Y > min.Y && minVert.Y <= min.Y + 1.1) 
-					min.Y = minVert.Y;
-
-				if (minVert.Z > min.Z && minVert.Z <= min.Z + 1.1) 
-					min.Z = minVert.Z;
+				
 			}
-			//2. If reset check if contains backup_bb.
-			if (reset && indx != -1) {
-				if (minVert.X >= backup_bb[indx][0].X && minVert.X <= backup_bb[indx][1].X &&
-					minVert.Y >= backup_bb[indx][0].Y && minVert.Y <= backup_bb[indx][1].Y &&
-					minVert.Z >= backup_bb[indx][0].Z && minVert.Z <= backup_bb[indx][1].Z) {
-					min = backup_bb[indx][0];
-				}
-				
-				if (maxVert.X >= backup_bb[indx][0].X && maxVert.X <= backup_bb[indx][1].X &&
-					maxVert.Y >= backup_bb[indx][0].Y && maxVert.Y <= backup_bb[indx][1].Y &&
-					maxVert.Z >= backup_bb[indx][0].Z && maxVert.Z <= backup_bb[indx][1].Z) {
-					max = backup_bb[indx][1];
-				}
+			//If reset check if contains backup_bb.
+			if (reset && indx != -1 && allInBackup) {
+				min = backup_bb[indx][0];
+				max = backup_bb[indx][1];
 			}
 		
 		}
@@ -141,7 +161,8 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 
 		celldata->bb_verts[0] = min;
 		celldata->bb_verts[1] = max;
-		updateMeshBB(scn, celldata, indx);
+
+		if(indx != -1)updateMeshBB(scn, celldata, indx);
 	}
 
 }

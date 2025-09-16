@@ -35,6 +35,7 @@ public:
 	int64_t paramsad;   //offset in file to start of param frame array
 	int64_t vertssad; //ofset for vertices
 	int64_t planessad; //ofset for planes
+	int64_t lengthsad;
 	scnSurf_t * surfs;
 	scnSurfParamFrame_t* paramFrames;
 	scnPlane_t * planes;

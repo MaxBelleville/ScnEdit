@@ -46,9 +46,9 @@ public:
 	bool try_load_texture(video::ITexture*& t, std::set<std::string>& cantFind, const char* format, const wchar_t* baseDir, const char* texPath, bool&);
 
 	void setTexture(CScn* scn, const char* path,int si);
-	indexedVec3df_t updateVert(CScn* scn, indexedVec3df_t vert, core::vector3df);
+	void updateVert(CScn* scn, indexedVec3df_t& vert, core::vector3df);
 	void updateMeshVert(int si, int surf_vertidx, core::vector3df pos);
-	indexedVec3df_t resetVert(CScn* scn, indexedVec3df_t vert);
+	void resetVert(CScn* scn, indexedVec3df_t& vert);
 	indexed_vertices getVertices(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf);
 	indexedVec3df_t getVertexFromPos(CScn* scn, u32 si, u32 vertindx);
 

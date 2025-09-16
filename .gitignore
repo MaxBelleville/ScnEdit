@@ -26,10 +26,11 @@
 *.exe
 *.out
 *.app
-.vs/
+/.vs/
 
 # Build folder
 /Bin/
+/BuildCommand/
 /PrjMac/
 /PrjIOS/
 /PrjVisualStudio/

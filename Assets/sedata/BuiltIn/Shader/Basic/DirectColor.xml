@@ -1,0 +1,12 @@
+<shaderConfig name="DirectColor" baseShader="SOLID">
+	<uniforms>
+		<vs>
+			<uniform name="uMvpMatrix" type="WORLD_VIEW_PROJECTION" value="0" float="16" matrix="true"/>
+		</vs>
+		<fs>
+			<uniform name="uColor" type="MATERIAL_PARAM" valueIndex="0" value="1.0, 1.0, 1.0, 1.0" float="4"/>
+		</fs>
+	</uniforms>
+	<shader type="GLSL" vs="GLSL/ColorVS.glsl" fs="GLSL/DirectColorFS.glsl"/>
+	<shader type="HLSL" vs="HLSL/ColorVS.hlsl" fs="HLSL/DirectColorFS.hlsl"/>
+</shaderConfig>

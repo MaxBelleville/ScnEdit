@@ -1,0 +1,22 @@
+<shaderConfig name="TextureColor2LayerAlpha" baseShader="TRANSPARENT_ALPHA_CHANNEL_REF">
+	<uniforms>
+		<vs>
+			<uniform name="uMvpMatrix" type="WORLD_VIEW_PROJECTION" value="0" float="16" matrix="true"/>
+		</vs>
+		<fs>
+			<uniform name="uTexDiffuse1" type="DEFAULT_VALUE" value="0" float="1" directX="false"/>
+			<uniform name="uTexDiffuse2" type="DEFAULT_VALUE" value="1" float="1" directX="false"/>
+			<uniform name="uLightMapEnable" type="MATERIAL_PARAM" valueIndex="0" value="1.0" float="1"/>
+			<uniform name="uSelected" type="MATERIAL_PARAM" valueIndex="1" value="1.0" float="1"/>
+			<uniform name="uSelectedColor" type="MATERIAL_PARAM" valueIndex="2" value="1.0 1.0 1.0 1.0" float="4"/>
+		</fs>
+	</uniforms>
+	<customUI>
+		<ui control="UIGroup" name="Texture">
+			<ui control="UITexture" name="uTexDiffuse1"/>
+			<ui control="UITexture" name="uTexDiffuse2"/>
+		</ui>
+	</customUI>
+	<shader type="GLSL" vs="GLSL/TextureColor2LayerVS.glsl" fs="GLSL/TextureColor2LayerFS.glsl"/>
+	<shader type="HLSL" vs="HLSL/TextureColor2LayerVS.hlsl" fs="HLSL/TextureColor2LayerFS.hlsl"/>
+</shaderConfig>

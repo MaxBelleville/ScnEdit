@@ -192,7 +192,7 @@ solidSelect_t CScnMeshData::getSurfaceIndx(CScn* scn, core::triangle3df tri) {
 			core::vector3df vectori(verti->X, verti->Y, verti->Z);
 			for (int p = 0; p < 3; p++) {
 				if (!found[p]) {
-					if (vectori.equals(point[p], 1))
+					if (vectori.equals(point[p], 0.1))
 						found[p] = true;
 				}
 			}

@@ -217,6 +217,14 @@ void CInteractionManager::activateText(UI::CUITextBox* textbox,
 	textbox->setEnable(true);
 }
 
+void CInteractionManager::activateText(UI::CUITextBox* textbox,
+	core::array<std::pair<irr::EKEY_CODE, int>> accepted, std::string head_msg, std::string body_msg, int size) {
+	textbox->setAcceptedKeys(accepted);
+	textbox->setText((head_msg+body_msg).c_str());
+	textbox->setLength(head_msg.length(), head_msg.length() + size);
+	textbox->setEnable(true);
+}
+
 void CInteractionManager::resetText(UI::CUITextBox* textbox, int size) {
 	textbox->resetAcceptedKeys();
 	textbox->setText("");

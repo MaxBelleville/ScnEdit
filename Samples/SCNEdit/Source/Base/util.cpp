@@ -66,6 +66,24 @@ int str_equals(const char* one, const char* two) {
 int str_equiv(const char* one, const char* two) {
 	return str_equiv_lim(one, two, 2048);
 }
+std::string str_trim(const char* str, const char* chars) {
+	std::string result(str);
+
+	// Trim from start
+	size_t start = result.find_first_not_of(chars);
+	if (start == std::string::npos) {
+		return "";
+	}
+	result = result.substr(start);
+
+	// Trim from end
+	size_t end = result.find_last_not_of(chars);
+	if (end != std::string::npos) {
+		result = result.substr(0, end + 1);
+	}
+
+	return result;
+}
 
 
 //Reads files characters
@@ -528,3 +546,4 @@ bool invert3x3(const double src[3][3], double dst[3][3])
 
 	return true;
 }
+

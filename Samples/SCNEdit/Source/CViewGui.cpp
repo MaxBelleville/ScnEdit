@@ -266,13 +266,9 @@ void CViewGui::setupEvents() {
 				}
 			}
 		}
-		else if(interaction->guiStateLayer().find(GUIState::EditAll)) {
-			core::array<std::string> msg = str_split(m_textSection1->getText(), ",");
-			//This will need some proccessing so probably do in another function.
-			
-		}
+	
 		isSection1Set = true;
-		if (interaction->guiStateLayer().find(GUIState::EditFlags, GUIState::EditAll) && isSection1Set && isSection2Set) {
+		if (interaction->guiStateLayer().find(GUIState::EditFlags) && isSection1Set && isSection2Set) {
 			resetEditText(isVertInf);
 			interaction->setCursorMode(false);
 		}
@@ -304,13 +300,38 @@ void CViewGui::setupEvents() {
 			}
 	
 		}
-		else if (interaction->guiStateLayer().find(GUIState::EditAll)) {
-			core::array<std::string> msg = str_split(m_textSection1->getText(), ",");
-			//This will need some proccessing so probably do in another function.
+		else if (interaction->guiStateLayer().find(GUIState::EditEntity)) {
+			core::array<std::string> msg = str_split(m_textSection2->getText(), ",");
+			CScn* scn = SCNEdit::getSCN();
+			int entindx = interaction->getEntityISelected();
+			CScnEnt* ent = scn->getEnt(entindx);
+			core::array<std::string> keys;
+
+			//Get keys that aren't filtered.
+			for (u32 i = 0; i < ent->n_fields; i++) {
+				if (!str_equiv(ent->fields[i].key, "Classname") && !str_equiv(ent->fields[i].key, "Origin")) {
+					keys.push_back(ent->fields[i].key);
+				}
+			}
+
+			if (keys.size() == msg.size()) {
+				for (u32 i = 0; i < keys.size(); i++) {
+
+					std::string trimmed = str_trim(msg[i].c_str(), " \t\n\r");
+					if (!trimmed.empty()) {
+						ent->setField(keys[i].c_str(), trimmed.c_str());
+					}
+				}
+			}
 			
 		}
 		isSection2Set = true;
-		if (isSection1Set && isSection2Set) {
+		if (interaction->guiStateLayer().find(GUIState::EditEntity) && isSection2Set) {
+			resetEditText(isVertInf);
+			interaction->setCursorMode(false);
+		}
+
+		if (interaction->guiStateLayer().find(GUIState::EditFlags) && isSection1Set && isSection2Set) {
 			resetEditText(isVertInf);
 			interaction->setCursorMode(false);
 		}
@@ -327,7 +348,7 @@ void CViewGui::setupEvents() {
 			}
 
 			if (interaction->guiStateLayer().swap(GUIState::Default,
-				GUIState::EditAll, GUIState::EditFlags, GUIState::EditShading, GUIState::EditSurfShading,
+				GUIState::EditEntity, GUIState::EditFlags, GUIState::EditShading, GUIState::EditSurfShading,
 				GUIState::EditAlpha)) {
 				resetEditText(isVertInf);
 			}
@@ -336,7 +357,7 @@ void CViewGui::setupEvents() {
 	bool debug = m_arguments->isInternalDebug();
 	//Custom interaction manager events/callbacks for key input.
 	interaction->OnKeyEvent([interaction, isVertInf, debug](key_pair pair) {
-
+		CScn* scn = SCNEdit::getSCN();
 		//Update UV mode and scale
 		if (interaction->getKeyState(make_pair(KEY_KEY_F, KeyAugment::None))) 
 			interaction->swapUVMode();
@@ -371,7 +392,62 @@ void CViewGui::setupEvents() {
 		}
 
 
+		if (interaction->getKeyState(make_pair(KEY_KEY_E, KeyAugment::Ctrl))) {
+			if (interaction->selTypeLayer().get() != SelectedType::Entity) return;
 
+			CScn* scn = SCNEdit::getSCN();
+
+			if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags,
+				GUIState::EditAlpha, GUIState::EditShading, GUIState::EditSurfShading))
+				resetEditText(isVertInf);
+			
+
+			if (interaction->guiStateLayer().swap(GUIState::EditEntity, GUIState::Default)) {
+				interaction->setCursorMode(true);
+				interaction->resetKeyState();
+			
+				int entindx = interaction->getEntityISelected();
+				CScnEnt* ent = scn->getEnt(entindx);
+				std::string valueDisplay;
+				std::string keyDisplay;
+
+				bool first = true;
+
+				for (u32 i = 0; i < ent->n_fields; i++) {
+					if (str_equiv(ent->fields[i].key, "Classname") ||
+						str_equiv(ent->fields[i].key, "Origin")) {
+						continue;
+					}
+
+					if (!first) {
+						keyDisplay += ", ";
+						valueDisplay += ", ";
+					}
+
+					keyDisplay += ent->fields[i].key;
+					valueDisplay += ent->fields[i].value;
+
+					first = false;
+				}
+
+				core::array<std::pair<irr::EKEY_CODE, int>> allowedKeys;
+				CInteractionManager::getAlphaNumeric(allowedKeys);
+				allowedKeys.push_back(std::make_pair(KEY_COMMA, KeyAugment::AnyKey));
+				allowedKeys.push_back(std::make_pair(KEY_SPACE, KeyAugment::AnyKey));
+				allowedKeys.push_back(std::make_pair(KEY_PERIOD, KeyAugment::None));
+				allowedKeys.push_back(std::make_pair(KEY_MINUS, KeyAugment::AnyKey));
+
+				m_textSection1->setText(format("Read-only entity keys: {}",keyDisplay).c_str());
+				
+				CInteractionManager::activateText(m_textSection2, allowedKeys,
+					"Edit entity values here: ",valueDisplay, 256);
+
+			}
+			else if (interaction->guiStateLayer().find(GUIState::EditEntity)) {
+				interaction->setCursorMode(false);
+				resetEditText(isVertInf);
+			}
+		}
 
 		if (!interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra)) 
 			return;
@@ -395,10 +471,10 @@ void CViewGui::setupEvents() {
 		CInteractionManager::getNumeric(numerickeys);
 
 
-		//Proccess Alpha,Shading,Flag editing. TODO: EditAll
+		//Proccess Alpha,Shading,Flag editing. 
 		if (interaction->getKeyState(make_pair(KEY_KEY_F, KeyAugment::Ctrl))) {
 			if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditAlpha, 
-				GUIState::EditShading, GUIState::EditSurfShading, GUIState::EditAll))
+				GUIState::EditShading, GUIState::EditSurfShading, GUIState::EditEntity))
 				resetEditText(isVertInf);
 			if (interaction->guiStateLayer().swap(GUIState::EditFlags, GUIState::Default)) {
 				interaction->setCursorMode(true);
@@ -413,7 +489,7 @@ void CViewGui::setupEvents() {
 		}
 		if (interaction->getKeyState(make_pair(KEY_KEY_T, KeyAugment::Ctrl))) {
 			if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags, 
-				GUIState::EditShading,GUIState::EditSurfShading, GUIState::EditAll))
+				GUIState::EditShading,GUIState::EditSurfShading, GUIState::EditEntity))
 				resetEditText(isVertInf);
 			
 			
@@ -431,14 +507,13 @@ void CViewGui::setupEvents() {
 
 
 		if (interaction->getKeyState(make_pair(KEY_KEY_C, KeyAugment::None))) {
-			CScn* scn = SCNEdit::getSCN();
 			solidSelect_t surfdata = interaction->getSurfISelected();
 
 			CScnSolid* solid = scn->getSolid(surfdata.solididx);
 			scnSurf_t surf = solid->surfs[surfdata.surfsel];
 			if (surf.shading && surf.hasVertexColors) {
 				if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags,
-					GUIState::EditAlpha, GUIState::EditShading, GUIState::EditAll))
+					GUIState::EditAlpha, GUIState::EditShading, GUIState::EditEntity))
 					resetEditText(isVertInf);
 
 
@@ -465,7 +540,7 @@ void CViewGui::setupEvents() {
 			scnSurf_t surf = solid->surfs[surfdata.surfsel];
 			if (surf.shading && surf.hasVertexColors) {
 				if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags,
-					GUIState::EditAlpha, GUIState::EditSurfShading, GUIState::EditAll))
+					GUIState::EditAlpha, GUIState::EditSurfShading, GUIState::EditEntity))
 					resetEditText(isVertInf);
 
 
@@ -724,6 +799,8 @@ void CViewGui::helpDialog() {
 		"LEFT (SOLID SELECTED): Change UV u+\n"
 		"RIGHT (SOLID SELECTED): Change UV v-\n\n"
 
+		"Ctrl+E (ENTITY SELECTED): Change non-protected entity fields\n"
+
 		"CTRL or SHIFT (SOLID SELECTED): Select vertex to move\n\n"
 
 		"CTRL+R (SOLID or ENTITY SELECTED): Reset position\n"
@@ -736,8 +813,8 @@ void CViewGui::helpDialog() {
 
 	float size = getApplication()->getDriver()->getScreenSize().Width;
 	float sizeH = getApplication()->getDriver()->getScreenSize().Height;
-	ImGui::SetNextWindowPos(ImVec2(size / 2 - 260, sizeH / 2 - 290), ImGuiCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(475, 570), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(size / 2 - 260, sizeH / 2 - 300), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(475, 595), ImGuiCond_Always);
 	int selected = m_msgbox.Draw();
 	
 

@@ -15,7 +15,7 @@ int str_equals_lim(const char* one, const char* two, int lim);
 int str_equiv_lim(const char* one, const char* two, int lim);
 int str_equals(const char* one, const char* two);
 int str_equiv(const char* one, const char* two);
-
+std::string str_trim(const char* str, const char* chars);
 
 void error(bool fatal, const char* message, ...);
 
@@ -66,3 +66,4 @@ bool solveProjectionFrame(const core::array <std::pair<core::vector3df, core::ve
     core::vector3df& v_axis_out);
 
 bool invert3x3(const double src[3][3], double dst[3][3]);
+

@@ -33,7 +33,7 @@ enum GUIState
 	Help,
 	Export,
 	Debug,
-	EditAll,
+	EditEntity,
 	EditFlags,
 	EditAlpha,
 	EditSurfShading,
@@ -114,6 +114,7 @@ public:
 	static void getAlphaNumeric(core::array<std::pair<irr::EKEY_CODE, int>>&);
 	static void getAlphabetic(core::array<std::pair<irr::EKEY_CODE, int>>&);
 	static void activateText(UI::CUITextBox* textbox, core::array<std::pair<irr::EKEY_CODE, int>> accepted, std::string msg, int size);
+	static void activateText(UI::CUITextBox* textbox, core::array<std::pair<irr::EKEY_CODE, int>> accepted, std::string head_msg, std::string body_msg, int size);
 	static void resetText(UI::CUITextBox* textbox, int size);
 	static bool ToggleButton(const char* str_id, bool* v, ImGuiKey key);
 	static void registerImgui(const wchar_t* dir);

@@ -221,6 +221,7 @@ CScnEnt* CScn::getAmbientByCell(const char* name)
 			}
 		}
 	}
+	return nullptr;
 }
 CScnEnt* CScn::getGlobalAmbient()
 {
@@ -236,11 +237,14 @@ CScnEnt* CScn::getGlobalAmbient()
 		const char* val = ambienti->getField("TargetName");
 		
 		if (val) {
-			if (str_equiv(val, "global_ambient"))
+			if (str_equiv(val, "global_ambient")) {
+				os::Printer::log("Found global ambient");
 				return ambienti;
+			}
 		}
 
 	}
+	return nullptr;
 }
 
 

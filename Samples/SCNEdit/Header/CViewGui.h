@@ -84,4 +84,5 @@ protected:
 	static UI::CUITextBox* addTextbox(const char* textPath);
 	static UI::CUIButton* addButton(const char* btnPath);
 	void addTooltip(UI::CUIButton*, std::string, std::string);
+
 };

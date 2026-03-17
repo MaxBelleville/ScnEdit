@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "SkylichtEngine.h"
 #include "Header/Components/CScnMeshData.h"
-#include <set>
-
 
 CScnMeshData::CScnMeshData() :
 	MeshBuffer(NULL){}
@@ -26,8 +24,8 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 	CScnLightmap* lmap = scn->getLightmap();
 	
 	solidindx = mesh->solididx;
-	std::set<std::string> cantFind({});
-
+	std::unordered_map<std::string, std::string> findMap = {};
+	
 		video::ITexture* t = 0;
 		ITexture* lt{};
 		core::array<u32> is;
@@ -47,11 +45,8 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 			CMaterial* material = new CMaterial((to_string(mesh->solididx) + "-" + to_string(i)).c_str(), 
 				"TextureColor2Layer.xml");
 
-			if (try_load_texture(t, cantFind, "./textures/%s.bmp", nullptr, mesh->surfs[i].texture,istga)||
-				try_load_texture(t, cantFind, "%S/general/%s.bmp", args->getBaseDirectory(), mesh->surfs[i].texture, istga)
-				||try_load_texture(t, cantFind, "./textures/%s.tga", nullptr, mesh->surfs[i].texture, istga)||
-				try_load_texture(t, cantFind, "%S/general/%s.tga", args->getBaseDirectory(), mesh->surfs[i].texture,istga)) 
-			{ 
+			if (try_load_texture(t, findMap, args->getBaseDirectory(), mesh->surfs[i].texture, istga))
+			{
 				//Load in lightmap atlas pos (ie where in the lightmap texture the solid surface currently is.)
 				//And add that portion of the lightmap to be used later in a material.
 				if (lmap->hasLightmaps() && args) {
@@ -136,30 +131,52 @@ void CScnMeshData::initMesh(CScn* scn,CScnSolid* mesh, CScnArguments* args)
 	RenderMesh->setHardwareMappingHint(EHM_STATIC);
 	
 }
+bool CScnMeshData::try_load_texture(video::ITexture*& t, std::unordered_map<std::string, std::string>& findSet,
+	const wchar_t* dir, const char* tex, bool& istga) {
+	if (t != nullptr) return true;
 
-bool CScnMeshData::try_load_texture(video::ITexture*& t, std::set<std::string>& findSet, 
-	const char* format, const wchar_t* dir, const char* tex, bool& istga) {
-	if (t != 0)
-		return true;
-
-	char tmp[128] = "";
-
-	if(dir != nullptr)
-		sprintf_s(tmp, format, dir, tex);
-	else 
-		sprintf_s(tmp, format, tex);
-	io::path file = tmp;
-
-	if (!findSet.contains(tmp)) {
-		t = convert_image(tmp);
-		if (t == 0) 
-			findSet.insert(tmp);
-		istga = hasFileExtension(file, "tga");
-		//May set to true in the case were can't convert tga but that shouldn't matter due to 
-		// the fact we only care when it does work.
+	if (findSet.contains(tex)) {
+		if (!findSet[tex].empty()) {
+			t = convert_image(findSet[tex].c_str());
+			istga = (findSet[tex].find(".tga") != std::string::npos ||
+				findSet[tex].find(".TGA") != std::string::npos);
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
-	
-	return t!=0;
+
+	// 1. Prepare potential search locations
+	std::wstring ws(dir);
+	std::string baseDirStr(ws.begin(), ws.end());
+	std::vector<std::string> roots = { "./textures/", baseDirStr + "/general/" };
+
+	// Potential extensions to check
+	std::vector<std::string> exts = { ".tga", ".bmp", ".TGA", ".BMP" };
+
+	// 2. Iterate through base paths and search recursively
+	for (const std::string& root : roots) {
+		core::array<std::string> matches = search_dir_recursive(root, tex);
+
+		for (u32 j = 0; j < matches.size(); ++j) {
+			std::string fullPath = matches[j];
+
+			// 4. Attempt to load/convert
+			t = convert_image(fullPath.c_str());
+
+			if (t != nullptr) {
+				// Success! Set the TGA flag based on the actual file found
+				istga = (fullPath.find(".tga") != std::string::npos ||
+					fullPath.find(".TGA") != std::string::npos);
+				findSet[tex] = fullPath;
+				return true;
+			}
+		}
+	}
+	os::Printer::log(format("Missing texture: {}", tex).c_str(), ELL_WARNING);
+	findSet[tex] = ""; 
+	return false;
 }
 
 void CScnMeshData::setLightmapVisible(bool vis) {
@@ -585,97 +602,100 @@ void CScnMeshData::updateMeshUV(CScn* scn, core::array <int> surf) {
 		}
 	}
 }
-void CScnMeshData::updateUV(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf,
-	int uvmode, core::vector2df uvShift) {
+void CScnMeshData::updateUV(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf, int uvmode, core::vector2df uvShift) {
 	CScnSolid* solid = scn->getSolid(solidindx);
-//	core::array<u32> uvidxs = getSurfUVIdxs(scn, selsurf);
 	CScnLightmap* lmap = scn->getLightmap();
 
-
 	for (u32 i = 0; i < selsurf.size(); i++) {
-	 int si = selsurf[i];
-	 scnSurf_t* surfi = &solid->surfs[si];
-	 f32* mults = lmap->getMults(solidindx, si);
-	 scnSurfParamFrame_t* paramFrame = &solid->paramFrames[si];
+		int si = selsurf[i];
+		scnSurf_t* surfi = &solid->surfs[si];
+		f32* mults = lmap->getMults(solidindx, si);
+		scnSurfParamFrame_t* paramFrame = &solid->paramFrames[si];
 
-	// Get the unknown offsets (very likely atlas texel offsets)
-	core::vector2df minUV(FLT_MAX);
-	core::vector2df maxUV(-FLT_MAX);
+		// 1. Get the translation scales (UV to Texel)
+		// If your game applies a global texture scale, you may need to multiply these.
+		// For now, assuming direct division by width/height based on the struct.
+		float scaleU = (float)surfi->width;
+		float scaleV = (float)surfi->height;
 
-	for (int f = 0; f < surfi->faceidxlen; f++) {
-		u32 uvi = solid->uvidxs[surfi->faceidxstart + f];
-		core::vector2df uv = solid->uvpos[uvi];
-
-		minUV = core::vector2df(min(minUV.X, uv.X), min(minUV.Y, uv.Y));
-		maxUV = core::vector2df(max(maxUV.X, uv.X), max(maxUV.Y, uv.Y));
-
-	}
-	// Get the unknown offsets (very likely atlas texel offsets)
-	core::vector3df minVert(FLT_MAX);
-	core::vector3df maxVert(-FLT_MAX);
-	for (int f = 0; f < surfi->faceidxlen; f++) {
-		u32 verti = solid->vertidxs[surfi->faceidxstart + f];
-		core::vector3df vert = solid->verts[verti];
-
-		minVert = core::vector3df(min(minVert.X, vert.X), min(minVert.Y, vert.Y), min(minVert.Z, vert.Z));
-		maxVert = core::vector3df(max(maxVert.X, vert.X), max(maxVert.Y, vert.Y), max(maxVert.Z, vert.Z));
-
-	}
-
-	os::Printer::log(format("MinUV {} {}", minUV.X, minUV.Y).c_str());
-	os::Printer::log(format("MaxUV {} {}", maxUV.X, maxUV.Y).c_str());
-	os::Printer::log(format("MinVert {} {} {}", minVert.X, minVert.Y , minVert.Z).c_str());
-	os::Printer::log(format("MaxVert {} {} {}", maxVert.X, maxVert.Y, maxVert.Z).c_str());
-
-	os::Printer::log(format("Unknown vec2 offset {} {}", surfi->lmoff.X, surfi->lmoff.Y).c_str());
-
-	float s_shift = surfi->lmoff.X / 16;
-	float t_shift = surfi->lmoff.Y / 16;
-	// half-extent center in luxels
-	float u_center = s_shift + (float)surfi->lmsize_h * 0.5f; // e.g. 47 + 11/2 = 52.5
-	float v_center = t_shift + (float)surfi->lmsize_v * 0.5f; // e.g.  3 +  7/2 = 6.5
-	//Change uvs for solid
-	for (int f = 0; f < surfi->faceidxlen; f++) {
-		u32 uvi = solid->uvidxs[surfi->faceidxstart + f];
-		if (uvmode == 0) //MOVE
-			solid->uvpos[uvi] += uvShift;
-		else if (uvmode == 1) {//RESIZE
-			solid->uvpos[uvi].X *= (1.0f - uvShift.X);
-			solid->uvpos[uvi].Y *= (1.0f - uvShift.Y);
+		// 2. Find UV Bounds
+		core::vector2df minUV(FLT_MAX), maxUV(-FLT_MAX);
+		for (int f = 0; f < surfi->faceidxlen; f++) {
+			u32 uvi = solid->uvidxs[surfi->faceidxstart + f];
+			core::vector2df uv = solid->uvpos[uvi];
+			minUV.X = min(minUV.X, uv.X); minUV.Y = min(minUV.Y, uv.Y);
+			maxUV.X = max(maxUV.X, uv.X); maxUV.Y = max(maxUV.Y, uv.Y);
 		}
-		//else if (uvmode == 2) //FLIP H
-		//	solid->uvpos[uvi].X = (minUV.X+ maxUV.X) - solid->uvpos[uvi].X;
-		//else  //FLIP V 
-		//	solid->uvpos[uvi].Y = (minUV.Y + maxUV.Y) - solid->uvpos[uvi].Y;
-	}
+	
+		// 2. Apply Transformations
+		for (int f = 0; f < surfi->faceidxlen; f++) {
+			u32 uvi = solid->uvidxs[surfi->faceidxstart + f];
+			u32 vertidx = solid->vertidxs[surfi->faceidxstart + f];
 
-		if (uvmode == 0) {
-			paramFrame->origin -= uvShift.X * paramFrame->u_axis;
-			paramFrame->origin -= uvShift.Y * paramFrame->v_axis;
-			if (mults) {
-				mults[2] += uvShift.X * mults[0];
-				mults[3] += uvShift.Y * mults[1];
+			if (uvmode == 0) { // MOVE
+				solid->uvpos[uvi] += uvShift;
 			}
-
-
-		}
-		else if (uvmode == 1) {
-			paramFrame->u_axis *= (1.0f - uvShift.X);
-			paramFrame->v_axis *= (1.0f - uvShift.Y);
-			if (mults) {
-				mults[0] -= uvShift.X / 4.0f;
-				mults[1] -= uvShift.Y / 4.0f;
+			else if (uvmode == 1) {//RESIZE
+				solid->uvpos[uvi].X *= (1.0f - uvShift.X);
+				solid->uvpos[uvi].Y *= (1.0f - uvShift.Y);
 			}
+			else if (uvmode == 2) { // FLIP H
+				solid->uvpos[uvi].X = (maxUV.X + minUV.X) - solid->uvpos[uvi].X;
+			}
+			else if (uvmode == 3) { // FLIP V
+				solid->uvpos[uvi].Y = (maxUV.Y + minUV.Y) - solid->uvpos[uvi].Y;
+			}
+			
 		}
-	/*	else if (uvmode == 2) {
-			paramFrame->u_axis *= -1;
-			paramFrame->origin += (maxUV.X- minUV.X) *paramFrame->u_axis;
+		
+		if (uvmode == 0) { // MOVE
+			// Formula: OriginShift = -(UVShift * Dim) * Axis
+			paramFrame->origin -= (uvShift.X * (f32)surfi->width) * paramFrame->u_axis;
+			paramFrame->origin -= (uvShift.Y * (f32)surfi->height) * paramFrame->v_axis;
+
+			//if (mults) {
+			//	// Lightmap offset moves inversely to maintain world alignment
+			//	mults[2] -= uvShift.X * mults[0];
+			//	mults[3] -= uvShift.Y * mults[1];
+			//}
+		}
+		else if (uvmode == 1) { // RESIZE
+			float scaleFactorX = (1.0f - uvShift.X);
+			float scaleFactorY = (1.0f - uvShift.Y);
+
+			// To stretch UVs (Resize > 1), the Axis must get shorter
+			if (scaleFactorX != 0.0f) paramFrame->u_axis *= scaleFactorX;
+			if (scaleFactorY != 0.0f) paramFrame->v_axis *= scaleFactorY;
+
+			//if (mults) {
+			//	mults[0] /= scaleFactorX;
+			//	mults[1] /= scaleFactorY;
+			//}
+		}
+		else if (uvmode == 2) { // FLIP H
+			// Formula: Move origin to the 'other side' of the selection
+			// O_new = O_old + (SumOfUVs * Width) * Axis
+			paramFrame->origin += ((minUV.X + maxUV.X) * scaleU) * paramFrame->u_axis;
+			paramFrame->u_axis = -paramFrame->u_axis;
+
+			//if (mults) {
+			//	float old_m0 = mults[0];
+			//	mults[0] = -old_m0;
+			//	mults[2] = mults[2] + ((minUV.X + maxUV.X) * old_m0);
+			//	
+			//}
+		}
+		else if (uvmode == 3) { // FLIP V
+			paramFrame->origin += ((minUV.Y + maxUV.Y) * scaleV) * paramFrame->v_axis;
+			paramFrame->v_axis = -paramFrame->v_axis;
+
+			//if (mults) {
+			//	float old_m1 = mults[1];
+			//	mults[1] = -old_m1;
+			//	mults[3] = mults[3] + ((minUV.Y + maxUV.Y) * old_m1);
+			//}
 		}
 
-		else {
-			paramFrame->v_axis *= -1;
-			paramFrame->origin += (maxUV.Y - minUV.Y) * paramFrame->v_axis;
-		}*/
 	}
 
 	updateMeshUV(scn, selsurf);

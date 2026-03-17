@@ -41,7 +41,7 @@ public:
 	scnPlane_t * planes;
 	core::vector3df	* verts;
 	core::vector2df * uvpos;
-	core::array<const char*> names;
+	core::array<std::string> names;
 	u32 * vertidxs;
 	u32 * uvidxs;
 	CScnBSPTree * tree;
@@ -59,7 +59,8 @@ public:
 	s16 getCellAtPos(core::vector3df pos) const;
 	scnCellData_t* getBBFromSurf(u16 surfindx, u16 cellindx);
 	scnNode_t getNodeAtPos(core::vector3df pos) const;
-	
+
+	core::vector2df project_vertex_to_uv(u32 surfidx,u32 vertidx);
 
 #ifdef __IRRLICHT_H_INCLUDED__
 	//function only returns vertice from array

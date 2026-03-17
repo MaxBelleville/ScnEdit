@@ -260,6 +260,13 @@ SColor convert_color(const char* pos) {
 	
 }
 
+std::string toLowerStr(const std::string& s)
+{
+	std::string out = s;
+	std::transform(out.begin(), out.end(), out.begin(), [](unsigned char c) { return std::tolower(c); });
+	return out;
+}
+
 std::string str_join(const core::array<u32> arr) {
 	std::string result = "[";
 	for (size_t i = 0; i < arr.size(); ++i) {
@@ -305,6 +312,27 @@ core::array<std::string> search_dir(std::string dir, const char* file) {
 
 		if (data.find(file) != std::string::npos)
 			found.push_back(data);
+	}
+	return found;
+}
+
+core::array<std::string> search_dir_recursive(const std::string& dir, const std::string& target) {
+	core::array<std::string> found;
+	if (!std::filesystem::exists(dir) || !std::filesystem::is_directory(dir)) {
+		return found;
+	}
+
+	std::string targetLower = toLowerStr(target);
+
+	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+		if (entry.is_regular_file()) {
+			std::string fileName = entry.path().stem().string();
+
+			// Check if the filename (without path) matches our target
+			if (toLowerStr(fileName) == targetLower) {
+				found.push_back(entry.path().string());
+			}
+		}
 	}
 	return found;
 }
@@ -452,69 +480,6 @@ const u16* get_cube_indices()
 		20,22,23
 	};
 	return cube_index;
-}
-
-bool solveProjectionFrame(const  core::array <std::pair<core::vector3df, core::vector2df>>& samples,
-	core::vector3df& origin_out,
-	core::vector3df& u_axis_out,
-	core::vector3df& v_axis_out)
-{
-	int N = samples.size();
-	if (N < 3) return false;
-	double maxErr = 0.0;
-	double rmsErr = 0.0;
-	// Build M^T * M and M^T * P efficiently
-	// M has rows [1, u, v]
-	double MTM[3][3] = { 0 }; // symmetric
-	double MTP[3][3] = { 0 }; // 3 x 3, columns for X,Y,Z
-
-	for (int i = 0; i < N; ++i) {
-		double u = samples[i].second.X;
-		double v = samples[i].second.Y;
-		core::vector3df fit = origin_out + u_axis_out * u + v_axis_out * v;
-		double err = (samples[i].first - fit).getLength();
-		rmsErr += err * err;
-		maxErr = max(maxErr, err);
-		double row[3] = { 1.0, u, v };
-		// MTM += outer(row, row)
-		for (int a = 0; a < 3; ++a)
-			for (int b = 0; b < 3; ++b)
-				MTM[a][b] += row[a] * row[b];
-
-		// MTP += row^T * P_i  (accumulate for X, Y, Z separately)
-		MTP[0][0] += row[0] * samples[i].first.X;
-		MTP[1][0] += row[1] * samples[i].first.X;
-		MTP[2][0] += row[2] * samples[i].first.X;
-
-		MTP[0][1] += row[0] * samples[i].first.Y;
-		MTP[1][1] += row[1] * samples[i].first.Y;
-		MTP[2][1] += row[2] * samples[i].first.Y;
-
-		MTP[0][2] += row[0] * samples[i].first.Z;
-		MTP[1][2] += row[1] * samples[i].first.Z;
-		MTP[2][2] += row[2] * samples[i].first.Z;
-	}
-
-	// Invert MTM (3x3). Use a robust 3x3 inversion or a small linear algebra helper.
-	double invMTM[3][3];
-	if (!invert3x3(MTM, invMTM)) return false;
-	rmsErr = sqrt(rmsErr / N);
-	printf("rmsErr = %f, maxErr = %f\n", rmsErr, maxErr);
-	// X = inv(MTM) * MTP  (3x3 * 3x3 -> 3x3)
-	double Xmat[3][3] = { 0 };
-	for (int r = 0; r < 3; ++r)
-		for (int c = 0; c < 3; ++c) {
-			double s = 0.0;
-			for (int k = 0; k < 3; ++k) s += invMTM[r][k] * MTP[k][c];
-			Xmat[r][c] = s;
-		}
-
-	// Extract rows
-	origin_out = core::vector3df((float)Xmat[0][0], (float)Xmat[0][1], (float)Xmat[0][2]);
-	u_axis_out = core::vector3df((float)Xmat[1][0], (float)Xmat[1][1], (float)Xmat[1][2]);
-	v_axis_out = core::vector3df((float)Xmat[2][0], (float)Xmat[2][1], (float)Xmat[2][2]);
-
-	return true;
 }
 
 // Helper function to invert a 3x3 matrix.

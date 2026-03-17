@@ -43,13 +43,14 @@ SColor convert_color(const char* pos);
 core::vector3df convert_vec3(const char* pos);
 core::vector2df convert_vec2(const char* pos);
 std::string vec2_to_str(core::vector2df pos, int decimals);
+std::string toLowerStr(const std::string& s);
 
 std::string vec3_to_str(core::vector3df pos, int decimals);
 
 std::string str_join(const core::array<u32> arr);
 
-core::array<std::string> search_dir(std::string dir, const char* file);
-
+core::array<std::string> search_dir(const std::string& dir, const std::string& file);
+core::array<std::string> search_dir_recursive(const std::string& dir, const std::string& file);
 core::array<ITexture*> get_skybox(const char* file);
 
 core::array<ITexture*> get_decals(const char* file);
@@ -60,10 +61,4 @@ video::S3DVertex* get_cube_vertices(core::vector3df start, core::vector3df end, 
 IMeshBuffer* generate_cube_mesh_buff(core::vector3df start, core::vector3df end, SColor clr);
 const u16* get_cube_indices();
 
-bool solveProjectionFrame(const core::array <std::pair<core::vector3df, core::vector2df>>& samples,
-    core::vector3df& origin_out,
-    core::vector3df& u_axis_out,
-    core::vector3df& v_axis_out);
-
 bool invert3x3(const double src[3][3], double dst[3][3]);
-

@@ -7,7 +7,6 @@
 #include "Header/Managers/CInteractionManager.h"
 #include "Header/CViewInit.h"
 #include "CImguiManager.h"
-
 CViewGui::CViewGui(CScnArguments* args)
 {
 	m_arguments = args;
@@ -382,7 +381,7 @@ void CViewGui::setupEvents() {
 			printSections(isVertInf);
 		}
 
-		if (interaction->getKeyState(make_pair(KEY_TAB, KeyAugment::None))) {
+		if (interaction->getKeyState(make_pair(KEY_OEM_3, KeyAugment::None))) {
 			if (debug) {
 				if (interaction->guiStateLayer().swap(GUIState::Debug, GUIState::Hover, GUIState::Default)) {
 					interaction->setCursorMode(true);
@@ -504,7 +503,12 @@ void CViewGui::setupEvents() {
 				resetEditText(isVertInf);
 			}
 		}
-
+		if (pair.second == KeyAugment::CtrlShift) {
+			resetEditText(isVertInf);
+		}
+		if (pair.first == KEY_TAB) {
+			resetEditText(isVertInf);
+		}
 
 		if (interaction->getKeyState(make_pair(KEY_KEY_C, KeyAugment::None))) {
 			solidSelect_t surfdata = interaction->getSurfISelected();
@@ -767,18 +771,13 @@ void CViewGui::helpDialog() {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	static const char* buttons[] = { "Ok", NULL };
 	m_msgbox.Init("Controls and help", NULL, 
-		"1-7: Hotkeys to enable disable scn options\n"
-		"Tab: Open internal debug (if enabled)\n"
-		"Scroll wheel: increase/decrease camera rotation speed\n\n"
-		
+		"~: Open internal debug (if enabled)\n"
+		"Scroll wheel: increase/decrease camera rotation speed\n"
+		"P/CTRL+P/SHIFT+P (ANY SELECTED): Print to console\n\n"
+
 		"H (ANY SELECTED): Hides element from editor\n"
 		"SHIFT+H (SOLID SELECTED): Hides shared and selected surfaces\n"
 		"CTRL+H: Unhides hidden elements\n\n"
-
-		"P/CTRL+P/SHIFT+P (ANY SELECTED): Print to console\n\n"
-
-		"X (SOLID SELECTED): Flips selected texture horizontally\n"
-		"V (SOLID SELECTED): Flips selected texture vertically\n\n"
 
 		"T (SOLID SELECTED): Change texture using file dialog.\n\n"
 
@@ -789,10 +788,15 @@ void CViewGui::helpDialog() {
 		"C (SOLID SELECTED & HAS SHADING): Change shading of surface\n"
 		"CTRL+C (VERT SELECT & HAS SHADING): Change shading of vertex\n\n"
 
+		
 		"F: Change face uv mode\n"
 		"Q: Decrease UV Scalar\n"
 		"E: Increase UV Scalar\n\n"
 
+		"TAB (SOLID SELECTED): Node details about surface \n"
+		"CTRL + SHIFT(SOLID SELECTED): View geometry entity for surface\n\n"
+
+		"X or V (SOLID SELECTED): Flip uv horizontal/vertical\n"
 		"R (SOLID SELECTED): Reset uv\n"
 		"UP (SOLID SELECTED): Change UV v+\n"
 		"DOWN (SOLID SELECTED): Change UV v -\n"
@@ -801,7 +805,7 @@ void CViewGui::helpDialog() {
 
 		"Ctrl+E (ENTITY SELECTED): Change non-protected entity fields\n"
 
-		"CTRL or SHIFT (SOLID SELECTED): Select vertex to move\n\n"
+		"CTRL *or* SHIFT (SOLID SELECTED): Select vertex to move\n\n"
 
 		"CTRL+R (SOLID or ENTITY SELECTED): Reset position\n"
 		"SHIFT+UP (SOLID or ENTITY SELECTED): Move X+\n"
@@ -989,22 +993,70 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 				"no shared | uv idx = {} |",
 				vert.faceidx, vertidx, vert.surf_vertidx, uvidx);
 		}
+		
+	
+
+
 		if (scn->getLightmap()->hasLightmaps()) {
 
 			core::vector3di atlas = scn->getLightmap()->getAtlasPos(vert.solididx, vert.surfidx);
 			core::vector3df delta = vert.pos - params.origin;
-		
+
 			float* mult = scn->getLightmap()->getMults(vert.solididx, vert.surfidx);
-			info.section2 = format("uv_pos = {} | lm mult w={:.3f} h={:.3f} x={:.3f} y={:.3f} | lm bias pos={} u={} v={} | ",
-				vec2_to_str(uv, 3), mult[0], mult[1], mult[2], mult[3],vec3_to_str(params.origin, 2),
-				vec3_to_str(params.u_axis, 2), vec3_to_str(params.v_axis, 2));
+			info.section2 = format("uv_pos = {} | lm mult w={:.3f} h={:.3f} x={:.3f} y={:.3f} | solidref_index = {} | ",
+				vec2_to_str(uv, 3), mult[0], mult[1], mult[2], mult[3], surf.solidref_index);
 		}
 		else {
-			info.section2 = format("uv_pos = {} | lm bias org={} u_ax={} v_ax={} | ", uvidx, vec2_to_str(uv, 3),
-				vec3_to_str(params.origin, 2), vec3_to_str(params.u_axis, 2), vec3_to_str(params.v_axis, 2));
+			info.section2 = format("uv_pos = {} | solidref_index = {} | ", vec2_to_str(uv, 3), surf.solidref_index);
+		}
+	}
+	if (interaction->getKeyState(make_pair(KEY_TAB,KeyAugment::None))) {
+		scnPlane_t* surfPlane = &solid->planes[surf.planeidx];
+	
+		core::vector3df center = interaction->getVertCenter();
+		// Create a normal vector from the plane constants
+		core::vector3df normal(surfPlane->a, surfPlane->b, surfPlane->c);
+
+		// Nudge the point slightly BACKWARDS (into the material)
+		// Use a small epsilon like 0.1 or 0.01
+		core::vector3df pushIn = center - (normal * 0.01f);
+
+		s16 nodeindx = solid->tree->findNodePos(pushIn);
+		scnNode_t node = solid->tree->nodes[nodeindx];
+		info.section1 = format("node[{}]: | 'edge' 1 = {} | 'edge' 2= {} | parent= {} | area/portal visiblity flag={:d} | ",nodeindx, node.node1, node.node2, node.nodep, node.area);
+		if (node.cell >= 0) {
+			scnRawCell_t cell = solid->rawcells[node.cell];
+			info.section1 = format("node 1 = {} | node 2= {} | parent= {} | cell=#{}, name=\"{}\" | area/portal visiblity flag={:d} |", node.node1, node.node2, node.nodep,
+				node.cell,cell.name, node.area);
 		}
 		
+		info.section2 = format("material = {} | material flags = {} | no special geom | unk = {} |", 
+			CScn::getMaterialName(node.material), CScn::getMaterialFlags(node.material), node.visframe);
+		if (node.specialGeomIdx>=0&&node.specialGeomIdx<solid->n_names) {
+			if (!solid->names[node.specialGeomIdx].empty()) {
+				info.section2 = format("material ={} | material flags ={} | special geom = {} | unk = {} |",
+					CScn::getMaterialName(node.material), CScn::getMaterialFlags(node.material), solid->names[node.specialGeomIdx], node.visframe);
+			}
+		}
 	}
+	if (interaction->getKeyAugment(KeyAugment::CtrlShift)) {
+		if (surf.solidref_index >= 1) {
+			CScnEnt* ent = scn->getSolidRef(surf.solidref_index);
+			int split = ent->n_fields / 2;
+			std::string sec1;
+			std::string sec2;
+
+			for (int i = 0; i < ent->n_fields; i++) {
+				if (i > split && split >= 4) {
+					sec2 += format("{}:({}) | ", ent->fields[i].key, ent->fields[i].value);
+				}
+				else sec1 += format("{}:({}) | ", ent->fields[i].key, ent->fields[i].value);
+			}
+			info.section1 = sec1;
+			info.section2 = sec2;
+		}
+	}
+
 
 	if (interaction->getSelectObj() && interaction->hasMoveableVert()) {
 		CScnMeshComponent* comp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
@@ -1033,7 +1085,7 @@ InfoText CViewGui::getPortalInfo() {
 	info.section1 = format(" | portal id: {} name: \"{}\" | cell #{}, name: \"{}\" | nextcell id: {}, name: \"{}\" "
 		"| normal = ({:.1f}, {:.1f}, {:.1f}), d = {:.1f} | unknown= {} {} |",
 		portaldata.portalidx, portal.name, portaldata.cellidx, cell.name, portal.nextcell, 
-		nextcell.name, plane.a, plane.b, plane.c, plane.d, portal.unk2, portal.unk3);
+		nextcell.name, plane.a, plane.b, plane.c, plane.d, portal.flag1, portal.flag2);
 	return info;
 }
 
@@ -1054,5 +1106,3 @@ InfoText CViewGui::getEntityInfo() {
 	
 	return info;
 }
-
-

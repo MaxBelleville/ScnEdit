@@ -163,6 +163,9 @@ int CScn::loadEntities(std::ifstream * file)
 
 			if (str_equiv(enti->fields[n].key, "Classname") && str_equiv(enti->fields[n].value, "light_ambient"))
 				CScn::ambients.push_back(enti);
+
+			if (str_equiv(enti->fields[n].key, "Classname") && str_equiv(enti->fields[n].value, "func_solidref"))
+				CScn::func_solidref.push_back(enti);
 		}
 		if (!hasPos && str_equiv(enti->getField("Classname"), "swt_start")) 
 			swt_start = enti;
@@ -223,6 +226,24 @@ CScnEnt* CScn::getAmbientByCell(const char* name)
 	}
 	return nullptr;
 }
+
+CScnEnt* CScn::getSolidRef(s32 solidref_index)
+{
+	CScnEnt* solidrefi;
+	for (u16 i = 0; i < CScn::func_solidref.size(); i++)
+	{
+		solidrefi = CScn::func_solidref[i];
+		const char* val = solidrefi->getField("solidref_index");
+		if (val) {
+			if (atoi(val) == solidref_index) {
+				return solidrefi;
+			}
+		}
+	}
+	return nullptr;
+}
+
+
 CScnEnt* CScn::getGlobalAmbient()
 {
 
@@ -245,6 +266,25 @@ CScnEnt* CScn::getGlobalAmbient()
 
 	}
 	return nullptr;
+}
+const char* CScn::getMaterialName(u8 material) {
+	u8 materialType = material & 0xF0;
+
+	switch (materialType) {
+	case ESM_DEFAULT:    return "Default";
+	case ESM_LIQUID:     return "Liquid";
+	case ESM_MUD:        return "Mud";
+	case ESM_GRAVEL:     return "Gravel";
+	case ESM_PLASTER:    return "Plaster";
+	case ESM_CARPET:     return "Carpet";
+	case ESM_GLASS:      return "Glass";
+	case ESM_WOOD:       return "Wood";
+	case ESM_CREAKWOOD:  return "Creakwood";
+	case ESM_BRICK:      return "Brick";
+	case ESM_SHEETMETAL: return "Sheet Metal";
+	case ESM_STEEL:      return "Steel";
+	default:             return "Unknown";
+	}
 }
 
 

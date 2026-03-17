@@ -26,11 +26,11 @@ struct scnHeader_t
 /* 0x18 */	u32     solid0_length;	//lengths of solid[0], ie, worldspawn
 /* 0x1c */	u32     solids_offset;  //offset to solids[1]
 /* 0x20 */	u32     solids_length;    //length of all other solids
-/* 0x24 */	u32     unk2;
-/* 0x28 */	u32     ents_offset;
-/* 0x2c */	u32     unk3; //ent length?
-/* 0x30 */	u32     unk4;
-/* 0x34 */	u32     ents_offset2;
+/* 0x24 */	u32     planes_offset; //Might not be correct
+/* 0x28 */	u32     ents_offset; //binary enity data(spawn objects from engine)
+/* 0x2c */	u32     ents_length; //ent length?
+/* 0x30 */	u32     ents_version; // no idea?  
+/* 0x34 */	u32     ents_offset2;//entity stirng data(key and value pairs)
 /* 0x38 */	u32     ents_size;
 /* 0x4c */	u32     n_extralmaps;
 /* 0x40 */	u32     lmaps_offset;   //lightmaps start address
@@ -51,7 +51,10 @@ struct scnSurf_t
 	u16 planeidx;
 	u16 faceidxlen;
 	u16 hasVertexColors;
-	//char stuff2[10]; // There are some potential surface flags here maybe material too?.
+
+	s16 _unk; //possibly padding 
+	s32 solidref_index;
+	s16 _unk2; //possibly padding?
 	u8 * shading;
 	//char extra[?]
 };
@@ -92,18 +95,18 @@ struct scnEntField_t
 
 enum EScnMaterial
 {
-	ESM_DEFAULT     = 0x00,
-	ESM_LIQUID      = 0x10,
-	ESM_MUD         = 0x20,
-	ESM_GRAVEL      = 0x30,
-	ESM_PLASTER     = 0x40,
-	ESM_CARPET      = 0x50,
-	ESM_GLASS       = 0x60,
-	ESM_WOOD        = 0x70,
-	ESM_CREAKWOOD   = 0x80,
-	ESM_BRICK       = 0x90,
-	ESM_SHEETMETAL  = 0xA0,
-	ESM_STEEL       = 0xB0
+	ESM_DEFAULT     = 0x00, //0000 0000
+	ESM_LIQUID      = 0x10, //0001 0000
+	ESM_MUD         = 0x20, //0010 0000
+	ESM_GRAVEL      = 0x30, //0011 0000
+	ESM_PLASTER     = 0x40, //0100 0000
+	ESM_CARPET      = 0x50, //0101 0000
+	ESM_GLASS       = 0x60, //0110 0000
+	ESM_WOOD        = 0x70, //0111 0000
+	ESM_CREAKWOOD   = 0x80, //1000 0000
+	ESM_BRICK       = 0x90, //1001 0000
+	ESM_SHEETMETAL  = 0xA0, //1010 0000
+	ESM_STEEL       = 0xB0, //1011 0000
 };
 
 struct scnSwitchableLMapHeader_t {
@@ -119,7 +122,7 @@ struct scnLMapHeader_t {
 	u16 b;     
 	u32 offset;
 	u16 cellidx; // check
-	u16 unk; //can be -1
+	u16 light_styles; //can be -1
 	f32 uv_mults[4]; 
 	//these are w, h, x0, y0 that we need to multiply by a vertex regular uv
 	//to get the lightmap uv
@@ -127,7 +130,7 @@ struct scnLMapHeader_t {
 
 struct scnLMapLump_t {
 	u32 size;
-	s32 unk;
+	s32 compression_type; // might be related to texture flipping?
 	s8* data; //byte[size]
 };
 
@@ -140,7 +143,7 @@ struct scnSurfParamFrame_t {
 struct scnNode_t  //16 bytes
 {
 	s16 plane;  //splitting plane idx
-	s8 area;   //?
+	s8 area;   //? potentially used in determining which are visible via portals/cells an or outside of the map.
 	u8 material;
 
 	s16 node1;  //node in front of plane
@@ -149,17 +152,18 @@ struct scnNode_t  //16 bytes
 
 	s16 cell;   //cell index
 	s16 specialGeomIdx;   // Index of special geometry (whose name is given in solid.names)
-	s16 unk2;
+	s16 visframe; //assume it's padding as it's always zero, but it might be used for something else. 
+	
 };
 
 struct scnPortal_t
 {
 	char name[32];
 	s16 nextcell; //cell idx this portal looks into
-	u8 unk2;
-	u8 unk3;
+	u8 flag1;
+	u8 flag2;
 	scnPlane_t plane;
-	f32 unk;        //float ?
+	f32 winding;     
 	s32 n_verts;    //number of verts defining the portal
 	core::vector3df bb_verts[2]; //portal bounding box points
 	core::vector3df * verts;
@@ -181,7 +185,7 @@ struct scnRawCell_t //raw cell means it's the cell read not from the entity list
 	char name[32];
 	s32 n_nodesidxs;
 	s32 n_portals;
-	s32 n3; //?
+	s32 n_occluders;
 	char skyname[32];
 	u16 * nodesidxs; //index of nodes
 	scnPortal_t * portals;

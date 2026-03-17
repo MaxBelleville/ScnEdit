@@ -61,8 +61,7 @@ int CScnCellBBData::getIndexFromCellBB(CScnSolid* solid, scnCellData_t* celldata
 
 void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 	CScnSolid* solid= scn->getSolid(vert.solididx);
-	scnCellData_t* celldata;
-	celldata = solid->getBBFromSurf(vert.surfidx, cellindx);
+	scnCellData_t* celldata = solid->getBBFromSurf(vert.surfidx, cellindx);
 
 	//This math may be wrong lol
 	if (celldata) {

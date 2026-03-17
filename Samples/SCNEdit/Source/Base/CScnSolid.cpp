@@ -166,11 +166,11 @@ int CScnSolid::loadCells(std::ifstream * file)
 		//reads number of portals
 		rawcells[i].n_portals=read_s32(file);
 		//reads unknow variable
-		rawcells[i].n3=read_s32(file);
+		rawcells[i].n_occluders=read_s32(file);
 		//reads sky name in file 32 bits
 		read_generic(rawcells[i].skyname,file,32);
 		os::Printer::log(format("\t\tcell[{}]: {} {} {} {} {}", 
-			i, rawcells[i].name, rawcells[i].n_nodesidxs, rawcells[i].n_portals, rawcells[i].n3, rawcells[i].skyname).c_str());
+			i, rawcells[i].name, rawcells[i].n_nodesidxs, rawcells[i].n_portals, rawcells[i].n_occluders, rawcells[i].skyname).c_str());
 
 		//creates new node id
 		rawcells[i].nodesidxs = new u16[rawcells[i].n_nodesidxs];
@@ -258,7 +258,7 @@ int CScnSolid::loadPortal(scnPortal_t * portal, std::ifstream * file)
 	//reads the plane in the file in the size of the plane
 	read_generic(&(portal->plane),file,sizeof(scnPlane_t));
 	//read portals unk what ever that means
-	portal->unk=read_f32(file);
+	portal->winding=read_f32(file);
 	//os::Printer::log("(%.1f %.1f %.1f %.1f %.1f)",portal->plane.a, portal->plane.b, portal->plane.c, portal->plane.d, portal->unk);
 	//reads the portals number of vertices
 	portal->n_verts=read_s32(file);
@@ -405,11 +405,13 @@ int CScnSolid::loadNodes(std::ifstream * file)
 {
 	os::Printer::log("\tReading nodes...");
 	//file->seek(n[N_NODES]*16,true);
-
+	int64_t start_node = file->tellg();
 	tree = new CScnBSPTree(n_nodes);
 
 	if (tree->loadNodes(file) == -1)
 		error(true,"loadNodes: Error reading nodes from solid,n_nodes < 1");
+
+	int64_t end_node = file->tellg();
 
 	os::Printer::log("\t\tdone.");
 
@@ -430,7 +432,7 @@ int CScnSolid::loadSurfs(std::ifstream * file)
 
 		read_generic(&surfs[i],file,72);   //read the usual 72 first bytes
 		int64_t t = file->tellg();
-
+	
 		if (surfs[i].hasVertexColors==1)  //means there are more bytes - the shading or smoothing or whatever we call it
 		{
 			surfs[i].shading = new u8[4*surfs[i].faceidxlen];     //allocate
@@ -450,6 +452,11 @@ int CScnSolid::loadSurfs(std::ifstream * file)
 s16 CScnSolid::getCellAtPos(core::vector3df pos) const {
    s16 nodeindx= tree->findNodePos(pos);
    return tree->nodes[nodeindx].cell;
+}
+
+scnNode_t CScnSolid::getNodeAtPos(core::vector3df pos) const {
+	s16 nodeindx = tree->findNodePos(pos);
+	return tree->nodes[nodeindx];
 }
 
 
@@ -539,4 +546,23 @@ void CScnSolid::calcSurfIndices(u32 surfidx, IIndexBuffer* ibuff)
 	}
 
 
+}
+core::vector2df CScnSolid::project_vertex_to_uv(u32 surfidx, u32 vertidx) {
+	scnSurf_t* surfi = &surfs[surfidx];
+	scnSurfParamFrame_t* frame = &paramFrames[surfidx];
+	
+	core::vector3d vertex = verts[vertidx];
+
+	// Standard BSP Projection: U = (Vertex - Origin) dot U_Axis
+	core::vector3df rel = vertex - frame->origin;
+
+	// Get lengths squared to avoid square roots
+	float u_lenSq = frame->u_axis.getLengthSQ();
+	float v_lenSq = frame->v_axis.getLengthSQ();
+
+	// Prevent division by zero
+	float u = (u_lenSq > 0) ? (rel.dotProduct(frame->u_axis) / (u_lenSq * surfi->width)) : 0;
+	float v = (v_lenSq > 0) ? (rel.dotProduct(frame->v_axis) / (v_lenSq * surfi->height)) : 0;
+
+	return core::vector2df(u, v);
 }

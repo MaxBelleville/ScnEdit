@@ -118,6 +118,7 @@ public:
 	static void resetText(UI::CUITextBox* textbox, int size);
 	static bool ToggleButton(const char* str_id, bool* v, ImGuiKey key);
 	static void registerImgui(const wchar_t* dir);
+	core::vector3df getVertCenter();
 	inline void resetLeftClick() {
 		m_leftToggle = std::make_pair(false, KeyAugment::None);
 	}
@@ -177,6 +178,9 @@ public:
 			key.second = m_augment;
 		
 		return m_keyMap.find(key) != m_keyMap.end();
+	}
+	inline bool getKeyAugment(KeyAugment aug) {
+		return m_augment == aug;
 	}
 
 

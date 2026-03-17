@@ -2,7 +2,6 @@
 #include "Header/Base/CScn.h"
 #include "Header/CScnArguments.h"
 #include "Header/Base/util.h"
-#include <set>
 #include <future>
 #include <thread>
 
@@ -43,7 +42,8 @@ public:
 	void deselectAll();
 	void hide(int si);
 	void show();
-	bool try_load_texture(video::ITexture*& t, std::set<std::string>& cantFind, const char* format, const wchar_t* baseDir, const char* texPath, bool&);
+	bool try_load_texture(video::ITexture*& t, 
+		std::unordered_map<std::string, std::string>& cantFind, const wchar_t* baseDir, const char* texPath, bool&);
 
 	void setTexture(CScn* scn, const char* path,int si);
 	void updateVert(CScn* scn, indexedVec3df_t& vert, core::vector3df);

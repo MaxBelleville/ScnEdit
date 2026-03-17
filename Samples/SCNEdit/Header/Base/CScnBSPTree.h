@@ -37,8 +37,10 @@ public:
 	inline int loadNodes(std::ifstream * file)
 	{
 		if (n_nodes <= 0) return -1;
+		int64_t offset= file->tellg();
 
 		read_generic(nodes, file,n_nodes*sizeof(scnNode_t));
+
 
 	  //  os::Printer::log("done.\n");
 		return n_nodes;
@@ -72,11 +74,15 @@ public:
 		scnPlane_t * plane = &planes[nodes[nodeidx].plane];
 		//dot product
 		f32 prod= pos.X * plane->a + pos.Y * plane->b + pos.Z * plane->c + plane->d;
-		if (prod==0)     return 0;
-		else if (prod>0) return 1;
-		else             return -1;
+		f32 epsilon = 0.001f; // Small margin of error
+
+		if (prod > epsilon) return 1;       // Clearly Front
+		else if (prod < -epsilon) return -1; // Clearly Back
+		else return 0;                     // "On" the plane
 
 	}
+
+
 
 
 };

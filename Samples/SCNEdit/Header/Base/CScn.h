@@ -33,12 +33,16 @@ public:
 
 	inline static vector<CScnEnt*> cells;
 	inline static vector<CScnEnt*> ambients;
+	inline static vector<CScnEnt*> func_solidref;
 	inline static CScnEnt* swt_start;
 
 	//get cell by index as defined by cell_index field
 	static CScnEnt * getCell(u32 cell_index);
 	static CScnEnt* getAmbientByCell(const char* name);
 	static CScnEnt* getGlobalAmbient();
+	static CScnEnt* getSolidRef(s32 solidref_index);
+	static const char* getMaterialName(u8 material);
+
 
 	CScn ();
 	CScn (std::ifstream *);
@@ -52,6 +56,10 @@ public:
 	inline CScnEnt* getAllEnts()
 	{
 		return ents;
+	}
+
+	static inline u8 getMaterialFlags(u8 materialByte) {
+		return materialByte & 0x0F;
 	}
 
 	//returns pointer to CScnSolid from index or NULL if none

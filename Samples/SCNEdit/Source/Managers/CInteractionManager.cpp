@@ -106,6 +106,22 @@ bool CInteractionManager::isGuiSettingsUpdated() {
 		gui->scrape_lightmaps != prevgui->scrape_lightmaps;
 }
 
+core::vector3df CInteractionManager::getVertCenter() {
+	core::vector3df center(0, 0, 0);
+	for (int i = 0; i < vertexdata.first.size(); i++) {
+		center += vertexdata.first[i].pos;
+	}
+	for (int i = 0; i < vertexdata.second.size(); i++) {
+		center += vertexdata.second[i].pos;
+	}
+	int totalVerts = vertexdata.first.size() + vertexdata.second.size();
+	if (totalVerts > 0) {
+		center /= static_cast<f32>(totalVerts);
+	}
+
+	return center;
+}
+
 bool CInteractionManager::OnEvent(const SEvent& event)
 {
 	m_augment = KeyAugment::None;

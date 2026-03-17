@@ -46,7 +46,7 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
                 // Ensure fields are initialized
                 tmp_lump->data = nullptr;
                 tmp_lump->size = read_u32(file);
-                tmp_lump->unk = read_s32(file);
+                tmp_lump->compression_type= read_s32(file);
 
                 if (tmp_lump->size > 0) {
                     tmp_lump->data = new s8[tmp_lump->size];
@@ -136,7 +136,7 @@ s8* CScnLightmap::getBitmap(CScnSolid* solids,u32 solididx, u32 surfidx)
 
 u16_pair CScnLightmap::getMasterBitmapId(scnLMapHeader_t hlmap)
 {
-	return make_pair(hlmap.cellidx, hlmap.unk);
+	return make_pair(hlmap.cellidx, hlmap.light_styles);
 }
 ///Takes the raw lightmap data and converts it into a larger bitmap I can use in the renderer.
 void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
@@ -168,7 +168,7 @@ void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
             scnLMapHeader_t hlmap = hlmaps[i][j];
             scnSurf_t surf  = solids[i].surfs[j];
 
-            if (hlmap.unk == -1)
+            if (hlmap.light_styles == -1)
                 continue; // Surfaces are not lit
 
             // Obtain bitmap pointer safely

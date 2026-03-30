@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Base\CScn.cpp">
+      <Filter>Source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Base\CScnLightmap.cpp">
+      <Filter>Source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Base\CScnSolid.cpp">
+      <Filter>Source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Base\CScnSurface.cpp">
+      <Filter>Source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Base\export.cpp">
+      <Filter>Source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Base\util.cpp">
+      <Filter>Source\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\CViewGui.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\CViewInit.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\CViewInteraction.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnCellBBComponent.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnCellBBData.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnEntityComponent.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnEntityData.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnMeshComponent.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnMeshData.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnPortalComponent.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Components\CScnPortalData.cpp">
+      <Filter>Source\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Managers\CContext.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Managers\CInteractionManager.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Managers\CViewLayer.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\Managers\CViewManager.cpp">
+      <Filter>Source\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Source\SCNEdit.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Main\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Main\Platforms\Win32\MainW32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\CScn.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\CScnBSPTree.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\CScnEnt.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\CScnLightmap.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\CScnSolid.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\CScnSurface.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\export.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\scntypes.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Base\util.h">
+      <Filter>Header\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\CGUILogger.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\CScnArguments.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\CViewGui.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\CViewInit.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\CViewInteraction.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnCellBBComponent.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnCellBBData.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnEntityComponent.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnEntityData.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnMeshComponent.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnMeshData.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnPortalComponent.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Components\CScnPortalData.h">
+      <Filter>Header\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Managers\CContext.h">
+      <Filter>Header\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Managers\CInteractionEnumLayer.h">
+      <Filter>Header\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Managers\CInteractionManager.h">
+      <Filter>Header\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Managers\CView.h">
+      <Filter>Header\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Managers\CViewLayer.h">
+      <Filter>Header\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Managers\CViewManager.h">
+      <Filter>Header\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\SCNEdit.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\Header\Version.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Main\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Main\Platforms\Win32\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Main\Platforms\Win32\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Samples\SCNEdit\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Main\Platforms\Win32\Skylicht.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header">
+      <UniqueIdentifier>{105D3911-834C-3941-AAFC-0CBD9C13E50E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6A893D3A-5CEA-340C-A464-49A34C978E57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Base">
+      <UniqueIdentifier>{CDDD3F97-A169-3C53-B9D3-BAC2825ABCD5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Components">
+      <UniqueIdentifier>{ACBCE76E-AD32-3BCE-A567-FB47C1C3D21E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Managers">
+      <UniqueIdentifier>{29D31218-7C65-31CA-BE03-EA425CFE8B21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{80A48BCB-E210-3375-9DDE-BB3578316B3D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F5922CAB-41C4-3CA5-A0B7-CF332A51411B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Base">
+      <UniqueIdentifier>{04639122-1D45-30ED-8496-1F72173655D7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Components">
+      <UniqueIdentifier>{E765F69E-E639-3239-85B2-5243CFFB5989}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Managers">
+      <UniqueIdentifier>{6DAC8160-49B8-387B-88EC-0DE72EE98746}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\CImguiManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\FileDialog\ImGuiFileDialog.cpp">
+      <Filter>FileDialog</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\TextSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_impl_skylicht.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imguial_msgbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\CImguiManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\FileDialog\ImGuiFileDialog.h">
+      <Filter>FileDialog</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\FileDialog\ImGuiFileDialogConfig.h">
+      <Filter>FileDialog</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\FileDialog\dirent\dirent.h">
+      <Filter>FileDialog\dirent</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\FileDialog\stb\stb_image.h">
+      <Filter>FileDialog\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\FileDialog\stb\stb_image_resize2.h">
+      <Filter>FileDialog\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\TextSelect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_impl_skylicht.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imgui_stdlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imguial_msgbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imstb_rectpack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imstb_textedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\imstb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Imgui\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="FileDialog">
+      <UniqueIdentifier>{EFBEB5A0-EA87-3882-9EC4-94B978685DB6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileDialog\dirent">
+      <UniqueIdentifier>{628EC6A8-9B2D-3AB5-8027-04E5E2E30C6A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileDialog\stb">
+      <UniqueIdentifier>{2133BE49-D2D3-3984-B4B5-DFCC1C790DF1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6A893D3A-5CEA-340C-A464-49A34C978E57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F5922CAB-41C4-3CA5-A0B7-CF332A51411B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

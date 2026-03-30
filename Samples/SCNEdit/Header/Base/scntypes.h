@@ -56,7 +56,6 @@ struct scnSurf_t
 	s32 solidref_index;
 	s16 _unk2; //possibly padding?
 	u8 * shading;
-	//char extra[?]
 };
 
 //#surface flags :
@@ -134,7 +133,8 @@ struct scnLMapLump_t {
 	s8* data; //byte[size]
 };
 
-struct scnSurfParamFrame_t {
+//Project 3d to uv.
+struct scnProjectionBasis_t {
 	core::vector3df u_axis;
 	core::vector3df v_axis;
 	core::vector3df origin;
@@ -194,26 +194,16 @@ struct scnRawCell_t //raw cell means it's the cell read not from the entity list
 	core::array<u16> naivesurfs;
 	//there is also more data here
 };
-struct vertProp_t
-{
-	u32 faceidx;
-	u32 surf_vertidx;
-	bool bShared;
-	core::array<u32> sharesWith;
-};
 
 // ---------------------------------END OF Original SCN TYPES-----------------------------------
 // ---------------------------------Start of Custom Types------------------------------------
 
-struct indexedVec3df_t
-{
+struct localizedVertex_t {
 	core::vector3df pos;
-	u32 faceidx = 0;
-	u32 solididx = 0;
-	u32 surfidx = 0;
-	u32 surf_vertidx = 0;
-	bool bShared;
-	core::array<u32> sharesWith;
+	core::vector2df uv;
+	u32 faceidx; 
+	u8 color[4];
+	core::array<localizedVertex_t*> shared;
 };
 
 struct solidSelect_t
@@ -259,9 +249,5 @@ struct pair_hash {
 typedef std::pair<irr::EKEY_CODE, KeyAugment> key_pair;
 
 typedef std::unordered_set<key_pair, pair_hash> key_map; //key is (key code, augment) value is state.
-
-typedef std::pair<core::array<indexedVec3df_t>, core::array<indexedVec3df_t>> indexed_vertices;
-
-typedef std::optional<indexedVec3df_t> opt_indexedVec3df;
 
 #endif

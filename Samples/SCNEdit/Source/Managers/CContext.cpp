@@ -291,12 +291,3 @@ void CContext::releaseRenderPipeline()
 	}
 }
 
-void CContext::setDirectionalLight(CDirectionalLight* light)
-{
-	m_directionalLight = light;
-}
-
-void CContext::setPointLight(std::vector<CPointLight*> pointLight)
-{
-	m_pointLights = pointLight;
-}

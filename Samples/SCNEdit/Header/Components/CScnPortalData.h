@@ -15,9 +15,19 @@ public:
 
 	void initMesh(CScnSolid* solid, u32 cellindx, s32 portalindx);
 
-	void select();
+	inline void select() {
 
-	void deselect();
+		RenderMesh->Materials[0]->changeShader("BuiltIn/Shader/Basic/VertexColor.xml");
+
+	}
+
+	inline void deselect() {
+
+		if (!str_equals("BuiltIn/Shader/Basic/VertexColorAlpha.xml", RenderMesh->Materials[0]->getShaderPath())) {
+			RenderMesh->Materials[0]->changeShader("BuiltIn/Shader/Basic/VertexColorAlpha.xml");
+		}
+
+	}
 
 
 };

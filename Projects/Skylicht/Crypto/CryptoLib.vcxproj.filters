@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\base64.c">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\base64_test.c">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\md5.c">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\md5_test.c">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\sha256.c">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\sha256_test.c">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\base64.h">
+      <Filter>Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\crypto_type.h">
+      <Filter>Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\md5.h">
+      <Filter>Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\Crypto\sha256.h">
+      <Filter>Crypto</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Crypto\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Crypto">
+      <UniqueIdentifier>{57134ED6-CF7C-316D-9ED9-F1760E784D27}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

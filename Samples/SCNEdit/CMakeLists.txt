@@ -8,6 +8,7 @@ include_directories(
 	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty
 	${SKYLICHT_ENGINE_PROJECT_DIR}/ThirdParty/freetype2/include
 )
+
 if (BUILD_SKYLICHT_AUDIO)
 	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/Audio)
 endif()
@@ -27,7 +28,6 @@ endif()
 if (BUILD_SKYLICHT_SCNEdit)
 	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Skylicht/SCNEdit)
 endif()
-
 if (BUILD_IMGUI)
 	include_directories(${SKYLICHT_ENGINE_PROJECT_DIR}/Imgui)
 endif()
@@ -67,9 +67,6 @@ file(GLOB_RECURSE application_source
 	./Source/**.cpp 
 	./Source/**.c 
 	)
-
-
-
 
 # Custom additional sources
 include(CMakeProject.cmake)

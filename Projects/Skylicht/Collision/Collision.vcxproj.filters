@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CBBTriangleSelector.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CCollisionBuilder.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CCollisionManager.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CCollisionNode.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CMeshTriangleSelector.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\COctreeBuilder.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\COctreeNode.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CTriangleSelector.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Decal\CDecalData.cpp">
+      <Filter>Decal</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Decal\CDecals.cpp">
+      <Filter>Decal</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Decal\CDecalsRenderer.cpp">
+      <Filter>Decal</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CBBTriangleSelector.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CCollisionBuilder.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CCollisionManager.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CCollisionNode.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CMeshTriangleSelector.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\COctreeBuilder.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\COctreeNode.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Collision\CTriangleSelector.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\CollisionConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Decal\CDecalData.h">
+      <Filter>Decal</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Decal\CDecals.h">
+      <Filter>Decal</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\Decal\CDecalsRenderer.h">
+      <Filter>Decal</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Collision\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Collision">
+      <UniqueIdentifier>{2CC4EA0F-473D-34F7-A6B5-5058170DF846}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Decal">
+      <UniqueIdentifier>{FE724C4E-25F9-3638-BFBC-95D20EA7BECF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6A893D3A-5CEA-340C-A464-49A34C978E57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F5922CAB-41C4-3CA5-A0B7-CF332A51411B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

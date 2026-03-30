@@ -50,15 +50,6 @@ void CInteractionManager::registerImgui(const wchar_t* dir)
 	ImGui::AddSettingsHandler(&ini_handler);
 }
 
-void* CInteractionManager::readOpen(ImGuiContext*, ImGuiSettingsHandler* handler, const char* name) {
-
-	if (strcmp(name, "VISIBLITY") == 0)
-		return handler->UserData;
-
-	return nullptr;
-
-}
-
 void CInteractionManager::readLine(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line) {
     guiSettings_t* settings = static_cast<guiSettings_t*>(entry);
     int temp;
@@ -209,22 +200,6 @@ bool CInteractionManager::OnEvent(const SEvent& event)
 	return true;
 }
 
-void CInteractionManager::getNumeric(core::array<std::pair<irr::EKEY_CODE, int>>& keys) {
-	for (int i = 0; i < 10; i++) 
-		keys.push_back(std::make_pair(static_cast<irr::EKEY_CODE>(irr::KEY_KEY_0+i), KeyAugment::None));
-}
-
-void CInteractionManager::getAlphaNumeric(core::array<std::pair<irr::EKEY_CODE, int>>& keys) {
-	CInteractionManager::getNumeric(keys);
-	CInteractionManager::getAlphabetic(keys);
-}
-
-void CInteractionManager::getAlphabetic(core::array<std::pair<irr::EKEY_CODE, int>>& keys) {
-	for (char c = 'A'; c <= 'Z'; ++c) {
-		irr::EKEY_CODE key = static_cast<irr::EKEY_CODE>(irr::KEY_KEY_A + (c - 'A'));
-		keys.push_back(std::make_pair(key, KeyAugment::AnyKey));
-	}
-}
 void CInteractionManager::activateText(UI::CUITextBox* textbox, 
 	core::array<std::pair<irr::EKEY_CODE, int>> accepted, std::string msg, int size) {
 	textbox->setAcceptedKeys(accepted);
@@ -317,8 +292,6 @@ bool CInteractionManager::ToggleButton(const char* str_id, bool* v, ImGuiKey key
 
 	return toggled;
 }
-
-
 
 void CInteractionManager::swapCursorMode(bool isRightClick)
 {

@@ -1,0 +1,421 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9E79080C-739C-395E-BB6E-6384C591C743}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>Physics</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Bin\Windows\Libs\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Physics.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Physics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Bin\Windows\Libs\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Physics.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Physics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Bin\Windows\Libs\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Physics.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Physics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Bin\Windows\Libs\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Physics.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Physics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_OPENMP;BUILD_SKYLICHT_NETWORK;HAVE_CURL;CURL_STATICLIB;HTTP_ONLY;BUILDING_LIBCURL;USE_OPENSSL;FT2_BUILD_LIBRARY;_IRR_STATIC_LIB_;_SKYLICHT_STATIC_LIB_;USE_BULLET_PHYSIC_ENGINE;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN64;BUILD_IMGUI;BUILD_SKYLICHT_GRAPH;BUILD_SKYLICHT_COMPONENTS;BUILD_SKYLICHT_COLLISION;BUILD_SKYLICHT_LIGHMAPPER;BUILD_SKYLICHT_PHYSIC;BUILD_SKYLICHT_AUDIO;BUILD_SKYLICHT_UI;BUILD_SKYLICHT_CRYPTO;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Include;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src;C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/maxbe/Documents/Swat 3/skylicht-engine" "-BC:/Users/maxbe/Documents/Swat 3/skylicht-engine" --check-stamp-file "C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/maxbe/Documents/Swat 3/skylicht-engine" "-BC:/Users/maxbe/Documents/Swat 3/skylicht-engine" --check-stamp-file "C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/maxbe/Documents/Swat 3/skylicht-engine" "-BC:/Users/maxbe/Documents/Swat 3/skylicht-engine" --check-stamp-file "C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/maxbe/Documents/Swat 3/skylicht-engine" "-BC:/Users/maxbe/Documents/Swat 3/skylicht-engine" --check-stamp-file "C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Bullet\CBulletUtils.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\CharacterController\CCharacterController.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\CharacterController\CCharacterController.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CBoxCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CBoxCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CBvhMeshCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CBvhMeshCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CCapsuleCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CCapsuleCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CConvexMeshCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CConvexMeshCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CCylinderCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CCylinderCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CMeshCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CMeshCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CSphereCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CSphereCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CStaticPlaneCollider.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\Collider\CStaticPlaneCollider.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\PhysicsEngine\CDrawDebug.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\PhysicsEngine\CDrawDebug.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\PhysicsEngine\CPhysicsEngine.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\PhysicsEngine\CPhysicsEngine.h" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\PhysicsEngine\CPhysicsRaycast.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\PhysicsEngine\ICollisionObject.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\PhysicsEngine\ICollisionObject.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\RigidBody\CRigidbody.cpp" />
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\RigidBody\CRigidbody.h" />
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Physics\pch.h" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\ZERO_CHECK.vcxproj">
+      <Project>{DFD5C4BF-3C2F-39FE-9C32-75326BEA1BA5}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Audio\Audio.vcxproj">
+      <Project>{035B8D68-4D14-33E8-ACA9-45E60D7F5683}</Project>
+      <Name>Audio</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src\Bullet3Common\Bullet3Common.vcxproj">
+      <Project>{B2DFE712-8844-3C6E-B2BA-3216F29907E8}</Project>
+      <Name>Bullet3Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src\BulletCollision\BulletCollision.vcxproj">
+      <Project>{C693C760-05C8-3256-A88D-69982672F65B}</Project>
+      <Name>BulletCollision</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src\BulletDynamics\BulletDynamics.vcxproj">
+      <Project>{60F0C7B8-679B-309B-8915-AA286B0D9E57}</Project>
+      <Name>BulletDynamics</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src\BulletInverseDynamics\BulletInverseDynamics.vcxproj">
+      <Project>{AD33B53E-E24E-3F95-81A7-DB5152490410}</Project>
+      <Name>BulletInverseDynamics</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src\BulletSoftBody\BulletSoftBody.vcxproj">
+      <Project>{2713F15B-E7F1-37ED-B881-5D1FF8F499FE}</Project>
+      <Name>BulletSoftBody</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Components.vcxproj">
+      <Project>{67F086A0-FD27-3085-BC94-D0C48428A4F5}</Project>
+      <Name>Components</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Engine\Engine.vcxproj">
+      <Project>{09BB1776-1AAB-38BA-B737-D4CC0E6AD8A3}</Project>
+      <Name>Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Irrlicht\Irrlicht.vcxproj">
+      <Project>{9EB765AC-B82F-331C-A46E-771CCF22FE6B}</Project>
+      <Name>Irrlicht</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Bullet3\src\LinearMath\LinearMath.vcxproj">
+      <Project>{98A6E88E-22F4-3BD0-AF5E-8829380653F5}</Project>
+      <Name>LinearMath</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\System\System.vcxproj">
+      <Project>{F30C7461-3260-3F03-915B-F2AE1E6C9407}</Project>
+      <Name>System</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\ThirdParty\ThirdParty.vcxproj">
+      <Project>{202C2CC1-6833-30F5-960D-D2A8E7B5736A}</Project>
+      <Name>ThirdParty</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

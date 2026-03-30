@@ -949,7 +949,7 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 
 	CScnSolid* solid = scn->getSolid(surfdata.solididx);
 	scnSurf_t surf = solid->surfs[surfdata.surfsel];
-	scnSurfParamFrame_t params = solid->paramFrames[surfdata.surfsel];
+	scnProjectionBasis_t projBasis = solid->projection[surfdata.surfsel];
 	scnPlane_t plane = solid->planes[surf.planeidx];
 
 	if (!inVertInf || interaction->keyAugLayer().get() == KeyAugment::None) {
@@ -970,6 +970,8 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 		core::vector2df uv = solidv->uvpos[uvidx];
 		u32 vertidx = solidv->vertidxs[vert.faceidx];
 		scnSurf_t surfv = solidv->surfs[vert.surfidx];
+
+		core::vector2d proj = solidv->project_vertex_to_uv(vert.surfidx, vertidx);
 
 		if (surfv.shading&& surfv.hasVertexColors && vert.bShared && vert.sharesWith.size()>0) {
 			u8* ps = surfv.shading + vert.surf_vertidx * 4;
@@ -993,21 +995,20 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 				"no shared | uv idx = {} |",
 				vert.faceidx, vertidx, vert.surf_vertidx, uvidx);
 		}
-		
-	
 
+		bool is_valid = (uv - proj).getLengthSQ() < 0.0001;
 
 		if (scn->getLightmap()->hasLightmaps()) {
 
 			core::vector3di atlas = scn->getLightmap()->getAtlasPos(vert.solididx, vert.surfidx);
-			core::vector3df delta = vert.pos - params.origin;
+			core::vector3df delta = vert.pos - projBasis.origin;
 
 			float* mult = scn->getLightmap()->getMults(vert.solididx, vert.surfidx);
-			info.section2 = format("uv_pos = {} | lm mult w={:.3f} h={:.3f} x={:.3f} y={:.3f} | solidref_index = {} | ",
-				vec2_to_str(uv, 3), mult[0], mult[1], mult[2], mult[3], surf.solidref_index);
+			info.section2 = format("uv_pos = {} | lm mult w={:.3f} h={:.3f} x={:.3f} y={:.3f} | solidref_index = {} | proj uv valid = {} |",
+				vec2_to_str(uv, 3), mult[0], mult[1], mult[2], mult[3], surf.solidref_index, is_valid);
 		}
 		else {
-			info.section2 = format("uv_pos = {} | solidref_index = {} | ", vec2_to_str(uv, 3), surf.solidref_index);
+			info.section2 = format("uv_pos = {} | solidref_index = {} | proj uv valid = {} | ", vec2_to_str(uv, 3), surf.solidref_index, is_valid);
 		}
 	}
 	if (interaction->getKeyState(make_pair(KEY_TAB,KeyAugment::None))) {

@@ -80,14 +80,6 @@ int CScnLightmap::loadLightmap(std::ifstream* file, CScnSolid* solids, u32 n_sol
     return n_extralmaps; // should be the same as number of hlmaps.
 }
 
-video::IImage* CScnLightmap::getAtlas(s32 indx) {
-	return atlas[indx];
-}
-core::vector3di CScnLightmap::getAtlasPos(u32 solidi, u32 surfi) {
-	u16_pair id = getMasterBitmapId(hlmaps[solidi][surfi]);
-	return atlas_pos[id];
-}
-
 s8* CScnLightmap::getBitmap(CScnSolid* solids,u32 solididx, u32 surfidx)
 {
     if (!solids) {
@@ -134,10 +126,6 @@ s8* CScnLightmap::getBitmap(CScnSolid* solids,u32 solididx, u32 surfidx)
     return start;
 }
 
-u16_pair CScnLightmap::getMasterBitmapId(scnLMapHeader_t hlmap)
-{
-	return make_pair(hlmap.cellidx, hlmap.light_styles);
-}
 ///Takes the raw lightmap data and converts it into a larger bitmap I can use in the renderer.
 void CScnLightmap::createBitmaps(CScnSolid* solids,u32 n_solid)
 {

@@ -1,0 +1,552 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\GridPlane\CGridPlane.cpp">
+      <Filter>GridPlane</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\GridPlane\CGridPlaneData.cpp">
+      <Filter>GridPlane</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\GridPlane\CGridPlaneRender.cpp">
+      <Filter>GridPlane</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleBufferData.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleComponent.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleRenderer.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleTrailComponent.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleTrailData.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleTrailRenderer.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CTrailSerializable.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CFactory.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CGroup.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CModel.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticle.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleCPUBuffer.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleInstancing.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleSerializable.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleTrail.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CSubGroup.cpp">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CDirectionEmitter.cpp">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CEmitter.cpp">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CNormalEmitter.cpp">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CRandomEmitter.cpp">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CSphericEmitter.cpp">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CStraightEmitter.cpp">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\CBillboardAdditiveRenderer.cpp">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\CMeshParticleRenderer.cpp">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\CQuadRenderer.cpp">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\IRenderer.cpp">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParentRelativeSystem.cpp">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParticleCPUBufferSystem.cpp">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParticleInstancingSystem.cpp">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParticleSystem.cpp">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CVortexSystem.cpp">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CAABox.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CCylinder.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CLine.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CPoint.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CPolyLine.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CPositionZone.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CRing.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CSphere.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CZone.cpp">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CCapsule.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CCube.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CCylinder.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CLathe.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPlane.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitive.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveBaseRenderer.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveData.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveRenderer.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveRendererInstancing.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveSerializable.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CSphere.cpp">
+      <Filter>Primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CCapsuleMesh.cpp">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CCylinderMesh.cpp">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CLatheMesh.cpp">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CLine3D.cpp">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CGroupSkinnedInstancing.cpp">
+      <Filter>SkinnedInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CRenderSkinnedInstancing.cpp">
+      <Filter>SkinnedInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CSkinnedInstanceAnimationSystem.cpp">
+      <Filter>SkinnedInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CSkinnedInstanceData.cpp">
+      <Filter>SkinnedInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CSkinnedMeshRendererInstancing.cpp">
+      <Filter>SkinnedInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CTransformTextureData.cpp">
+      <Filter>SkinnedInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancingVAT\CRenderMeshInstancingVAT.cpp">
+      <Filter>SkinnedInstancingVAT</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancingVAT\CVertexAnimTextureData.cpp">
+      <Filter>SkinnedInstancingVAT</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyBox\CSkyBox.cpp">
+      <Filter>SkyBox</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyBox\CSkyBoxData.cpp">
+      <Filter>SkyBox</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyBox\CSkyBoxRender.cpp">
+      <Filter>SkyBox</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyDome\CSkyDome.cpp">
+      <Filter>SkyDome</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyDome\CSkyDomeData.cpp">
+      <Filter>SkyDome</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyDome\CSkyDomeRender.cpp">
+      <Filter>SkyDome</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkySun\CSkySun.cpp">
+      <Filter>SkySun</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkySun\CSkySunData.cpp">
+      <Filter>SkySun</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkySun\CSkySunRenderer.cpp">
+      <Filter>SkySun</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SpriteDraw\CSprite.cpp">
+      <Filter>SpriteDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SpriteDraw\CSpriteDrawData.cpp">
+      <Filter>SpriteDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SpriteDraw\CSpriteRenderer.cpp">
+      <Filter>SpriteDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ComponentsConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\DataTypeIndex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\GridPlane\CGridPlane.h">
+      <Filter>GridPlane</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\GridPlane\CGridPlaneData.h">
+      <Filter>GridPlane</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\GridPlane\CGridPlaneRender.h">
+      <Filter>GridPlane</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleBufferData.h">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleComponent.h">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleRenderer.h">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleTrailComponent.h">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleTrailData.h">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CParticleTrailRenderer.h">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\CTrailSerializable.h">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CFactory.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CGroup.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CModel.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticle.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleCPUBuffer.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleInstancing.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleSerializable.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CParticleTrail.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\CSubGroup.h">
+      <Filter>ParticleSystem\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CDirectionEmitter.h">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CEmitter.h">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CNormalEmitter.h">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CRandomEmitter.h">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CSphericEmitter.h">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Emitters\CStraightEmitter.h">
+      <Filter>ParticleSystem\Particles\Emitters</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\CBillboardAdditiveRenderer.h">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\CMeshParticleRenderer.h">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\CQuadRenderer.h">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Renderers\IRenderer.h">
+      <Filter>ParticleSystem\Particles\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParentRelativeSystem.h">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParticleCPUBufferSystem.h">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParticleInstancingSystem.h">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CParticleSystem.h">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\CVortexSystem.h">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Systems\ISystem.h">
+      <Filter>ParticleSystem\Particles\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CAABox.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CCylinder.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CLine.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CPoint.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CPolyLine.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CPositionZone.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CRing.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CSphere.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\ParticleSystem\Particles\Zones\CZone.h">
+      <Filter>ParticleSystem\Particles\Zones</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CCapsule.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CCube.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CCylinder.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CLathe.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPlane.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitive.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveBaseRenderer.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveRenderer.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveRendererInstancing.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimitiveSerializable.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CPrimiviteData.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\CSphere.h">
+      <Filter>Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CCapsuleMesh.h">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CCylinderMesh.h">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CLatheMesh.h">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\Primitive\LatheMesh\CLine3D.h">
+      <Filter>Primitive\LatheMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CGroupSkinnedInstancing.h">
+      <Filter>SkinnedInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CRenderSkinnedInstancing.h">
+      <Filter>SkinnedInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CSkinnedInstanceAnimationSystem.h">
+      <Filter>SkinnedInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CSkinnedInstanceData.h">
+      <Filter>SkinnedInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CSkinnedMeshRendererInstancing.h">
+      <Filter>SkinnedInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancing\CTransformTextureData.h">
+      <Filter>SkinnedInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancingVAT\CRenderMeshInstancingVAT.h">
+      <Filter>SkinnedInstancingVAT</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkinnedInstancingVAT\CVertexAnimTextureData.h">
+      <Filter>SkinnedInstancingVAT</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyBox\CSkyBox.h">
+      <Filter>SkyBox</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyBox\CSkyBoxData.h">
+      <Filter>SkyBox</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyBox\CSkyBoxRender.h">
+      <Filter>SkyBox</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyDome\CSkyDome.h">
+      <Filter>SkyDome</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyDome\CSkyDomeData.h">
+      <Filter>SkyDome</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkyDome\CSkyDomeRender.h">
+      <Filter>SkyDome</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkySun\CSkySun.h">
+      <Filter>SkySun</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkySun\CSkySunData.h">
+      <Filter>SkySun</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SkySun\CSkySunRenderer.h">
+      <Filter>SkySun</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SpriteDraw\CSprite.h">
+      <Filter>SpriteDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SpriteDraw\CSpriteDrawData.h">
+      <Filter>SpriteDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\SpriteDraw\CSpriteRenderer.h">
+      <Filter>SpriteDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\maxbe\Documents\Swat 3\skylicht-engine\Projects\Skylicht\Components\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="GridPlane">
+      <UniqueIdentifier>{FCE6A26C-ADCD-3057-8EFF-26E10DDB0A4F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6A893D3A-5CEA-340C-A464-49A34C978E57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleSystem">
+      <UniqueIdentifier>{493A5F47-86D1-31E4-AD4D-2A0119277AD9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleSystem\Particles">
+      <UniqueIdentifier>{D6E28698-B7DD-3F96-8999-5153F826C259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleSystem\Particles\Emitters">
+      <UniqueIdentifier>{ADC4E984-B46B-3466-906E-E209A281F8C9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleSystem\Particles\Renderers">
+      <UniqueIdentifier>{D73C9D58-09F0-314F-8490-9AC3A6F4581E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleSystem\Particles\Systems">
+      <UniqueIdentifier>{FA8F710F-3B2B-3858-8E9A-FD053E4E629E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleSystem\Particles\Zones">
+      <UniqueIdentifier>{9DCED257-1CEB-34ED-BFB1-E52319EC843A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitive">
+      <UniqueIdentifier>{3C1E6CAF-82EE-3B92-AE83-8A57100B98D3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitive\LatheMesh">
+      <UniqueIdentifier>{39D26E76-FC2D-30E8-81B5-CF8216403271}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SkinnedInstancing">
+      <UniqueIdentifier>{A9713BE2-7414-36F1-A1D9-D019CA5E4692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SkinnedInstancingVAT">
+      <UniqueIdentifier>{49D153E6-C493-370C-9334-09B5D9AEB891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SkyBox">
+      <UniqueIdentifier>{0662E6A4-22B4-3C13-BEAB-1701D3F8BD57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SkyDome">
+      <UniqueIdentifier>{A716F60F-D38B-3D9C-98E2-4BB9E866D1BD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SkySun">
+      <UniqueIdentifier>{9DEF28D0-94FA-3750-AAE7-19D3C01A1D11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F5922CAB-41C4-3CA5-A0B7-CF332A51411B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpriteDraw">
+      <UniqueIdentifier>{1EFC0579-720D-3EC9-9BB2-0A58F8A55ACA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

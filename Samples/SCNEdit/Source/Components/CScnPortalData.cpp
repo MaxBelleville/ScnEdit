@@ -43,16 +43,3 @@ void CScnPortalData::initMesh(CScnSolid* solid, u32 cellindx, s32 portalIndx)
 	RenderMesh->setHardwareMappingHint(EHM_STATIC);
 }
 
-void CScnPortalData::select() {
-
-	RenderMesh->Materials[0]->changeShader("BuiltIn/Shader/Basic/VertexColor.xml");
-
-}
-
-void CScnPortalData::deselect() {
-	
-	if (!str_equals("BuiltIn/Shader/Basic/VertexColorAlpha.xml", RenderMesh->Materials[0]->getShaderPath())) {
-		RenderMesh->Materials[0]->changeShader("BuiltIn/Shader/Basic/VertexColorAlpha.xml");
-	}
-
-}

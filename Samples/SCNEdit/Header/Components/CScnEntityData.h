@@ -19,9 +19,13 @@ public:
 
 	void initMesh(CScnEnt* ent);
 
-	void select();
-
-	void deselect();
+	inline void select() {
+		RenderMesh->Materials[0]->changeShader("TextureColor.xml");
+	};
+	inline void deselect() {
+		if (!str_equals("TextureColor.xml", RenderMesh->Materials[0]->getShaderPath()))
+			RenderMesh->Materials[0]->changeShader("TextureColorAlpha.xml");
+	}
 
 	inline int getEntityIndx() {
 		return m_indx;

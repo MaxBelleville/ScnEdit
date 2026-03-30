@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <filesystem>
 
+using namespace std;
 void error(bool fatal, const char* message, ...)
 {
 	va_list args;
@@ -154,7 +155,6 @@ bool is_number(const char* str)
 	return end != str && *end == '\0' && val != HUGE_VAL;
 }
 
-using namespace std;
 
 //create new file (overwritting if exists) and copy contents from existfile
 bool copy_file(const char * existfile, const char * newfile)

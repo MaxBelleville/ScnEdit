@@ -72,13 +72,3 @@ void CScnEntityData::initMesh(CScnEnt* ent)
 	m_firstLoad = true;
 }
 
-
-void CScnEntityData::select() {
-	RenderMesh->Materials[0]->changeShader("TextureColor.xml");
-}
-
-void CScnEntityData::deselect() {
-;	if (!str_equals("TextureColor.xml", RenderMesh->Materials[0]->getShaderPath())) 
-		RenderMesh->Materials[0]->changeShader("TextureColorAlpha.xml");
-
-}

@@ -254,9 +254,9 @@ bool SCNEdit::saveSCN() {
 			output->write((char*)(solid->uvpos), len);
 
 			//Save param frame
-			output->seekp(solid->paramsad);
-			len = (solid->n_surfs) * sizeof(scnSurfParamFrame_t);
-			output->write((char*)(solid->paramFrames), len);
+			output->seekp(solid->projsad);
+			len = (solid->n_surfs) * sizeof(scnProjectionBasis_t);
+			output->write((char*)(solid->projection), len);
 
 
 			//save bb data

@@ -114,9 +114,15 @@ public:
 		return m_zone;
 	}
 
-	void setDirectionalLight(CDirectionalLight* light);
+	inline void setDirectionalLight(CDirectionalLight* light)
+	{
+		m_directionalLight = light;
+	}
 
-	void setPointLight(std::vector<CPointLight*> pointLight);
+	inline void setPointLight(std::vector<CPointLight*> pointLight)
+	{
+		m_pointLights = pointLight;
+	}
 
 	inline std::vector<CPointLight*>& getPointLight()
 	{

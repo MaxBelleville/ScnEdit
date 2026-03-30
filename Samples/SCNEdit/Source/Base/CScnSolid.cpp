@@ -10,8 +10,6 @@ CScnSolid::CScnSolid()
 {
 	offset = 0;
 	length = 0;
-	//TODO: do something
-	textures.clear();
 
 	//setting pointers to zero
 	rawcells = 0;
@@ -30,6 +28,8 @@ CScnSolid::CScnSolid()
 //Deconstructor for solids
 CScnSolid::~CScnSolid()
 {
+	textures.clear();
+
 	//pointers must be set to zero initially otherwise errors
 	if (rawcells)
 	{
@@ -76,8 +76,8 @@ CScnSolid::~CScnSolid()
 	if (surfsad)
 		delete [] surfsad;
 
-	if (paramFrames)
-		delete[] paramFrames;
+	if (projection)
+		delete[] projection;
 
 	if (surfs)
 	{
@@ -95,8 +95,8 @@ CScnSolid::~CScnSolid()
    if (vertpos_caller)
 	   delete[] vertpos_caller;
 	//Deletes uv id caller
-   if (uvvertidxs_caller)
-	  delete [] uvvertidxs_caller;
+   if (faceidxs_caller)
+	  delete [] faceidxs_caller;
 
 }
 
@@ -114,7 +114,7 @@ int CScnSolid::loadSolid(std::ifstream * file, u32 indx)
 	n_unk1=read_u32(file);
 	n_verts=read_u32(file);
 	n_uvpos = read_u32(file);
-	n_vertidxs=read_u32(file);
+	n_faceidx=read_u32(file);
 	n_planes=read_u32(file);
 	n_nodes=read_u32(file);
 	n_surfs=read_u32(file);
@@ -131,7 +131,7 @@ int CScnSolid::loadSolid(std::ifstream * file, u32 indx)
 	loadUVPos(file);
 	loadVertIdxs(file);
 	loadUVIdxs(file);
-	loadParamFrames(file);
+	loadProjection(file);
 	loadCells(file);
 	loadNames(file);
 
@@ -144,6 +144,7 @@ int CScnSolid::loadSolid(std::ifstream * file, u32 indx)
 		error(true,"loadSolid: Number of unique textures and texture array size doesn't match");
 	//Thats good for the enivoroment
 	buildBackTree();
+
 
 	return 1;
 }
@@ -170,7 +171,8 @@ int CScnSolid::loadCells(std::ifstream * file)
 		//reads sky name in file 32 bits
 		read_generic(rawcells[i].skyname,file,32);
 		os::Printer::log(format("\t\tcell[{}]: {} {} {} {} {}", 
-			i, rawcells[i].name, rawcells[i].n_nodesidxs, rawcells[i].n_portals, rawcells[i].n_occluders, rawcells[i].skyname).c_str());
+			i, rawcells[i].name, rawcells[i].n_nodesidxs, rawcells[i].n_portals, 
+			rawcells[i].n_occluders, rawcells[i].skyname).c_str());
 
 		//creates new node id
 		rawcells[i].nodesidxs = new u16[rawcells[i].n_nodesidxs];
@@ -245,7 +247,7 @@ int CScnSolid::loadCellData(scnRawCell_t* rawcell,scnCellData_t * celldata,std::
    
 	return n;
 }
-//IMPORTANT Figure out why he is hiding the fact he is reading the portals by commenting out the say commands
+
 int CScnSolid::loadPortal(scnPortal_t * portal, std::ifstream * file)
 {
 	//reads portal name
@@ -259,7 +261,8 @@ int CScnSolid::loadPortal(scnPortal_t * portal, std::ifstream * file)
 	read_generic(&(portal->plane),file,sizeof(scnPlane_t));
 	//read portals unk what ever that means
 	portal->winding=read_f32(file);
-	//os::Printer::log("(%.1f %.1f %.1f %.1f %.1f)",portal->plane.a, portal->plane.b, portal->plane.c, portal->plane.d, portal->unk);
+	//os::Printer::log("(%.1f %.1f %.1f %.1f %.1f)",
+	// portal->plane.a, portal->plane.b, portal->plane.c, portal->plane.d, portal->unk);
 	//reads the portals number of vertices
 	portal->n_verts=read_s32(file);
 	//reads the portals bb_verices in the file in double the size of core::vector3df
@@ -273,12 +276,12 @@ int CScnSolid::loadPortal(scnPortal_t * portal, std::ifstream * file)
 	return 0;
 }
 
-int CScnSolid::loadParamFrames(std::ifstream * file)
+int CScnSolid::loadProjection(std::ifstream * file)
 {
 	os::Printer::log("\t\tReading paramertization frames/lightmap uv bias for surfaces...");
-	paramsad = file->tellg();
-	paramFrames = new scnSurfParamFrame_t[n_surfs];
-	read_generic(paramFrames, file, sizeof(scnSurfParamFrame_t)*n_surfs);
+	projsad = file->tellg();
+	projection = new scnProjectionBasis_t[n_surfs];
+	read_generic(projection, file, sizeof(scnProjectionBasis_t)*n_surfs);
 	
 	os::Printer::log("\t\tdone.");
 	return 0;
@@ -319,47 +322,45 @@ int CScnSolid::calcUniqueTexturesNames(std::ifstream * file)
 
 int CScnSolid::loadUVIdxs(std::ifstream * file)
 {
-	u32 nvui = n_vertidxs;
-	os::Printer::log(format("\tGetting UV coordinates indices... {}", nvui).c_str());
+	os::Printer::log(format("\tGetting UV coordinates indices... {}", n_faceidx).c_str());
 	//creates new uv indexes
-	uvidxs = new u32[nvui];   //allocate   n_uvidxs=n_vertidxs
+	uvidxs = new u32[n_faceidx];   //allocate   n_uvidxs=n_vertidxs
 	//reads uv indexes in file
-	read_generic(uvidxs,file,sizeof(u32)*nvui);
+	read_generic(uvidxs,file,sizeof(u32)* n_faceidx);
 	os::Printer::log("\t\tdone.");
 
-	return nvui;
+	return n_faceidx;
 
 }
 
 void CScnSolid::buildBackTree()
 {
-
-	uvpos_caller = new core::array<u32>[n_vertidxs];
+	uvpos_caller = new core::array<u32>[n_faceidx];
 	//build backtree
-	for (u32 i=0; i< n_vertidxs;i++)
+	for (u32 i=0; i< n_faceidx;i++)
 		uvpos_caller[uvidxs[i]].push_back(i);
 
-	vertpos_caller = new core::array<u32>[n_vertidxs];
-	for (u32 i = 0; i < n_vertidxs; i++)
+	vertpos_caller = new core::array<u32>[n_faceidx];
+	for (u32 i = 0; i < n_faceidx; i++)
 		vertpos_caller[vertidxs[i]].push_back(i);
 
-	uvvertidxs_caller = new core::array<u32>[n_vertidxs];
+	faceidxs_caller = new core::array<u32>[n_faceidx];
 	for (u32 i = 0; i < n_surfs; i++) {
 		for (u32 j = 0; j < surfs[i].faceidxlen; j++)
-			uvvertidxs_caller[surfs[i].faceidxstart + j].push_back(i);
+			faceidxs_caller[surfs[i].faceidxstart + j].push_back(i);
 	}
 }
 
 
 int CScnSolid::loadVertIdxs(std::ifstream * file)
 {
-	os::Printer::log(format("\tGetting Vertex indices... {}", n_vertidxs).c_str());
-	vertidxs = new u32[n_vertidxs];   //allocate
-	read_generic(vertidxs,file,sizeof(u32)*n_vertidxs); //read all, should work
+	os::Printer::log(format("\tGetting Vertex indices... {}", n_faceidx).c_str());
+	vertidxs = new u32[n_faceidx];   //allocate
+	read_generic(vertidxs,file,sizeof(u32)* n_faceidx); //read all, should work
 
 	os::Printer::log("\t\tdone.");
 
-	return n_vertidxs;
+	return n_faceidx;
 }
 
 int CScnSolid::loadUVPos(std::ifstream * file)
@@ -449,21 +450,6 @@ int CScnSolid::loadSurfs(std::ifstream * file)
 	return i;
 }
 
-s16 CScnSolid::getCellAtPos(core::vector3df pos) const {
-   s16 nodeindx= tree->findNodePos(pos);
-   return tree->nodes[nodeindx].cell;
-}
-
-scnNode_t CScnSolid::getNodeAtPos(core::vector3df pos) const {
-	s16 nodeindx = tree->findNodePos(pos);
-	return tree->nodes[nodeindx];
-}
-
-
-
-scnCellData_t* CScnSolid::getBBFromSurf(u16 surfindx,u16 cellIndx) {
-	return getBBFromSurf(surfindx,&rawcells[cellIndx].bvh);
-}
 scnCellData_t* CScnSolid::getBBFromSurf(u16 surfindx,scnCellData_t * celldata) {
 	scnCellData_t* founddata;
 	for (u32 s = 0; s < celldata->n_surfs; s++) {
@@ -476,93 +462,4 @@ scnCellData_t* CScnSolid::getBBFromSurf(u16 surfindx,scnCellData_t * celldata) {
 			return founddata;
 	}
 	return nullptr;
-}
-
-
-//return array of surface vertices with alpha, shading and uv information
-//irr_specific
-void CScnSolid::calcSurfVertices(u32 surfidx, f32* mults, IVertexBuffer* vbuff, u16 arg_alpha)
-{
-
-	scnSurf_t * surfi = &surfs[surfidx];
-
-	S3DVertex2TCoords tVert;
-
-	u8 * ps= surfi->shading;
-
-	for (u32 i=0; i < surfi->faceidxlen; i++)
-	{
-		tVert = getVertice(vertidxs[surfi->faceidxstart+i]);
-		  
-		tVert.TCoords = uvpos[uvidxs[surfi->faceidxstart + i]];
-
-		tVert.TCoords2 = uvpos[uvidxs[surfi->faceidxstart + i]];
-		if(mults) {
-			tVert.TCoords2.X = tVert.TCoords2.X * mults[0] + mults[2];
-			tVert.TCoords2.Y = tVert.TCoords2.Y * mults[1] + mults[3];
-		}
-
-		u32 a = surfi->alpha;
-
-		if (a!=255 && arg_alpha > 0) a = arg_alpha; //override with l
-		//if (a!=255) //removed this
-		tVert.Color.setAlpha(a);
-		if (surfi->hasVertexColors)
-		{
-			//if there is shading, we find that ps[3] always equals surfi->alpha
-			//we could use this to make fun things like make vertices of the same surface have different transparencies
-			tVert.Color = video::SColor(ps[3],ps[0],ps[1],ps[2]);
-			ps+=4;
-		}
-		vbuff->addVertex(&tVert);
-	}
-
-}
-
-
-
-void CScnSolid::calcSurfIndices(u32 surfidx, IIndexBuffer* ibuff)
-{
-
-	scnSurf_t * surfi = &surfs[surfidx];
-
-	//we pass the vertices always in the order 0,1,2; 2,3,0; 3,4,0; ...
-	//                  (swat and irrlicht are counter-clockwise)
-
-	ibuff->addIndex(0);
-	ibuff->addIndex(1);
-	ibuff->addIndex(2);
-
-	//each surface is a new meshbuffer - because they may have different textures
-	//draw mesh like a triangle fan - first three vertices define a triangle,
-	//from then, each new one defines a tringle with the last and the origin (0)
-
-
-	for (u16 j=3; j<surfi->faceidxlen ;j++)
-	{
-		ibuff->addIndex(j-1);
-		ibuff->addIndex(j);
-		ibuff->addIndex(0);
-	}
-
-
-}
-core::vector2df CScnSolid::project_vertex_to_uv(u32 surfidx, u32 vertidx) {
-	scnSurf_t* surfi = &surfs[surfidx];
-	scnSurfParamFrame_t* frame = &paramFrames[surfidx];
-	
-	core::vector3d vertex = verts[vertidx];
-
-	// Standard BSP Projection: U = (Vertex - Origin) dot U_Axis
-	core::vector3df rel = vertex - frame->origin;
-
-	// Get lengths squared to avoid square roots
-	float u_lenSq = frame->u_axis.getLengthSQ();
-	float v_lenSq = frame->v_axis.getLengthSQ();
-
-	// Prevent division by zero
-	float u = (u_lenSq > 0) ? (rel.dotProduct(frame->u_axis) / (u_lenSq * surfi->width)) : 0;
-	float v = (v_lenSq > 0) ? (rel.dotProduct(frame->v_axis) / (v_lenSq * surfi->height)) : 0;
-
-	return core::vector2df(u, v);
 }

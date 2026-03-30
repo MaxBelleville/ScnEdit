@@ -1,0 +1,33 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/ThirdParty/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Irrlicht/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/System/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Engine/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Imgui/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/SpineCpp/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Graph/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Components/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Collision/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Lightmapper/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Physics/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Audio/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/UserInterface/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Crypto/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Network/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Skylicht/Client/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Samples/SCNEdit/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/UnitTest/TestApp/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/src/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/src/BulletInverseDynamics/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/src/BulletSoftBody/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/src/BulletCollision/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/src/BulletDynamics/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/src/LinearMath/cmake_install.cmake",
+		"C:/Users/maxbe/Documents/Swat 3/skylicht-engine/Projects/Bullet3/src/Bullet3Common/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

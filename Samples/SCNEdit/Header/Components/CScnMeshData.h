@@ -17,7 +17,7 @@ protected:
 	core::array<IImage*>lmapImages;
 	core::array<BackupData> vis_backup;
 	core::array<BackupData> vert_backup;
-	core::array<scnSurfParamFrame_t> param_backup;
+	core::array<scnProjectionBasis_t> proj_backup;
 	core::array<int> hiddensurfs;
 
 public:
@@ -31,31 +31,31 @@ public:
 
 	void initMesh(CScn* scn, CScnSolid* solid, CScnArguments*);
 	void setLightmapVisible(bool);
-	solidSelect_t getSurfaceIndx(CScn* scn, core::triangle3df);
-	core::array<int> getUVSharedSurface(CScn* scn, core::array<int>sindices);
-	core::array<int> getUVSharedSurface(CScn* scn, int si);
-	core::array<int> getVertSharedSurface(CScn* scn, int si, int vertidx);
-	core::array<vertProp_t> getSurfVertProps(CScn* scn, int si);
 
-	void select(int si, bool bShared);
+	solidSelect_t getSurfaceIndx(CScn* scn, core::triangle3df);
+
+	void select(int si, bool shared);
 	void deselect(int si);
 	void deselectAll();
 	void hide(int si);
 	void show();
-	bool try_load_texture(video::ITexture*& t, 
-		std::unordered_map<std::string, std::string>& cantFind, const wchar_t* baseDir, const char* texPath, bool&);
 
 	void setTexture(CScn* scn, const char* path,int si);
 	void updateVert(CScn* scn, indexedVec3df_t& vert, core::vector3df);
-	void updateMeshVert(int si, int surf_vertidx, core::vector3df pos);
+	
 	void resetVert(CScn* scn, indexedVec3df_t& vert);
-	indexed_vertices getVertices(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf);
-	indexedVec3df_t getVertexFromPos(CScn* scn, u32 si, u32 vertindx);
 
 	void updatePlane(CScn* scn, int si);
 	void updateUV(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf, int, core::vector2df add);
 	void resetUV(CScn* scn, core::array<int> selsurf, core::array<int> sharedsurf);
-	void updateMeshUV(CScn* scn, core::array < int > surf);
 
-	core::array<u32> getSurfUVIdxs(CScn* scn, core::array<int> surf);
+private: 
+	void updateUVSurf(CScnSolid* solid, int si, int uvmode, core::vector2df uvShift);
+	void resetUVSurf(CScnSolid* solid, int si);
+	void updateMeshUV(CScn* scn, core::array < int > surf);
+	void updateMeshVert(int si, int surf_vertidx, core::vector3df pos);
+
+	bool try_load_texture(video::ITexture*& t,
+		std::unordered_map<std::string, std::string>& cantFind, const wchar_t* baseDir, const char* texPath, bool&);
+
 };

@@ -110,9 +110,6 @@ public:
 	void updateVertPos();
 	bool isGuiSettingsUpdated();
 	bool findKeyState(std::vector<key_pair> keys);
-	static void getNumeric(core::array<std::pair<irr::EKEY_CODE, int>>&);
-	static void getAlphaNumeric(core::array<std::pair<irr::EKEY_CODE, int>>&);
-	static void getAlphabetic(core::array<std::pair<irr::EKEY_CODE, int>>&);
 	static void activateText(UI::CUITextBox* textbox, core::array<std::pair<irr::EKEY_CODE, int>> accepted, std::string msg, int size);
 	static void activateText(UI::CUITextBox* textbox, core::array<std::pair<irr::EKEY_CODE, int>> accepted, std::string head_msg, std::string body_msg, int size);
 	static void resetText(UI::CUITextBox* textbox, int size);
@@ -121,6 +118,23 @@ public:
 	core::vector3df getVertCenter();
 	inline void resetLeftClick() {
 		m_leftToggle = std::make_pair(false, KeyAugment::None);
+	}
+
+	inline void getNumeric(core::array<std::pair<irr::EKEY_CODE, int>>& keys) {
+		for (int i = 0; i < 10; i++)
+			keys.push_back(std::make_pair(static_cast<irr::EKEY_CODE>(irr::KEY_KEY_0 + i), KeyAugment::None));
+	}
+
+	inline void getAlphaNumeric(core::array<std::pair<irr::EKEY_CODE, int>>& keys) {
+		getNumeric(keys);
+		getAlphabetic(keys);
+	}
+
+	inline void getAlphabetic(core::array<std::pair<irr::EKEY_CODE, int>>& keys) {
+		for (char c = 'A'; c <= 'Z'; ++c) {
+			irr::EKEY_CODE key = static_cast<irr::EKEY_CODE>(irr::KEY_KEY_A + (c - 'A'));
+			keys.push_back(std::make_pair(key, KeyAugment::AnyKey));
+		}
 	}
 
 	inline void setBlockCursor(bool block) {
@@ -312,7 +326,11 @@ public:
 
 protected:
 	// Function to read the custom settings block (initialize)
-	static void* readOpen(ImGuiContext*, ImGuiSettingsHandler* handler, const char* name);
+	inline static void* readOpen(ImGuiContext*, ImGuiSettingsHandler* handler, const char* name) {
+		if (strcmp(name, "VISIBLITY") == 0)
+			return handler->UserData;
+		return nullptr;
+	};
 
 	// Function to parse each line in the settings block
 	static void readLine(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line);

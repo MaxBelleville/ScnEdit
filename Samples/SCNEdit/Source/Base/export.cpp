@@ -3,6 +3,8 @@
 #include "pch.h"
 #include "Header/Base/export.h"
 
+using namespace irr;
+using namespace core;
 void scnExportObj(CScn* scn, const char* name)
 {
     u32 i;
@@ -186,8 +188,6 @@ void scnExport3ds(CScnSolid* mesh, u32 totalSize, const char* name)
     os::Printer::log("\tdone.");
 }
 
-using namespace irr;
-using namespace core;
 
 void writeMapLine(FILE* map, vector3df a, vector3df b, vector3df c, vector3df t1, vector3df t2, const char* texname = 0)
 {
@@ -204,10 +204,6 @@ void writeMapLine(FILE* map, vector3df a, vector3df b, vector3df c, vector3df t1
         t1.X, t1.Z, t1.Y, t2.X, t2.Z, t2.Y);
 }
 
-vector3df vec2irrvec(core::vector3df a)
-{
-    return vector3df(a.X, a.Y, a.Z);
-}
 void scnExportMap(CScn* scn, const char* name)
 {
 
@@ -235,8 +231,8 @@ void scnExportMap(CScn* scn, const char* name)
             u32 idxs[3];
             idxs[0] = surfi->faceidxstart;
             idxs[1] = surfi->faceidxstart + 1;
-            a = vec2irrvec(solid->verts[solid->vertidxs[idxs[0]]]);
-            b = vec2irrvec(solid->verts[solid->vertidxs[idxs[1]]]);
+            a = solid->verts[solid->vertidxs[idxs[0]]];
+            b = solid->verts[solid->vertidxs[idxs[1]]];
 
             f32 width = 0.5;
             scnPlane_t* plane = &solid->planes[surfi->planeidx];
@@ -264,8 +260,8 @@ void scnExportMap(CScn* scn, const char* name)
 
                 idxs[1] = surfi->faceidxstart + j;
 
-                a = vec2irrvec(solid->verts[solid->vertidxs[idxs[0]]]);
-                b = vec2irrvec(solid->verts[solid->vertidxs[idxs[1]]]);
+                a = solid->verts[solid->vertidxs[idxs[0]]];
+                b = solid->verts[solid->vertidxs[idxs[1]]];
                 c = b - dp;
                 r1 = (b - a);
                 if (lastr1 != zero) {

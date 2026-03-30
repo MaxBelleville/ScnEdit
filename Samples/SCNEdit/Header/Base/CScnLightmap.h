@@ -24,8 +24,11 @@ private:
 
 	s8* getBitmap(CScnSolid*, u32, u32);
 	void createBitmaps(CScnSolid*,u32);
-	u16_pair getMasterBitmapId(scnLMapHeader_t hlmap);
 
+	inline u16_pair getMasterBitmapId(scnLMapHeader_t hlmap)
+	{
+		return make_pair(hlmap.cellidx, hlmap.light_styles);
+	}
 
 public:
 	//constructor - do nothing for now
@@ -35,9 +38,13 @@ public:
 	int ATLASSIZE = 128;
 
 	int loadLightmap(std::ifstream*,  CScnSolid*, u32, u32);
-	video::IImage* getAtlas(s32 indx);
-	core::vector3di getAtlasPos(u32 solidi, u32 surfi);
-	
+	inline video::IImage* getAtlas(s32 indx) {
+		return atlas[indx];
+	}
+	inline core::vector3di getAtlasPos(u32 solidi, u32 surfi) {
+		u16_pair id = getMasterBitmapId(hlmaps[solidi][surfi]);
+		return atlas_pos[id];
+	}
 	inline u16 getCellIndex(u32 solidi, u32 surfi) {
 	   return hlmaps[solidi][surfi].cellidx;
     }

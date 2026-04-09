@@ -221,6 +221,7 @@ void CViewInit::buildScnComponents() {
 	CZone* zone = scene->getZone(0);
 
 	CScnSolid* solid = scn->getSolid(0);
+	CScnLightmap* lmap = scn->getLightmap();
 	//Will try to get the first skybox in the scn and set the skybox to that.
 
 	const char* skyName = "";
@@ -261,7 +262,7 @@ void CViewInit::buildScnComponents() {
 	zone->registerObjectInSearchList(scnObj);
 
 	CScnMeshComponent* mesh = scnObj->addComponent<CScnMeshComponent>();
-	mesh->setMesh(scn, solid, m_arguments);
+	mesh->setMesh(solid, lmap, m_arguments);
 
 	context->getCollisionManager()->addComponentCollision(scnObj);
 
@@ -273,7 +274,7 @@ void CViewInit::buildScnComponents() {
 		CGameObject* extra = extraGroup->createEmptyObject("solid_extra");
 
 		CScnMeshComponent* mesh = extra->addComponent<CScnMeshComponent>();
-		mesh->setMesh(scn, solid, m_arguments);
+		mesh->setMesh(solid, lmap, m_arguments);
 
 		context->getCollisionManager()->addComponentCollision(extra);
 	}

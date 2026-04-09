@@ -205,11 +205,10 @@ void CViewGui::setupEvents() {
 			u8 num = std::atoi(msg.c_str());
 			//This section is repeated maybe I can improve it so it's shared between textsections?
 
-			CScnMeshComponent* comp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-
-			for (int i = 0; i < comp->selsurfs.size(); i++) {
-				int si = comp->selsurfs[i];
-				CScnSolid* solid = scn->getSolid(comp->solididx);
+			core::array<surfaceBox_t> surfsels = interaction->getSurfSelected();
+			for (int i = 0; i < surfsels.size(); i++) {
+				int si = surfsels[i].si;
+				CScnSolid* solid = scn->getSolid(surfsels[i].solididx);
 				scnSurf_t* surfi = &solid->surfs[si];
 				if (interaction->guiStateLayer().get() == GUIState::EditAlpha) {
 					if (num > 255) num = 255;
@@ -228,39 +227,38 @@ void CViewGui::setupEvents() {
 				color[i] = std::atoi(split[i].c_str());
 			}
 			
-			CScnMeshComponent* comp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
+			core::array<surfaceBox_t> surfsels = interaction->getSurfSelected();
 			if (interaction->guiStateLayer().get() == GUIState::EditSurfShading) {
-				for (int i = 0; i < comp->selsurfs.size(); i++) {
-					int si = comp->selsurfs[i];
-					CScnSolid* solid = scn->getSolid(comp->solididx);
-					scnSurf_t* surfi = &solid->surfs[si];
-					if (surfi->shading && surfi->hasVertexColors) {
-						for (u32 j = 0; j < surfi->faceidxlen; j++)
-						{
-							u8* ps = surfi->shading + (j * 4);
+				for (int i = 0; i < surfsels.size(); i++) {
+					int si = surfsels[i].si;
+					CScnSolid* solid = scn->getSolid(surfsels[i].solididx);
+
+					for (u32 j = 0; j < solid->local_faces[si].verts.size(); j++)
+					{
+						localizedVertex_t* vert = &solid->local_faces[si].verts[j];
+
+						if (vert->hasShading) {
 							for (int i = 0; i < 4; i++) {
 
 								if (color[i] > 255) color[i] = 255;
-								ps[i] = color[i];
+								vert->color[i] = color[i];
 							}
 						}
 					}
+					
 				}
 
 			}
-			else if (interaction->hasMoveableVert()) {
-				indexedVec3df_t vert = interaction->getMoveableVert();
-				CScnSolid* solid = scn->getSolid(vert.solididx);
-				scnSurf_t* surfi = &solid->surfs[vert.surfidx];
+			else if (interaction->getVertSelected().localidx != -1) {
+				vertBox_t vertsel = interaction->getVertSelected();	
+				CScnSolid* solid = scn->getSolid(vertsel.solididx);
+				
+				localizedVertex_t* vert = &solid->local_faces[vertsel.si].verts[vertsel.localidx];
 
-
-				if (surfi->shading && surfi->hasVertexColors) {
-
-					u8* ps = surfi->shading + (vert.surf_vertidx * 4);
+				if (vert->hasShading) {
 					for (int i = 0; i < 4; i++) {
-						
 						if (color[i] > 255) color[i] = 255;
-						ps[i] = color[i];
+						vert->color[i] = color[i];
 					}
 				}
 			}
@@ -286,14 +284,11 @@ void CViewGui::setupEvents() {
 			u8 flag2 = std::atoi(msg.c_str());
 			CScn* scn = SCNEdit::getSCN();
 
-
-			CScnMeshComponent* comp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
-				
-			for (int i = 0; i < comp->selsurfs.size(); i++) {
-				int si = comp->selsurfs[i];
-				CScnSolid* solid = scn->getSolid(comp->solididx);
+			core::array<surfaceBox_t> surfsels = interaction->getSurfSelected();
+			for (int i = 0; i < surfsels.size(); i++) {
+				int si = surfsels[i].si;
+				CScnSolid* solid = scn->getSolid(surfsels[i].solididx);
 				scnSurf_t* surfi = &solid->surfs[si];
-
 
 				surfi->flag2 = flag2;
 			}
@@ -302,7 +297,7 @@ void CViewGui::setupEvents() {
 		else if (interaction->guiStateLayer().find(GUIState::EditEntity)) {
 			core::array<std::string> msg = str_split(m_textSection2->getText(), ",");
 			CScn* scn = SCNEdit::getSCN();
-			int entindx = interaction->getEntityISelected();
+			int entindx = interaction->getEntityIdx();
 			CScnEnt* ent = scn->getEnt(entindx);
 			core::array<std::string> keys;
 
@@ -349,7 +344,9 @@ void CViewGui::setupEvents() {
 			if (interaction->guiStateLayer().swap(GUIState::Default,
 				GUIState::EditEntity, GUIState::EditFlags, GUIState::EditShading, GUIState::EditSurfShading,
 				GUIState::EditAlpha)) {
+				os::Printer::log("Resetting text and cursor");
 				resetEditText(isVertInf);
+				os::Printer::log("Text and cursor reset");
 			}
 		}
 	});
@@ -405,7 +402,7 @@ void CViewGui::setupEvents() {
 				interaction->setCursorMode(true);
 				interaction->resetKeyState();
 			
-				int entindx = interaction->getEntityISelected();
+				int entindx = interaction->getEntityIdx();
 				CScnEnt* ent = scn->getEnt(entindx);
 				std::string valueDisplay;
 				std::string keyDisplay;
@@ -511,10 +508,10 @@ void CViewGui::setupEvents() {
 		}
 
 		if (interaction->getKeyState(make_pair(KEY_KEY_C, KeyAugment::None))) {
-			solidSelect_t surfdata = interaction->getSurfISelected();
+			surfaceBox_t surfdata = interaction->getLastSurfSelected();
 
 			CScnSolid* solid = scn->getSolid(surfdata.solididx);
-			scnSurf_t surf = solid->surfs[surfdata.surfsel];
+			scnSurf_t surf = solid->surfs[surfdata.si];
 			if (surf.shading && surf.hasVertexColors) {
 				if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags,
 					GUIState::EditAlpha, GUIState::EditShading, GUIState::EditEntity))
@@ -538,10 +535,10 @@ void CViewGui::setupEvents() {
 		//Should only do this is vert is 1.
 		if (interaction->getKeyState(make_pair(KEY_KEY_C, KeyAugment::Ctrl))) {
 			CScn* scn = SCNEdit::getSCN();
-			solidSelect_t surfdata = interaction->getSurfISelected();
+			surfaceBox_t surfdata = interaction->getLastSurfSelected();
 			
-			CScnSolid* solid = scn->getSolid(surfdata.solididx);
-			scnSurf_t surf = solid->surfs[surfdata.surfsel];
+			CScnSolid* solid = scn->getSolid(surfdata.si);
+			scnSurf_t surf = solid->surfs[surfdata.si];
 			if (surf.shading && surf.hasVertexColors) {
 				if (interaction->guiStateLayer().swap(GUIState::Default, GUIState::EditFlags,
 					GUIState::EditAlpha, GUIState::EditSurfShading, GUIState::EditEntity))
@@ -580,6 +577,7 @@ void CViewGui::resetEditText(bool isVertInf) {
 	interaction->guiStateLayer().set(GUIState::Default);
 	CInteractionManager::resetText(m_textSection1,512);
 	CInteractionManager::resetText(m_textSection2, 512);
+	
 	updateSections(isVertInf);
 }
 
@@ -773,7 +771,8 @@ void CViewGui::helpDialog() {
 	m_msgbox.Init("Controls and help", NULL, 
 		"~: Open internal debug (if enabled)\n"
 		"Scroll wheel: increase/decrease camera rotation speed\n"
-		"P/CTRL+P/SHIFT+P (ANY SELECTED): Print to console\n\n"
+		"P/CTRL+P/SHIFT+P (ANY SELECTED): Print to console\n"
+		"G (SOLID SELECTED): Set camera to surface center\n"
 
 		"H (ANY SELECTED): Hides element from editor\n"
 		"SHIFT+H (SOLID SELECTED): Hides shared and selected surfaces\n"
@@ -788,7 +787,6 @@ void CViewGui::helpDialog() {
 		"C (SOLID SELECTED & HAS SHADING): Change shading of surface\n"
 		"CTRL+C (VERT SELECT & HAS SHADING): Change shading of vertex\n\n"
 
-		
 		"F: Change face uv mode\n"
 		"Q: Decrease UV Scalar\n"
 		"E: Increase UV Scalar\n\n"
@@ -804,7 +802,6 @@ void CViewGui::helpDialog() {
 		"RIGHT (SOLID SELECTED): Change UV v-\n\n"
 
 		"Ctrl+E (ENTITY SELECTED): Change non-protected entity fields\n"
-
 		"CTRL *or* SHIFT (SOLID SELECTED): Select vertex to move\n\n"
 
 		"CTRL+R (SOLID or ENTITY SELECTED): Reset position\n"
@@ -835,6 +832,7 @@ void CViewGui::helpDialog() {
 void CViewGui::closeFile() {
 
 	CInteractionManager* interaction = CInteractionManager::getInstance();
+	interaction->resetSelected();
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
 	CGameObject* obj = zone->searchObject(L"body");
@@ -888,8 +886,13 @@ void CViewGui::openTextures() {
 		if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
 			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 
-			if (selected)
-				selected->getComponent<CScnMeshComponent>()->setTexture(SCNEdit::getSCN(), filePathName.c_str());
+			if (selected) {
+				
+				CScnMeshComponent* meshcomp = selected->getComponent<CScnMeshComponent>();
+
+				CScnSolid* solid = SCNEdit::getSCN()->getSolid(meshcomp->getSolidIdx());
+				meshcomp->setTexture(solid, filePathName.c_str());
+			}
 		}
 		ImGuiFileDialog::Instance()->Close();
 		interaction->setCursorMode(false);
@@ -898,6 +901,8 @@ void CViewGui::openTextures() {
 	}
 }
 void CViewGui::quit() {
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	interaction->resetSelected();
 	//Should probably generalize this in SCNEdit as there two instances of this function.
 	SCNEdit::proccessQuit();
 	delete m_arguments;
@@ -942,20 +947,20 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 	
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	CScn* scn = SCNEdit::getSCN();
-	solidSelect_t surfdata = interaction->getSurfISelected();
+	surfaceBox_t surfdata = interaction->getLastSurfSelected();
 
-	if (surfdata.solididx == -1 || surfdata.surfsel == -1) 
+	if (surfdata.solididx == -1 || surfdata.si == -1) 
 		return info;
 
 	CScnSolid* solid = scn->getSolid(surfdata.solididx);
-	scnSurf_t surf = solid->surfs[surfdata.surfsel];
-	scnProjectionBasis_t projBasis = solid->projection[surfdata.surfsel];
+	scnSurf_t surf = solid->surfs[surfdata.si];
+	scnProjectionBasis_t projBasis = solid->projection[surfdata.si];
 	scnPlane_t plane = solid->planes[surf.planeidx];
 
 	if (!inVertInf || interaction->keyAugLayer().get() == KeyAugment::None) {
 		info.section1 = format("surf[{}]: | texture = {} | flags = {} {} | alpha = {} | lighmap size = {}x{} "
 			"| texture size = {}x{} |",
-			surfdata.surfsel, surf.texture, surf.flag1, surf.flag2, surf.alpha, surf.lmsize_h, surf.lmsize_v, 
+			surfdata.si, surf.texture, surf.flag1, surf.flag2, surf.alpha, surf.lmsize_h, surf.lmsize_v, 
 			surf.height, surf.width);
 
 		info.section2 = format("face vert idx = from {} to {} | plane idx = {} | normal = ({:.1f}, {:.1f},"
@@ -963,58 +968,62 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 			surf.faceidxstart, surf.faceidxstart + surf.faceidxlen, surf.planeidx, plane.a, plane.b, 
 			plane.c, plane.d, surf.hasVertexColors);
 	}
-	else if (interaction->getSelectObj() && interaction->hasMoveableVert()) {
-		indexedVec3df_t vert = interaction->getMoveableVert();
-		CScnSolid* solidv = scn->getSolid(vert.solididx);
-		u32 uvidx = solidv->uvidxs[vert.faceidx];
-		core::vector2df uv = solidv->uvpos[uvidx];
-		u32 vertidx = solidv->vertidxs[vert.faceidx];
-		scnSurf_t surfv = solidv->surfs[vert.surfidx];
+	else if (interaction->getSelectObj() && interaction->getVertSelected().localidx !=-1) {
+		vertBox_t vertsel = interaction->getVertSelected();
+		CScnSolid* solidv = scn->getSolid(vertsel.solididx);
+		scnSurf_t surfv = solidv->surfs[vertsel.si];
+		scnProjectionBasis_t projBasisV = solidv->projection[vertsel.si];
 
-		core::vector2d proj = solidv->project_vertex_to_uv(vert.surfidx, vertidx);
+		localizedVertex_t vert = solidv->local_faces[vertsel.si].verts[vertsel.localidx];
+		bool isShared = !solidv->local_faces[vertsel.si].verts[vertsel.localidx].shared.empty();
+		core::vector2d proj = solidv->local_faces[vertsel.si].projectVertToUv(vertsel.localidx, projBasis, surfv.width, surfv.height);
 
-		if (surfv.shading&& surfv.hasVertexColors && vert.bShared && vert.sharesWith.size()>0) {
-			u8* ps = surfv.shading + vert.surf_vertidx * 4;
+		core::array<u32> sharedsurf = solidv->local_faces[vertsel.si].shared;
+
+		if (vert.hasShading && isShared) {
 			info.section1 = format("face vert[{}]: | world vert idx = {} | local vert idx = {} | shading color(rgba) "
 				"= {} {} {} {} | shared surfs = {} | uv idx = {} |",
-				vert.faceidx, vertidx, vert.surf_vertidx, ps[0], ps[1], ps[2], ps[3], str_join(vert.sharesWith), uvidx);
+				vert.faceidx, vert.vertidx, vertsel.localidx, vert.color[0], vert.color[1], vert.color[2], vert.color[3], 
+				str_join(sharedsurf), vert.uvidx);
 		}
-		else if (surfv.shading && surfv.hasVertexColors) {
-			u8* ps = surfv.shading + vert.surf_vertidx * 4;
+		else if (vert.hasShading) {
+			
 			info.section1 = format("face vert[{}]: | world vert idx = {} | local vert idx = {} | shading color(rgba) "
 				"= {} {} {} {} | no shared | uv idx = {} | ",
-				vert.faceidx, vertidx, vert.surf_vertidx, ps[0], ps[1], ps[2], ps[3], uvidx);
+				vert.faceidx, vert.vertidx, vertsel.localidx, vert.color[0], vert.color[1], vert.color[2], vert.color[3], vert.uvidx);
 		}
-		else if (vert.bShared && vert.sharesWith.size() > 0) {
+		else if (isShared) {
 			info.section1 = format("face vert[{}]: | world vert idx = {} | local vert idx = {} | no vertex color | "
 				"shared surfs = {} | uv idx = {} |",
-				vert.faceidx, vertidx, vert.surf_vertidx, str_join(vert.sharesWith), uvidx);
+				vert.faceidx, vert.vertidx, vertsel.localidx, str_join(sharedsurf), vert.uvidx);
 		}
 		else {
 			info.section1 = format("face vert[{}]: | world vert idx = {} | local vert idx = {} | no vertex color | "
 				"no shared | uv idx = {} |",
-				vert.faceidx, vertidx, vert.surf_vertidx, uvidx);
+				vert.faceidx, vert.vertidx, vertsel.localidx, vert.uvidx);
 		}
 
-		bool is_valid = (uv - proj).getLengthSQ() < 0.0001;
+		bool is_valid = (vert.uv - proj).getLengthSQ() < 0.0001;
 
-		if (scn->getLightmap()->hasLightmaps()) {
+		if (solidv->local_faces[vertsel.si].hlmap) {
 
-			core::vector3di atlas = scn->getLightmap()->getAtlasPos(vert.solididx, vert.surfidx);
+			core::vector3di atlas = scn->getLightmap()->getAtlasPos(vertsel.solididx, vertsel.si);
 			core::vector3df delta = vert.pos - projBasis.origin;
 
-			float* mult = scn->getLightmap()->getMults(vert.solididx, vert.surfidx);
+			float* mult = solidv->local_faces[vertsel.si].hlmap->uv_mults;
 			info.section2 = format("uv_pos = {} | lm mult w={:.3f} h={:.3f} x={:.3f} y={:.3f} | solidref_index = {} | proj uv valid = {} |",
-				vec2_to_str(uv, 3), mult[0], mult[1], mult[2], mult[3], surf.solidref_index, is_valid);
+				vec2_to_str(vert.uv, 3), mult[0], mult[1], mult[2], mult[3], surf.solidref_index, is_valid);
 		}
 		else {
-			info.section2 = format("uv_pos = {} | solidref_index = {} | proj uv valid = {} | ", vec2_to_str(uv, 3), surf.solidref_index, is_valid);
+			info.section2 = format("uv_pos = {} | solidref_index = {} | proj uv valid = {} | ", 
+				vec2_to_str(vert.uv, 3), surf.solidref_index, is_valid);
 		}
+	
 	}
 	if (interaction->getKeyState(make_pair(KEY_TAB,KeyAugment::None))) {
 		scnPlane_t* surfPlane = &solid->planes[surf.planeidx];
 	
-		core::vector3df center = interaction->getVertCenter();
+		core::vector3df center = solid->local_faces[surfdata.si].getVertCenter();
 		// Create a normal vector from the plane constants
 		core::vector3df normal(surfPlane->a, surfPlane->b, surfPlane->c);
 
@@ -1024,11 +1033,12 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 
 		s16 nodeindx = solid->tree->findNodePos(pushIn);
 		scnNode_t node = solid->tree->nodes[nodeindx];
-		info.section1 = format("node[{}]: | 'edge' 1 = {} | 'edge' 2= {} | parent= {} | area/portal visiblity flag={:d} | ",nodeindx, node.node1, node.node2, node.nodep, node.area);
+		info.section1 = format("node[{}]: | 'edge' 1 = {} | 'edge' 2= {} | parent= {} | area/portal visiblity flag={:d} | ",
+			nodeindx, node.node1, node.node2, node.nodep, node.area);
 		if (node.cell >= 0) {
 			scnRawCell_t cell = solid->rawcells[node.cell];
-			info.section1 = format("node 1 = {} | node 2= {} | parent= {} | cell=#{}, name=\"{}\" | area/portal visiblity flag={:d} |", node.node1, node.node2, node.nodep,
-				node.cell,cell.name, node.area);
+			info.section1 = format("node 1 = {} | node 2= {} | parent= {} | cell=#{}, name=\"{}\" | area/portal visiblity flag={:d} |", 
+				node.node1, node.node2, node.nodep,node.cell,cell.name, node.area);
 		}
 		
 		info.section2 = format("material = {} | material flags = {} | no special geom | unk = {} |", 
@@ -1036,7 +1046,8 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 		if (node.specialGeomIdx>=0&&node.specialGeomIdx<solid->n_names) {
 			if (!solid->names[node.specialGeomIdx].empty()) {
 				info.section2 = format("material ={} | material flags ={} | special geom = {} | unk = {} |",
-					CScn::getMaterialName(node.material), CScn::getMaterialFlags(node.material), solid->names[node.specialGeomIdx], node.visframe);
+					CScn::getMaterialName(node.material), CScn::getMaterialFlags(node.material), 
+					solid->names[node.specialGeomIdx], node.visframe);
 			}
 		}
 	}
@@ -1059,13 +1070,26 @@ InfoText CViewGui::getSolidInfo(bool inVertInf) {
 	}
 
 
-	if (interaction->getSelectObj() && interaction->hasMoveableVert()) {
-		CScnMeshComponent* comp = interaction->getSelectObj()->getComponent<CScnMeshComponent>();
+	if (interaction->getSelectObj()) {
+		
 		const char* mode = interaction->keyAugLayer().get() == KeyAugment::None ? "Hover" : "Select";
-		indexedVec3df_t vert = interaction->getMoveableVert();
-	
-		info.section3 = format("Surfs: ({}), Shared: ({}) {} V: {}", comp->selsurfs.size(),
-			comp->sharedsurfs.size(), mode, vec3_to_str(vert.pos, 0));
+
+
+		vertBox_t vertsel = (interaction->keyAugLayer().get() == KeyAugment::None) ? 
+			interaction->getVertHover() : interaction->getVertSelected();
+		
+		core::array<surfaceBox_t> surfsels = interaction->getSurfSelected();
+
+
+		if (vertsel.localidx != -1) {
+			core::vector3df pos = solid->local_faces[vertsel.si].verts[vertsel.localidx].pos;
+			info.section3 = format("Surfs: ({}), Shared: ({}) {} V: {}", surfsels.size(),
+				interaction->getSharedSurfs().size(), mode, vec3_to_str(pos, 0));
+		}
+		else {
+			info.section3 = format("Surfs: ({}), Shared: ({}) {}", surfsels.size(),
+				interaction->getSharedSurfs().size(), mode);
+		}
 	
 	}
 
@@ -1076,7 +1100,7 @@ InfoText CViewGui::getPortalInfo() {
 	InfoText info;
 	CScn* scn = SCNEdit::getSCN();
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	portalSelect_t portaldata = interaction->getPortalISelected();
+	portalBox_t portaldata = interaction->getPortalIdx();
 	CScnSolid* solid = scn->getSolid(0);
 	scnRawCell_t cell = solid->rawcells[portaldata.cellidx];
 	scnPortal_t portal = solid->rawcells[portaldata.cellidx].portals[portaldata.portalidx];
@@ -1094,7 +1118,7 @@ InfoText CViewGui::getEntityInfo() {
 	InfoText info;
 	CScn* scn = SCNEdit::getSCN();
 	CInteractionManager* interaction = CInteractionManager::getInstance();
-	int entindx = interaction->getEntityISelected();
+	int entindx = interaction->getEntityIdx();
 	CScnEnt* ent = scn->getEnt(entindx);
 	int split = ent->n_fields / 2;
 

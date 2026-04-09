@@ -14,7 +14,7 @@ CScnPortalData::~CScnPortalData()
 
 void CScnPortalData::initMesh(CScnSolid* solid, u32 cellindx, s32 portalIndx)
 {
-	portaldata = portalSelect_t(cellindx, portalIndx);
+	portaldata = portalBox_t(cellindx, portalIndx);
 	if (MeshBuffer != NULL)
 		MeshBuffer->drop();
 

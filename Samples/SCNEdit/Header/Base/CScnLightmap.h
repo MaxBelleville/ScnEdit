@@ -12,7 +12,7 @@ private:
 	size_t lump_offset =0;
 	size_t hl_offset =0;
 	core::array <core::array<f32*>> omults;
-	
+
 	std::vector<video::IImage*> atlas;
 	video::IImage* current_atlas;
 	core::vector3di curr_atlas_pos = core::vector3di(0,0,0);
@@ -27,7 +27,7 @@ private:
 
 	inline u16_pair getMasterBitmapId(scnLMapHeader_t hlmap)
 	{
-		return make_pair(hlmap.cellidx, hlmap.light_styles);
+		return std::make_pair(hlmap.cellidx, hlmap.light_styles);
 	}
 
 public:
@@ -63,7 +63,7 @@ public:
 	inline size_t getHLOffset() const { return hl_offset; }
 	inline size_t getOffset() const { return offset; }
 	inline bool hasLightmaps() { return loaded; }
-	inline scnLMapHeader_t getHLmap(u32 solidindx, u32 surfindx) { return hlmaps[solidindx][surfindx]; }
-	inline scnSwitchableLMapHeader_t getHSLmap(u32 extralight) { return hslmaps[extralight]; }
+	inline scnLMapHeader_t* getHLmap(u32 solidindx, u32 surfindx) { return &hlmaps[solidindx][surfindx]; }
+	inline scnSwitchableLMapHeader_t* getHSLmap(u32 extralight) { return &hslmaps[extralight]; }
 };
 #endif

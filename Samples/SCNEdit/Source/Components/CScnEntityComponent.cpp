@@ -11,14 +11,11 @@ CScnEntityComponent::~CScnEntityComponent(){}
 void CScnEntityComponent::initComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
-
-	// add culling
 	CCullingData* culling = entity->addData<CCullingData>();
 	culling->Type = CCullingData::BoundingBox;
 }
 
 void CScnEntityComponent::setMesh(CScnEnt* ent) {
-
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->addData<CScnEntityData>(DATA_TYPE_INDEX(CRenderMeshData));
 	entData->initMesh(ent);
@@ -26,7 +23,6 @@ void CScnEntityComponent::setMesh(CScnEnt* ent) {
 }
 
 void CScnEntityComponent::updateMesh(CScnEnt* ent) {
-
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->getData<CScnEntityData>();
 	if (entData) {
@@ -35,43 +31,40 @@ void CScnEntityComponent::updateMesh(CScnEnt* ent) {
 	}
 }
 
-
-
 int CScnEntityComponent::select() {
-
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->getData<CScnEntityData>();
 	if (entData) {
-		selected ? entData->deselect() : entData->select();
-		selected = !selected;
-		if(selected)
+		if (entData->toggleSelect()) 
 			return entData->getEntityIndx();
 	}
 	return -1;
 }
 
 void CScnEntityComponent::deselect() {
-
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->getData<CScnEntityData>();
-	if (entData){
+	if (entData)
 		entData->deselect();
-		selected = false;
-	}
 }
 
+bool CScnEntityComponent::getSelected() {
+	CEntity* entity = m_gameObject->getEntity();
+	CScnEntityData* entData = entity->getData<CScnEntityData>();
+	if (entData)
+		entData->getSelected();
+	return false;
+}
 
 void CScnEntityComponent::updateComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->getData<CScnEntityData>();
-
 	if(entData) 
 		entData->setVisible(true);
 }
 
 std::string CScnEntityComponent::getResetPos() {
-
 	CEntity* entity = m_gameObject->getEntity();
 	CScnEntityData* entData = entity->getData<CScnEntityData>();
 	if (entData) 

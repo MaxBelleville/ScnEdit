@@ -159,9 +159,6 @@ bool SCNEdit::loadScnFile(io::path fname) {
 		deletePathFromFilename(fname);
 	}
 
-
-
-
 	//Creates the backupfile if not found. Important as without this it will crash.
 	std::filesystem::path backupDir = "backups";
 	std::filesystem::create_directory(backupDir);
@@ -217,7 +214,7 @@ bool SCNEdit::saveSCN() {
 		for (u32 s = 0; s < scn->getSolidSize(true); s++) {
 			u32 sum = 0;
 			CScnSolid* solid = scn->getSolid(s);
-
+			solid->rebuildSurfaces();
 			//save textures to file
 			for (u32 i = 0; i < solid->n_surfs; i++) {
 				output->seekp(solid->surfsad[i]);
@@ -247,6 +244,9 @@ bool SCNEdit::saveSCN() {
 			len = (solid->n_verts) * sizeof(core::vector3df);
 			output->write((char*)(solid->verts), len);
 
+			output->seekp(solid->uvidxsad);
+			len = (solid->n_faceidx) * sizeof(u32);
+			output->write((char*)(solid->uvidxs), len);
 
 			//save uvpos
 			output->seekp(solid->uvposad);

@@ -21,12 +21,16 @@ CInteractionManager::~CInteractionManager() {
 	resetLeftClick();
 	resetPrevGui();
 	resetSelected();
-	resetVerts();
 	m_selectedType = SelectedType::Empty;
 	m_guiState = GUIState::Default;
-	m_surfselected = solidSelect_t(-1, -1);
-	m_portalselected = portalSelect_t(-1, -1);
-	m_entityselected = -1;
+	surfsels.clear();
+	shared.clear();
+	m_verthover = vertBox_t(-1, -1, -1);
+	m_vertsel = vertBox_t(-1, -1, -1);
+	m_portalsel = portalBox_t(-1, -1);
+	m_entitysel = -1;
+	highlightMax = core::vector2di(0);
+	hightlightIdx = -1;
 }
 
 void CInteractionManager::registerImgui(const wchar_t* dir)
@@ -97,21 +101,23 @@ bool CInteractionManager::isGuiSettingsUpdated() {
 		gui->scrape_lightmaps != prevgui->scrape_lightmaps;
 }
 
-core::vector3df CInteractionManager::getVertCenter() {
-	core::vector3df center(0, 0, 0);
-	for (int i = 0; i < vertexdata.first.size(); i++) {
-		center += vertexdata.first[i].pos;
+u32 CInteractionManager::changeHighlightSurfIdx() {
+	// first gets surface index of surfsels using highlightIdx and highlightMax.x
+	// then gets shared surface index using highlightIdx and highlightMax.y
+	int si = -1;
+	if (hightlightIdx < highlightMax.X) {
+		si = surfsels[hightlightIdx].si;
 	}
-	for (int i = 0; i < vertexdata.second.size(); i++) {
-		center += vertexdata.second[i].pos;
-	}
-	int totalVerts = vertexdata.first.size() + vertexdata.second.size();
-	if (totalVerts > 0) {
-		center /= static_cast<f32>(totalVerts);
+	else {
+		int sharedIdx = hightlightIdx - highlightMax.X;
+		if (sharedIdx < shared.size())
+			si = shared[sharedIdx];
 	}
 
-	return center;
+	hightlightIdx = (hightlightIdx + 1) % (highlightMax.X + highlightMax.Y);
+	return si;
 }
+
 
 bool CInteractionManager::OnEvent(const SEvent& event)
 {
@@ -317,17 +323,3 @@ void CInteractionManager::setCursorMode(bool state)
 }
 
 
-void CInteractionManager::updateVertPos() {
-	for (int i = 0; i < getVerts().size(); i++) {
-		if (getVerts()[i].faceidx == moveablevert->faceidx) {
-			vertexdata.first[i].pos = moveablevert->pos;
-			return;
-		}
-	}
-	for (int i = 0; i < getSharedVerts().size(); i++) {
-		if (getSharedVerts()[i].faceidx == moveablevert->faceidx) {
-			vertexdata.second[i].pos = moveablevert->pos;
-			return;
-		}
-	}
-}

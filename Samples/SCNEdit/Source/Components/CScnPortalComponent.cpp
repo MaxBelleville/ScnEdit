@@ -11,8 +11,6 @@ CScnPortalComponent::~CScnPortalComponent(){}
 void CScnPortalComponent::initComponent()
 {
 	CEntity* entity = m_gameObject->getEntity();
-
-	// add culling
 	CCullingData* culling = entity->addData<CCullingData>();
 	culling->Type = CCullingData::BoundingBox;
 }
@@ -20,36 +18,37 @@ void CScnPortalComponent::initComponent()
 void CScnPortalComponent::setMesh(CScnSolid* solid, u32 cellindx, s32 portalIndx){
 	CEntity* entity = m_gameObject->getEntity();
 	CScnPortalData* portals = entity->addData<CScnPortalData>(DATA_TYPE_INDEX(CRenderMeshData));
-
 	portals->initMesh(solid,cellindx, portalIndx);
 	portals->setVisible(true);
 
 }
 
-
-portalSelect_t CScnPortalComponent::select() {
-
+portalBox_t CScnPortalComponent::select() {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnPortalData* portalData = entity->getData<CScnPortalData>();
-
 	if (portalData) {
-		selected ? portalData->deselect() : portalData->select();
-		selected = !selected;
-		if (selected) return portalData->portaldata;
+		if (portalData->toggleSelect())
+			return portalData->getPortalData();
 	}
-	return portalSelect_t(0, -1);
+	return portalBox_t(0, -1);
 }
 
 void CScnPortalComponent::deselect() {
-
 	CEntity* entity = m_gameObject->getEntity();
 	CScnPortalData* portalData = entity->getData<CScnPortalData>();
-	if (portalData) {
+	if (portalData) 
 		portalData->deselect();
-		selected = false;
-	}
 }
 
+
+
+bool CScnPortalComponent::getSelected() {
+	CEntity* entity = m_gameObject->getEntity();
+	CScnPortalData* portalData = entity->getData<CScnPortalData>();
+	if (portalData)
+		portalData->getSelected();
+	return false;
+}
 
 void CScnPortalComponent::updateComponent()
 {

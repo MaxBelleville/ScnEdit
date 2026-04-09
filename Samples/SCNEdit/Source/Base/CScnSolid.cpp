@@ -10,7 +10,6 @@ CScnSolid::CScnSolid()
 {
 	offset = 0;
 	length = 0;
-
 	//setting pointers to zero
 	rawcells = 0;
 	uvidxs = 0;
@@ -29,7 +28,6 @@ CScnSolid::CScnSolid()
 CScnSolid::~CScnSolid()
 {
 	textures.clear();
-
 	//pointers must be set to zero initially otherwise errors
 	if (rawcells)
 	{
@@ -75,10 +73,8 @@ CScnSolid::~CScnSolid()
 	//Deletes something about surfaces
 	if (surfsad)
 		delete [] surfsad;
-
 	if (projection)
 		delete[] projection;
-
 	if (surfs)
 	{
 		//Deletes surface shading then surfaces
@@ -134,7 +130,7 @@ int CScnSolid::loadSolid(std::ifstream * file, u32 indx)
 	loadProjection(file);
 	loadCells(file);
 	loadNames(file);
-
+	
 	//Gives utid-unique texture name
 	s32 n_texs = calcUniqueTexturesNames(file);
 	os::Printer::log(format("\t{} unique textures",n_texs).c_str());
@@ -144,7 +140,7 @@ int CScnSolid::loadSolid(std::ifstream * file, u32 indx)
 		error(true,"loadSolid: Number of unique textures and texture array size doesn't match");
 	//Thats good for the enivoroment
 	buildBackTree();
-
+	extractSurfaces();
 
 	return 1;
 }
@@ -192,12 +188,10 @@ int CScnSolid::loadCells(std::ifstream * file)
 		loadCellData(&rawcells[i], &(rawcells[i].bvh), file);
 		os::Printer::log("\t\tdone.");
 	}
-
-
    os::Printer::log("\t\tdone.");
    tree->n_cells = n_cells;
    tree->rawcells = rawcells;
-return n_cells;
+   return n_cells;
 }
 //
 int CScnSolid::loadNames(std::ifstream* file) {
@@ -253,16 +247,12 @@ int CScnSolid::loadPortal(scnPortal_t * portal, std::ifstream * file)
 	//reads portal name
 	read_generic(portal->name,file,32);
 	os::Printer::log(format("\t\tReading portal with {} names...", strlen(portal->name)).c_str());
-	//os::Printer::log("{} ", portal->name);
 	//reads next portal cell
 	portal->nextcell=read_s32(file);
-	//os::Printer::log("{} ",portal->nextcell);
 	//reads the plane in the file in the size of the plane
 	read_generic(&(portal->plane),file,sizeof(scnPlane_t));
 	//read portals unk what ever that means
 	portal->winding=read_f32(file);
-	//os::Printer::log("(%.1f %.1f %.1f %.1f %.1f)",
-	// portal->plane.a, portal->plane.b, portal->plane.c, portal->plane.d, portal->unk);
 	//reads the portals number of vertices
 	portal->n_verts=read_s32(file);
 	//reads the portals bb_verices in the file in double the size of core::vector3df
@@ -325,7 +315,10 @@ int CScnSolid::loadUVIdxs(std::ifstream * file)
 	os::Printer::log(format("\tGetting UV coordinates indices... {}", n_faceidx).c_str());
 	//creates new uv indexes
 	uvidxs = new u32[n_faceidx];   //allocate   n_uvidxs=n_vertidxs
+
+	uvidxsad = file->tellg();
 	//reads uv indexes in file
+
 	read_generic(uvidxs,file,sizeof(u32)* n_faceidx);
 	os::Printer::log("\t\tdone.");
 
@@ -333,29 +326,11 @@ int CScnSolid::loadUVIdxs(std::ifstream * file)
 
 }
 
-void CScnSolid::buildBackTree()
-{
-	uvpos_caller = new core::array<u32>[n_faceidx];
-	//build backtree
-	for (u32 i=0; i< n_faceidx;i++)
-		uvpos_caller[uvidxs[i]].push_back(i);
-
-	vertpos_caller = new core::array<u32>[n_faceidx];
-	for (u32 i = 0; i < n_faceidx; i++)
-		vertpos_caller[vertidxs[i]].push_back(i);
-
-	faceidxs_caller = new core::array<u32>[n_faceidx];
-	for (u32 i = 0; i < n_surfs; i++) {
-		for (u32 j = 0; j < surfs[i].faceidxlen; j++)
-			faceidxs_caller[surfs[i].faceidxstart + j].push_back(i);
-	}
-}
-
-
 int CScnSolid::loadVertIdxs(std::ifstream * file)
 {
 	os::Printer::log(format("\tGetting Vertex indices... {}", n_faceidx).c_str());
 	vertidxs = new u32[n_faceidx];   //allocate
+	vertidxsad = file->tellg();
 	read_generic(vertidxs,file,sizeof(u32)* n_faceidx); //read all, should work
 
 	os::Printer::log("\t\tdone.");
@@ -450,6 +425,25 @@ int CScnSolid::loadSurfs(std::ifstream * file)
 	return i;
 }
 
+void CScnSolid::buildBackTree()
+{
+	os::Printer::log("\tBuilding back tree...");
+	uvpos_caller = new core::array<u32>[n_faceidx];
+	vertpos_caller = new core::array<u32>[n_faceidx];
+
+	for (u32 i = 0; i < n_faceidx; i++) {
+		uvpos_caller[uvidxs[i]].push_back(i);
+		vertpos_caller[vertidxs[i]].push_back(i);
+	}
+
+	faceidxs_caller = new core::array<u32>[n_faceidx];
+	for (u32 i = 0; i < n_surfs; i++) {
+		for (u32 j = 0; j < surfs[i].faceidxlen; j++)
+			faceidxs_caller[surfs[i].faceidxstart + j].push_back(i);
+	}
+	os::Printer::log("\t\tdone.");
+}
+
 scnCellData_t* CScnSolid::getBBFromSurf(u16 surfindx,scnCellData_t * celldata) {
 	scnCellData_t* founddata;
 	for (u32 s = 0; s < celldata->n_surfs; s++) {
@@ -462,4 +456,124 @@ scnCellData_t* CScnSolid::getBBFromSurf(u16 surfindx,scnCellData_t * celldata) {
 			return founddata;
 	}
 	return nullptr;
+}
+
+void CScnSolid::extractSurfaces() {
+	os::Printer::log("\tExtracting surfaces into internal...");
+	for (u32 i = 0; i < n_surfs; i++) {
+		CScnLocalizedFace face;
+		face.si = i;
+		// don't call set_used here; reserve capacity instead
+		face.verts.set_used(0);
+		face.verts.reallocate(surfs[i].faceidxlen); // if reallocate is available, otherwise rely on push_back
+
+		for (u32 j = 0; j < surfs[i].faceidxlen; j++) {
+			u32 faceidx = surfs[i].faceidxstart + j;
+
+			// bounds checks
+			
+			u32 vindex = vertidxs[faceidx];
+			u32 uindex = uvidxs[faceidx];
+
+			localizedVertex_t vert;
+			vert.localidx = j;
+			vert.pos = verts[vindex];
+			vert.uv = uvpos[uindex];
+			vert.vertidx = vindex;
+			vert.uvidx = uindex;
+			vert.faceidx = faceidx;
+			vert.parent_si = i;
+			vert.hasShading = false;
+
+			if (surfs[i].hasVertexColors && surfs[i].shading) {
+				size_t shadingSize = 4 * (size_t)surfs[i].faceidxlen;
+				size_t off = (size_t)j * 4;
+				if (off + 4 <= shadingSize) {
+					vert.hasShading = true;
+					memcpy(vert.color, &surfs[i].shading[off], 4);
+				}
+				else {
+					os::Printer::log("color failed");
+				}
+			}
+
+			face.verts.push_back(vert);
+		}
+		local_faces.push_back(face);
+	}
+
+	for (u32 i = 0; i < local_faces.size(); i++) {
+		for (u32 j = 0; j < local_faces[i].verts.size(); j++) {
+			// Get a pointer to the current localized vertex
+			localizedVertex_t* vA = &local_faces[i].verts[j];
+
+			// 1. Get all global face indices sharing this UV/Pos point
+			core::array<u32>* peer_face_indices = &uvpos_caller[vA->uvidx];
+
+			for (u32 k = 0; k < peer_face_indices->size(); k++) {
+				u32 peer_fidx = (*peer_face_indices)[k]; // Use 'k', not 'i'!
+
+				// Skip if this is the same global index we are currently processing
+				if (peer_fidx == vA->faceidx) continue;
+
+				// 2. Find which surface(s) own this peer face index
+				core::array<u32>* peer_surfs = &faceidxs_caller[peer_fidx];
+
+				for (u32 s = 0; s < peer_surfs->size(); s++) {
+					u32 other_si = (*peer_surfs)[s]; // Use 's', not 'j'!
+
+					if (other_si != local_faces[i].si) {
+						// 3. Search the other surface for the peer_fidx
+						// (NOT vA->faceidx, which only exists on the current surface)
+						int other_local_idx = local_faces[other_si].findVertFromGlobal(peer_fidx);
+
+						if (other_local_idx != -1) {
+							// Link the pointers
+							localizedVertex_t* vB = &local_faces[other_si].verts[other_local_idx];
+							vA->shared.push_back(vB);
+						}
+
+						// Track neighbor surface ID at the face level
+						if (local_faces[i].shared.linear_search(other_si) == -1)
+							local_faces[i].shared.push_back(other_si);
+					}
+				}
+			}
+		}
+	}
+	os::Printer::log("\t\tdone.");
+
+}
+
+void CScnSolid::rebuildSurfaces() {
+	for (u32 i = 0; i < local_faces.size(); i++) {
+		for (u32 j = 0; j < local_faces[i].verts.size(); j++) {
+			localizedVertex_t* vA = &local_faces[i].verts[j];
+
+			verts[vA->vertidx] = vA->pos;
+			if (local_faces[i].flipX || local_faces[i].flipY) {
+
+
+				//assume flip means that vert 1(Top Left) uvidx and vert 2(To Right) uvidx are swapped
+				//only do for shared verts
+				bool wasSwapped = false;
+				for (u32 k = 0; k < local_faces[i].verts.size(); k++) {
+					localizedVertex_t* vB = &local_faces[i].verts[k];
+
+					if (vA->uv.getDistanceFromSQ(uvpos[vB->uvidx]) < 0.0001) {
+						//swap uvidx
+						uvidxs[vA->faceidx] = vB->uvidx;
+						uvidxs[vB->faceidx] = vA->uvidx;
+						wasSwapped = true;
+						break;
+					}
+				}
+			}
+			if (vA->shared.empty()) {
+				uvpos[vA->uvidx] = vA->uv;
+			}
+		}
+		if (local_faces[i].flipX) local_faces[i].flipX = false;
+		if (local_faces[i].flipY) local_faces[i].flipY = false;
+	}
 }

@@ -3,8 +3,6 @@
 
 class CScnPortalComponent : public CComponentSystem
 {
-private:
-	bool selected = false;
 public:
 	CScnPortalComponent();
 
@@ -16,7 +14,10 @@ public:
 
 	virtual void updateComponent();
 
-	portalSelect_t select();
+	portalBox_t select();
 
 	void deselect();
+
+	bool getSelected();
+
 };

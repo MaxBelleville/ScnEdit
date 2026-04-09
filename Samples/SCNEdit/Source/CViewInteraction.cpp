@@ -58,7 +58,7 @@ void CViewInteraction::onInit()
 		//If no scn or no selected item then ignore key input for interactions.
 		CScn* scn = SCNEdit::getSCN();
 		if (!scn) return;
-	
+
 		//Only really care when key is down
 		if (!interaction->getKeyState(make_pair(pair.first, pair.second)))
 			return;
@@ -71,7 +71,7 @@ void CViewInteraction::onInit()
 		CCollisionManager* collisionMgr = context->getCollisionManager();
 		CGameObject* selected = interaction->getSelectObj();
 		core::vector3df pos = core::vector3df(0);
-	
+
 		// If ctrl + h pressed then unhide all items. (Goes through each item and sets visible and adds collision
 		if (interaction->getKeyState(make_pair(KEY_KEY_H, KeyAugment::Ctrl))) {
 			for (int i = 0; i < m_hideEntity.size(); i++) {
@@ -98,7 +98,7 @@ void CViewInteraction::onInit()
 
 
 		// If h or shift h pressed then hide the currently selected item(remove collision as well)
-		if (interaction->findKeyState({ make_pair(KEY_KEY_H, KeyAugment::None),make_pair(KEY_KEY_H, KeyAugment::Shift)})) {
+		if (interaction->findKeyState({ make_pair(KEY_KEY_H, KeyAugment::None),make_pair(KEY_KEY_H, KeyAugment::Shift) })) {
 			//Hide entity and portal
 			if (interaction->selTypeLayer().find(SelectedType::Entity, SelectedType::Portal)) {
 				selected->setVisible(false);
@@ -106,32 +106,14 @@ void CViewInteraction::onInit()
 				collisionMgr->removeCollision(selected);
 				collisionMgr->build(false);
 			}
-			//Hide solid and extras
-			if (interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra)) {
-				
-				selected->getComponent<CScnMeshComponent>()->hide(pair.second == KeyAugment::Shift);
-				m_hideSolids.push_back(selected);
-				
-			
-				//The only way to update the solid surf is currnetly to remove the collision, then readd it (with hidden section)
-				collisionMgr->removeCollision(selected);
-				collisionMgr->addComponentCollision(selected);
-				collisionMgr->build(false);
-				
-				//Reset solid data/vertices and update gui callback.
-				interaction->UICallback();
-				interaction->resetLeftClick();
-				deselectAll(NULL);
-				resetSolid();
 
-			}
 			//add portal and entity to hideEntity list.
 			if (interaction->selTypeLayer().get() == SelectedType::Entity)
 				m_hideEntity.push_back(selected);
 			else if (interaction->selTypeLayer().get() == SelectedType::Portal)
 				m_hidePortal.push_back(selected);
 		}
-	
+
 		//Update pos based on arrow keys and agument.
 
 		if (pair.first == KEY_DOWN || pair.first == KEY_UP) {
@@ -156,41 +138,81 @@ void CViewInteraction::onInit()
 		if (!interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra))
 			return;
 
-		
+
 		CScnMeshComponent* meshcomp = selected->getComponent<CScnMeshComponent>();
+		CScnSolid* solid = scn->getSolid(meshcomp->getSolidIdx());
 		UVMode uvmode = interaction->getUVMode();
 		float uvscale = interaction->getUVScalar();
-		
+
+
+		if (interaction->getKeyState(make_pair(KEY_KEY_G, KeyAugment::AnyKey))) {
+			int si = interaction->changeHighlightSurfIdx();
+	
+			// 1. Get the target point (center of the surface)
+			core::vector3df target = solid->local_faces[si].getVertCenter();
+			scnPlane_t* plane = &solid->planes[solid->surfs[si].planeidx];
+			core::vector3df normal(plane->a, plane->b, plane->c);
+			normal.normalize(); 
+
+			float distance = 50.0f;
+			core::vector3df newPos = target + (normal * distance);
+
+			camera->lookAt(newPos, target, core::vector3df(0, 1, 0));
+			
+		}
+
+		if (interaction->findKeyState({ make_pair(KEY_KEY_H, KeyAugment::None),make_pair(KEY_KEY_H, KeyAugment::Shift) })) {
+
+			//Hide solid and extras
+			if (interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra)) {
+
+				meshcomp->hide(solid,pair.second == KeyAugment::Shift);
+				m_hideSolids.push_back(selected);
+
+
+				//The only way to update the solid surf is currnetly to remove the collision, then readd it (with hidden section)
+				collisionMgr->removeCollision(selected);
+				collisionMgr->addComponentCollision(selected);
+				collisionMgr->build(false);
+
+				//Reset solid data/vertices and update gui callback.
+				interaction->UICallback();
+				interaction->resetLeftClick();
+				deselectAll(NULL);
+				resetSolid();
+
+			}
+
+		}
+
 		//Move or reset uv.
 		if(pair.first >= KEY_LEFT && pair.first <= KEY_DOWN && pair.second == KeyAugment::None)
-			meshcomp->updateUV(scn, uvmode, core::vector2df(pos.Z, pos.X) * uvscale);
+			meshcomp->updateUV(solid, uvmode, core::vector2df(pos.Z, pos.X) * uvscale);
 
 		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::None)))
-			meshcomp->resetUV(scn);
+			meshcomp->resetUV(solid);
 
 		//Move solid vertex and then update bounding box
 		if (pair.first >= KEY_LEFT && pair.first <= KEY_DOWN && interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift)) {
-			if (interaction->hasMoveableVert()) {
-				meshcomp->updateVert(scn, interaction->getMoveableVert(), pos);
+			if (interaction->getVertSelected().localidx != -1) {
+				meshcomp->updateVert(solid, interaction->getVertSelected(), pos);
 				moveVertNBounds(false);
-
 			}
 		}
 		//Reset vert (only works for current game when you save you cant reset)
 		//Might change in future to have a history using imgui.ini or something idk.
 		if (interaction->getKeyState(make_pair(KEY_KEY_R, KeyAugment::Ctrl))) {
-			if (interaction->hasMoveableVert()) {
-				meshcomp->resetVert(scn, interaction->getMoveableVert());
+			if (interaction->getVertSelected().localidx != -1) {
+				meshcomp->resetVert(solid, interaction->getVertSelected());
 				moveVertNBounds(true);
-
 			}
 		}
 
 		if (interaction->getKeyState(make_pair(KEY_KEY_X, KeyAugment::None))) 
-			meshcomp->updateUV(scn,UVMode::FlipH,core::vector2df(0,0));
+			meshcomp->updateUV(solid,UVMode::FlipH,core::vector2df(0,0));
 		
 		if (interaction->getKeyState(make_pair(KEY_KEY_V, KeyAugment::None))) 
-			meshcomp->updateUV(scn, UVMode::FlipV, core::vector2df(0, 0));
+			meshcomp->updateUV(solid, UVMode::FlipV, core::vector2df(0, 0));
 
 	});
 	if (scn) CViewInteraction::updateVisbility();
@@ -284,28 +306,33 @@ void CViewInteraction::onUpdate()
 				//When click and solid is highlighted get the mesh component and select it. 
 				if ((str_equals(highlighted->getNameA(), "solid") || str_equals(highlighted->getNameA(), "solid_extra"))){
 					CScnMeshComponent* meshcomp = highlighted->getComponent<CScnMeshComponent>();
-					solidSelect_t surfdata = meshcomp->select(scn, triangle,
-						interaction->getLeftClickAug() == KeyAugment::Shift);
+			
+					CScnSolid* solid = scn->getSolid(meshcomp->getSolidIdx());
+		
+					bool bAdd = interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift);
+					core::array<surfaceBox_t> surfsels = meshcomp->select(solid, triangle, bAdd);
 			
 					//Set the surf indexed selected.
-					interaction->setSurfISelected(surfdata);
-					if (surfdata.surfsel != -1) {
+					collectSurfs(surfsels);
+					if (!surfsels.empty()) {
 						if (str_equals(highlighted->getNameA(), "solid"))
 							interaction->selTypeLayer().set(SelectedType::Solid);
 						else 
 							interaction->selTypeLayer().set(SelectedType::SolidExtra);
-						
+						os::Printer::log(format("Selected surface count {}", surfsels.size()).c_str());
 						//Set vert and draw cubes based on vert data.
-						interaction->setVertData(meshcomp->getVertices(scn));
-						updateSurfaceVertCube();
+						updateSurfVertCubes();
+					
 					}
-					else 
+					else {
 						interaction->selTypeLayer().set(SelectedType::Empty);
+						interaction->UICallback();
+					}
 				}
 
 				else if (str_equals(highlighted->getNameA(), "entity")) {
 					int entindx = highlighted->getComponent<CScnEntityComponent>()->select();
-					interaction->setEntityISelected(entindx);
+					interaction->setEntityIdx(entindx);
 					if (entindx != -1)
 						interaction->selTypeLayer().set(SelectedType::Entity);
 					else 
@@ -313,8 +340,8 @@ void CViewInteraction::onUpdate()
 
 				}
 				else if (str_equals(highlighted->getNameA(), "portal")) {
-					portalSelect_t portaldata = highlighted->getComponent<CScnPortalComponent>()->select();
-					interaction->setPortalISelected(portaldata);
+					portalBox_t portaldata = highlighted->getComponent<CScnPortalComponent>()->select();
+					interaction->setPortalIdx(portaldata);
 					if (portaldata.portalidx != -1)
 						interaction->selTypeLayer().set(SelectedType::Portal);
 					else 
@@ -322,19 +349,17 @@ void CViewInteraction::onUpdate()
 				}
 
 				interaction->setSelectObj(highlighted);
-				interaction->UICallback();
 				interaction->resetLeftClick();
+
+				
 			}
 
 			
 			//Update the nearest or selected vert depending on moveable vert
-			if (interaction->selTypeLayer().find(SelectedType::Solid,SelectedType::SolidExtra)) {
-				
-				if (interaction->keyAugLayer().get() == KeyAugment::None)
-					updateNearestVert(intersection);
-				else if (interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift))
-					updateSelectedVert(intersection);
+			if (interaction->selTypeLayer().find(SelectedType::Solid, SelectedType::SolidExtra)) {
+				updateSelectedVertCube(intersection, interaction->keyAugLayer().find(KeyAugment::Ctrl, KeyAugment::Shift));
 			}
+			
 
 		}
 
@@ -381,47 +406,13 @@ void CViewInteraction::onRender()
 	}
 
 }
-void CViewInteraction::moveVertNBounds(bool reset) {
-	CContext* context = CContext::getInstance();
-
-	CInteractionManager* interaction = CInteractionManager::getInstance();
-
-	CGameObject* selected = interaction->getSelectObj();
-	CCollisionManager* collisionMgr = context->getCollisionManager();
-	indexedVec3df_t moveable = interaction->getMoveableVert();
-	CZone* zone = context->getActiveZone();
-
-	CScn* scn = SCNEdit::getSCN();
-
-	interaction->updateVertPos();
-	interaction->UICallback();
-	collisionMgr->removeCollision(selected);
-	collisionMgr->addComponentCollision(selected);
-	collisionMgr->build(false);
-
-	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
-	selvert->removeAllEntities();
-	selvert->addPrimitive(moveable.pos, core::vector3df(0), core::vector3df(2.6));
-
-
-	if (moveable.solididx == 0) {
-		CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
-		if (group_bb) {
-			for (int i = 0; i < group_bb->getChilds()->size(); i++) {
-				CScnCellBBComponent* cellbb = group_bb->getChilds()->at(i)->getComponent<CScnCellBBComponent>();
-				cellbb->updateBB(scn, moveable, reset);
-			}
-		}
-	}
-
-}
 
 void CViewInteraction::updateEntityPos(core::vector3df addpos) {
 	//Get entity variables and singletons
 	CContext* context = CContext::getInstance();
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	CGameObject* selected = interaction->getSelectObj();
-	int entitySelected = interaction->getEntityISelected();
+	int entitySelected = interaction->getEntityIdx();
 	CScnEntityComponent* entcomp = selected->getComponent<CScnEntityComponent>();
 	CCollisionManager* collisionMgr = context->getCollisionManager();
 	CScnEnt* ent = SCNEdit::getSCN()->getEnt(entitySelected);
@@ -448,14 +439,14 @@ void CViewInteraction::deselectAll(CGameObject* current) {
 
 	//Deselect solid
 	CGameObject* solidObj = zone->searchObject(L"solid");
-    if(solidObj !=current)solidObj->getComponent<CScnMeshComponent>()->deselect();
+    if(solidObj !=current)solidObj->getComponent<CScnMeshComponent>()->deselectAll();
 
 	//Deselect solid extra
 	CContainerObject* group_extra = (CContainerObject*)zone->searchObject(L"group_extra");
 	if (group_extra) {
 		for (int i = 0; i < group_extra->getChilds()->size(); i++) {
 			if (group_extra->getChilds()->at(i) != current)
-				group_extra->getChilds()->at(i)->getComponent<CScnMeshComponent>()->deselect();
+				group_extra->getChilds()->at(i)->getComponent<CScnMeshComponent>()->deselectAll();
 		}
 	}
 
@@ -592,9 +583,8 @@ void CViewInteraction::resetSolid() {
 	surf->removeAllEntities();
 	shared->removeAllEntities();
 	interaction->resetSelected();
-	interaction->resetVerts();
 }
-void CViewInteraction::updateSurfaceVertCube() {
+void CViewInteraction::updateSurfVertCubes() {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
@@ -602,92 +592,148 @@ void CViewInteraction::updateSurfaceVertCube() {
 	CCube* surf = zone->searchObject(L"surf_verts")->getComponent<CCube>();
 	surf->removeAllEntities();
 	shared->removeAllEntities();
-	for (int i = 0; i < interaction->getVerts().size(); i++)
-		surf->addPrimitive(interaction->getVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
+	CScn* scn = SCNEdit::getSCN();
 
-	for (int i = 0; i < interaction->getSharedVerts().size(); i++)
-		shared->addPrimitive(interaction->getSharedVerts()[i].pos, core::vector3df(0), core::vector3df(2.4));
+	core::array<surfaceBox_t> surfsels = interaction->getSurfSelected();
+
+	for (int i = 0; i < surfsels.size(); i++) {
+		int si = surfsels[i].si;
+		int solididx = surfsels[i].solididx;
+
+		CScnSolid* solid = scn->getSolid(solididx);
+		for (int j = 0; j < solid->local_faces[si].verts.size(); j++) {
+
+			core::vector3df pos = solid->local_faces[si].verts[j].pos;
+			
+			if(!solid->local_faces[si].verts[j].shared.empty())
+				shared->addPrimitive(pos, core::vector3df(0), core::vector3df(2.4));
+			else 
+				surf->addPrimitive(pos, core::vector3df(0), core::vector3df(2.4));
+		}
+	
+	}
 
 }
 
-void CViewInteraction::updateNearestVert(core::vector3df pos) {
+void CViewInteraction::updateSelectedVertCube(core::vector3df pos, bool isSelected) {
 	CInteractionManager* interaction = CInteractionManager::getInstance();
 	CContext* context = CContext::getInstance();
 	CZone* zone = context->getActiveZone();
 	CScn* scn = SCNEdit::getSCN();
-	CCube* hoververt = zone->searchObject(L"hover_vert")->getComponent< CCube>();
-	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
-	//Make sure that surf and shared vert exists.
-	if (interaction->getSharedVerts().size() > 0 || interaction->getVerts().size() > 0) {
-		indexedVec3df_t closest;
-		float minDistSq = FLT_MAX;
+	CCube* hoververtCube = zone->searchObject(L"hover_vert")->getComponent< CCube>();
+	CCube* selvertCube = zone->searchObject(L"sel_vert")->getComponent< CCube>();
+
+	if (!isSelected) {
+		selvertCube->removeAllEntities();
+
+		core::array<surfaceBox_t> surfsels = interaction->getSurfSelected();
+
+		if (interaction->getVertSelected().localidx != -1) {
+			updateSurfVertCubes();
+		}
+
+		interaction->setVertSelected(vertBox_t(-1, -1, -1));
+		std::pair<int, float> nearest = std::make_pair(-1, FLT_MAX);
+		vertBox_t nearestVert = vertBox_t(-1, -1, -1);
+		core::vector3df nearestPos = core::vector3df(0);
+		for (int i = 0; i < surfsels.size(); i++) {
+			int si = surfsels[i].si;
+			int solididx = surfsels[i].solididx;
+
+			CScnSolid* solid = scn->getSolid(solididx);
+			std::pair<int,float> current = solid->local_faces[si].getNearestVert(pos);
+
+			if (current.second < nearest.second) {
+				nearest = current;
+				nearestVert = vertBox_t(solididx, si, nearest.first);
+				nearestPos = solid->local_faces[si].verts[nearest.first].pos;
+			}
+		}
+		int locali = nearest.first;
+		if (interaction->getVertHover().localidx != nearestVert.localidx) {
+			hoververtCube->removeAllEntities();
+			interaction->setVertHover(nearestVert);
+
+			hoververtCube->addPrimitive(nearestPos, core::vector3df(0), core::vector3df(2.6));
+			interaction->UICallback();
+		}
 		
-		//Gets the nearest Vert for shared surf and surf vert.
-		getNearestDistVert(pos, interaction->getVerts(), closest, minDistSq);
-		getNearestDistVert(pos, interaction->getSharedVerts(), closest, minDistSq);
-
-
-		//Resused code..
-		if (!interaction->hasMoveableVert()) {
-			hoververt->removeAllEntities();
-			hoververt->addPrimitive(closest.pos, core::vector3df(0), core::vector3df(2.6));
-
-			interaction->setMoveableVert(closest);
-			interaction->UICallback();
-		}
-		//If closest has changed update the moveable vert and proccess the vertex callback.
-		else if (closest.faceidx != interaction->getMoveableVert().faceidx) {
-			hoververt->removeAllEntities();
-			hoververt->addPrimitive(closest.pos, core::vector3df(0), core::vector3df(2.6));
-
-			interaction->setMoveableVert(closest);
-			interaction->UICallback();
-		}
-
-
-		if (selvert->getEntityCount() > 0) {
-			updateSurfaceVertCube();
-			interaction->UICallback();
-			selvert->removeAllEntities();
-			hoververt->removeAllEntities();
-			hoververt->addPrimitive(closest.pos, core::vector3df(0), core::vector3df(2.6));
-		}
-		
-	}
-}
-///Loop through each vert get the squared distance and compare/update current min.
-void CViewInteraction::getNearestDistVert(core::vector3df pos, core::array<indexedVec3df_t> verts,indexedVec3df_t& closest, float& minDistSq) {
-	for (int i = 0; i < verts.size(); i++) {
-		core::vector3df point = verts[i].pos;
-		float distanceSq = pos.getDistanceFromSQ(point); // Squared distance
-
-		if (distanceSq < minDistSq) {
-			minDistSq = distanceSq;
-			closest = verts[i];
-		}
-	}
-}
-
-void CViewInteraction::updateSelectedVert(core::vector3df pos) {
-	CInteractionManager* interaction = CInteractionManager::getInstance();
-	CContext* context = CContext::getInstance();
-	CZone* zone = context->getActiveZone();
-	CCube* hoververt = zone->searchObject(L"hover_vert")->getComponent< CCube>();
-	CCube* selvert = zone->searchObject(L"sel_vert")->getComponent< CCube>();
-	if (interaction->hasMoveableVert()) {
-		indexedVec3df_t moveable = interaction->getMoveableVert();
-
-		if (hoververt->getEntityCount() > 0) {
-			updateSurfaceVertCube();
-			interaction->UICallback();
-			hoververt->removeAllEntities();
-			selvert->removeAllEntities();
-			selvert->addPrimitive(moveable.pos, core::vector3df(0), core::vector3df(2.6));
-		}
-
 	}
 	else {
-		updateNearestVert(pos);
+		hoververtCube->removeAllEntities();
+		if (interaction->getVertSelected().localidx == -1 && interaction->getVertHover().localidx != -1) {
+			vertBox_t vert = interaction->getVertHover();
+			interaction->setVertSelected(vert);
+			interaction->setVertHover(vertBox_t(-1, -1, -1));
+
+			CScnSolid* solid = scn->getSolid(vert.solididx);
+
+			core::vector3df pos = solid->local_faces[vert.si].verts[vert.localidx].pos;
+			selvertCube->addPrimitive(pos, core::vector3df(0), core::vector3df(2.6));
+			interaction->UICallback();
+
+		}
 	}
+}
+
+void CViewInteraction::moveVertNBounds(bool reset) {
+	CContext* context = CContext::getInstance();
+
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+
+	CGameObject* selected = interaction->getSelectObj();
+	CCollisionManager* collisionMgr = context->getCollisionManager();
+	CZone* zone = context->getActiveZone();
+
+	CScn* scn = SCNEdit::getSCN();
+
+	interaction->UICallback();
+	collisionMgr->removeCollision(selected);
+	collisionMgr->addComponentCollision(selected);
+	collisionMgr->build(false);
+
+	CCube* selvertCube = zone->searchObject(L"sel_vert")->getComponent< CCube>();
 	
+	vertBox_t vert = interaction->getVertSelected();
+	if (vert.localidx == -1) return; //Check should be done before calling this function but just in case.
+	CScnSolid* solid = scn->getSolid(vert.solididx);
+
+	core::vector3df pos = solid->local_faces[vert.si].verts[vert.localidx].pos;
+	selvertCube->removeAllEntities();
+	selvertCube->addPrimitive(pos, core::vector3df(0), core::vector3df(2.6));
+
+
+	if (vert.solididx == 0) {
+		CContainerObject* group_bb = (CContainerObject*)zone->searchObject(L"group_bb");
+		if (group_bb) {
+			for (int i = 0; i < group_bb->getChilds()->size(); i++) {
+				CScnCellBBComponent* cellbb = group_bb->getChilds()->at(i)->getComponent<CScnCellBBComponent>();
+				cellbb->updateBB(solid, vert, reset);
+			}
+		}
+	}
+
+}
+
+void CViewInteraction::collectSurfs(core::array<surfaceBox_t> surfsels) {
+	CInteractionManager* interaction = CInteractionManager::getInstance();
+	CScn* scn = SCNEdit::getSCN();
+	core::array<u32> shared;
+
+	for (int i = 0; i < surfsels.size(); i++) {
+		int si = surfsels[i].si;
+		CScnSolid* solid = scn->getSolid(surfsels[i].solididx);
+		for (int j = 0; j < solid->local_faces[si].shared.size(); j++) {
+			shared.push_back(solid->local_faces[si].shared[j]);
+		}
+	}
+
+	for (int i = 0; i < surfsels.size(); i++) {
+		if (shared.linear_search(surfsels[i].si) != -1) {
+			shared.erase(surfsels[i].si);
+		}
+	}
+	interaction->setSurfSelected(surfsels);
+	interaction->setSharedSurfs(shared);
+	interaction->setHighlighterMax(core::vector2di(surfsels.size(),shared.size()));
 }

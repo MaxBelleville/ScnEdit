@@ -59,20 +59,21 @@ int CScnCellBBData::getIndexFromCellBB(CScnSolid* solid, scnCellData_t* celldata
 	return -1;
 }
 
-void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
-	CScnSolid* solid= scn->getSolid(vert.solididx);
-	scnCellData_t* celldata = solid->getBBFromSurf(vert.surfidx, cellindx);
+void CScnCellBBData::updateBB(CScnSolid* solid, vertBox_t vertsel, bool reset) {
+	scnCellData_t* celldata = solid->getBBFromSurf(vertsel.si, cellindx);
 
 	//This math may be wrong lol
 	if (celldata) {
 		core::vector3df min = celldata->bb_verts[0];
 		core::vector3df max = celldata->bb_verts[1];
 		int indx = getIndexFromCellBB(solid, celldata);
-		if (vert.pos.X >= min.X && vert.pos.X <= max.X &&
-			vert.pos.Y >= min.Y && vert.pos.Y <= max.Y &&
-			vert.pos.Z >= min.Z && vert.pos.Z <= max.Z) {
-			scnSurf_t* surfi = &solid->surfs[vert.surfidx];
 
+		core::vector3df vert = solid->local_faces[vertsel.si].verts[vertsel.localidx].pos;
+
+		if (vert.X >= min.X && vert.X <= max.X &&
+			vert.Y >= min.Y && vert.Y <= max.Y &&
+			vert.Z >= min.Z && vert.Z <= max.Z) {
+	
 			core::vector3df minVert = core::vector3df(FLT_MAX, FLT_MAX, FLT_MAX);
 			core::vector3df maxVert = -core::vector3df(FLT_MAX, FLT_MAX, FLT_MAX);
 			
@@ -83,9 +84,8 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 			bool allInside = true;
 			bool allInBackup = true;
 
-			for (int f = 0; f < surfi->faceidxlen; f++) {
-				u32 vertidx = solid->vertidxs[surfi->faceidxstart + f];
-				const core::vector3df& compareVert = solid->verts[vertidx];
+			for (int f = 0; f < solid->local_faces[vertsel.si].verts.size(); f++) {
+				const core::vector3df& compareVert = solid->local_faces[vertsel.si].verts[f].pos;
 
 				minVert = min(minVert, compareVert);
 				maxVert = max(maxVert, compareVert);
@@ -143,39 +143,38 @@ void CScnCellBBData::updateBB(CScn* scn, indexedVec3df_t vert , bool reset) {
 		}
 		else {
 			//In the cases of vert being beyond bounding box.
-			if (vert.pos.X < min.X) 
-				min.X = vert.pos.X;
-			if (vert.pos.Y < min.Y) 
-				min.Y = vert.pos.Y;
-			if (vert.pos.Z < min.Z) 
-				min.Z = vert.pos.Z;
+			if (vert.X < min.X) 
+				min.X = vert.X;
+			if (vert.Y < min.Y) 
+				min.Y = vert.Y;
+			if (vert.Z < min.Z) 
+				min.Z = vert.Z;
 
-			if (vert.pos.X > max.X) 
-				max.X = vert.pos.X;
-			if (vert.pos.Y > max.Y) 
-				max.Y = vert.pos.Y;
-			if (vert.pos.Z > max.Z) 
-				max.Z = vert.pos.Z;
+			if (vert.X > max.X) 
+				max.X = vert.X;
+			if (vert.Y > max.Y) 
+				max.Y = vert.Y;
+			if (vert.Z > max.Z) 
+				max.Z = vert.Z;
 		}
 
 		celldata->bb_verts[0] = min;
 		celldata->bb_verts[1] = max;
 
-		if(indx != -1)updateMeshBB(scn, celldata, indx);
+		if (indx != -1) {
+			core::vector3df start = celldata->bb_verts[0]; // Removes z-indexing
+			core::vector3df end = celldata->bb_verts[1]; // at cost of accuracy
+			video::SColor clr(255, 0, 0, 0);
+
+			IMeshBuffer* MeshBuffer = generate_cube_mesh_buff(start, end, clr);
+
+			MeshBuffer->getMaterial().Wireframe = true;
+			RenderMesh->replaceMeshBuffer(indx, MeshBuffer);
+			MeshBuffer->drop();
+
+			// Update bounding box of full mesh
+			RenderMesh->recalculateBoundingBox();
+		}
 	}
 
-}
-void CScnCellBBData::updateMeshBB(CScn* scn, scnCellData_t* celldata, int leafindx) {
-	core::vector3df start = celldata->bb_verts[0]; // Removes z-indexing
-	core::vector3df end = celldata->bb_verts[1]; // at cost of accuracy
-	video::SColor clr(255, 0, 0, 0);
-
-	IMeshBuffer* MeshBuffer = generate_cube_mesh_buff(start, end, clr);
-
-	MeshBuffer->getMaterial().Wireframe = true;
-	RenderMesh->replaceMeshBuffer(leafindx, MeshBuffer);
-	MeshBuffer->drop();
-
-	// Update bounding box of full mesh
-	RenderMesh->recalculateBoundingBox();
 }

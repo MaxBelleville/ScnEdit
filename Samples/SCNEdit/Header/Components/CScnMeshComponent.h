@@ -5,30 +5,29 @@
 class CScnMeshComponent : public CComponentSystem
 {
 public:
-	core::array<int> selsurfs;
-	core::array<int> sharedsurfs;
-	int solididx;
-public:
 	CScnMeshComponent();
 
 	virtual ~CScnMeshComponent();
 
 	virtual void initComponent();
 
-	void setMesh(CScn*, CScnSolid*, CScnArguments*);
+	void setMesh(CScnSolid* solid, CScnLightmap* lmap, CScnArguments*);
 
 	void setLightmapVisible(bool);
-	solidSelect_t select(CScn* scn, core::triangle3df, bool);
-	void deselect();
-	void hide(bool shared);
+
+	int getSolidIdx();
+
+
+	core::array<surfaceBox_t> select(CScnSolid* solid, core::triangle3df, bool);
+	void deselect(CScnSolid* solid, int si);
+	void deselectAll();
+	void hide(CScnSolid*,bool bShared);
 	void show();
-	void setTexture(CScn* scn, const char* path);
-	void updateVert(CScn* scn, indexedVec3df_t& vert, core::vector3df add);
-	void resetVert(CScn* scn, indexedVec3df_t& vert);
-	core::array<vertProp_t> getSurfVertProps(CScn* scn, int si);
-	indexed_vertices getVertices(CScn* scn);
-	void updateUV(CScn* scn, int uvmode, core::vector2df uvShift);
-	void resetUV(CScn* scn);
+	void setTexture(CScnSolid* solid, const char* path);
+	void updateVert(CScnSolid* solid, vertBox_t vertidx, core::vector3df add);
+	void resetVert(CScnSolid* solid, vertBox_t vertidx);
+	void updateUV(CScnSolid* solid, UVMode mode, core::vector2df uvShift);
+	void resetUV(CScnSolid* solid);
 	virtual void updateComponent();
 
 };

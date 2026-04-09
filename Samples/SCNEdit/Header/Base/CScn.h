@@ -24,6 +24,10 @@ private:
 	int loadHeader(std::ifstream * file);
 	int loadEntities(std::ifstream * file);
 	int loadLightmap(std::ifstream* file);
+	int saveFile(std::ofstream* file);
+	int saveHeader(std::ofstream* file);
+	int saveEntities(std::ofstream* file);
+
 public:
 	scnHeader_t * header;
 	CScnSolid * solids;

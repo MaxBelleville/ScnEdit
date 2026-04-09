@@ -20,10 +20,15 @@ private:
 	int loadNames(std::ifstream* file);
 	int loadPortal(scnPortal_t *, std::ifstream *);
 	int loadCellData(scnRawCell_t *,scnCellData_t * cell_data,std::ifstream * file);
-	scnCellData_t* getBBFromSurf(u16 surfindx, scnCellData_t* cell_data);
+
+
+
+
 	int calcUniqueTexturesNames(std::ifstream *);
 	void buildBackTree();
 
+
+	scnCellData_t* getBBFromSurf(u16 surfindx, scnCellData_t* cell_data);
 
 //const static defColor = video::SColor(128,255,255,255);
 public:
@@ -35,6 +40,9 @@ public:
 	int64_t uvposad;    //offset in file to start of uvpos array
 	int64_t projsad;   //offset in file to start of param frame array
 	int64_t vertssad; //ofset for vertices
+	int64_t uvidxsad; //offset for uvidxs 
+	int64_t vertidxsad; //offset for vertidxs
+
 	int64_t planessad; //ofset for planes
 	int64_t lengthsad;
 	scnSurf_t * surfs;
@@ -51,12 +59,17 @@ public:
 	//all texture names in the solid, each only once
 	std::vector<std::string> textures;
 	
+	core::array<CScnLocalizedFace> local_faces; 
+
 	//constructor - do nothing for now
 	CScnSolid ();
 	~CScnSolid();
 
 	//load from file
 	int loadSolid(std::ifstream*,u32);
+
+	void extractSurfaces();
+	void rebuildSurfaces();
 
 	core::array<u32>* uvpos_caller;  //for uvpos[i], this array contains the index of uvidxs that points to it,
 	//ie, uvpos[uvidx[uvpos_caller[i][j]]] = uvpos[i], for all j

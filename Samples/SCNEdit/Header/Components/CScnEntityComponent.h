@@ -3,8 +3,6 @@
 
 class CScnEntityComponent : public CComponentSystem
 {
-private:
-bool selected = false;
 public:
 	CScnEntityComponent();
 
@@ -22,7 +20,7 @@ public:
 
 	void deselect();
 
-	bool isSelected() { return selected; }
+	bool getSelected();
 
 	std::string getResetPos();
 };

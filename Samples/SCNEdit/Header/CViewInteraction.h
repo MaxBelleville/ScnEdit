@@ -41,8 +41,7 @@ protected:
 	static void deselectAll(CGameObject* current);
 	static void updateEntityPos(core::vector3df);
 	static void resetSolid();
-	static void updateNearestVert(core::vector3df);
-	static void updateSelectedVert(core::vector3df pos);
-	static void updateSurfaceVertCube();
-	static void getNearestDistVert(core::vector3df pos, core::array<indexedVec3df_t> verts, indexedVec3df_t& closest, float& minDistSq);
+	static void updateSelectedVertCube(core::vector3df, bool isSelected);
+	static void updateSurfVertCubes();
+	static void collectSurfs(core::array<surfaceBox_t> surfsels);
 };

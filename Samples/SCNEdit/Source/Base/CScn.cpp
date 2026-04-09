@@ -62,6 +62,7 @@ int CScn::loadFile(std::ifstream * file)
 		//Loads solids
 		os::Printer::log(format("\nGetting solid {}/{}...",i,header->n_solids-1).c_str());
 		solids[i].loadSolid(file,i);
+		
 		if (i < header->n_solids - 1)
 		//Sets overall offset of solid by the offset and length
 			solids[i+1].offset=solids[i].offset + solids[i].length;
@@ -71,6 +72,16 @@ int CScn::loadFile(std::ifstream * file)
 
 	loadEntities(file);
 	loadLightmap(file);
+
+	for (u32 i = 0; i < header->n_solids; i++)
+	{
+		for (u32 j = 0; j < solids[i].local_faces.size(); j++) {
+			if (lmap) {
+				solids[i].local_faces[j].hlmap =lmap->getHLmap(i, j);
+			}
+		}
+	}
+
 	return 0;
 }
 

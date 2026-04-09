@@ -201,24 +201,40 @@ struct scnRawCell_t //raw cell means it's the cell read not from the entity list
 struct localizedVertex_t {
 	core::vector3df pos;
 	core::vector2df uv;
-	u32 faceidx; 
+
+	u32 parent_si;
+	u32 localidx;
+
+	u32 uvidx;
+	u32 vertidx;
+	u32 faceidx;
+	bool hasShading;
 	u8 color[4];
 	core::array<localizedVertex_t*> shared;
 };
 
-struct solidSelect_t
+struct surfaceBox_t
 {
 	int solididx = 0;
-	int surfsel = 0;
-	solidSelect_t(int si, int surfs)
-		: solididx(si), surfsel(surfs) {}
+	int si = 0;
+	surfaceBox_t(int solidi, int si)
+		: solididx(solidi), si(si) {}
 };
 
-struct portalSelect_t
+struct vertBox_t {
+	int solididx = 0;
+	int si = 0;
+	int localidx = 0;
+	vertBox_t(int solidi, int si, int localidx)
+		: solididx(solidi), si(si), localidx(localidx) {
+	}
+};
+
+struct portalBox_t
 {
 	int cellidx = 0;
 	int portalidx = 0;
-	portalSelect_t(int ci, int pi)
+	portalBox_t(int ci, int pi)
 		: cellidx(ci), portalidx(pi) {}
 };
 
@@ -235,8 +251,15 @@ enum KeyAugment {
 	Shift,
 	CtrlShift,
 	Ctrl,
-	
 };
+
+enum UVMode {
+	Move,
+	Resize,
+	FlipH,
+	FlipV
+};
+
 struct pair_hash {
 	template <class T1, class T2>
 	std::size_t operator () (const std::pair<T1, T2>& p) const {

@@ -25,12 +25,12 @@ void CScnCellBBComponent::setMesh(CScnSolid* solid, u32 cellindx)
 	cellbb->setVisible(true);
 
 }
-void CScnCellBBComponent::updateBB(CScn* scn, indexedVec3df_t vert, bool reset)
+void CScnCellBBComponent::updateBB(CScnSolid* solid, vertBox_t vertsel, bool reset)
 {
 	CEntity* entity = m_gameObject->getEntity();
 	CScnCellBBData* cellbb = entity->getData<CScnCellBBData>();
 	if (cellbb) 
-		cellbb->updateBB(scn,vert,reset);
+		cellbb->updateBB(solid, vertsel,reset);
 }
 
 

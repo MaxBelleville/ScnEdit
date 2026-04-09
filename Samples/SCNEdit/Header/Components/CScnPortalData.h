@@ -5,9 +5,14 @@
 
 class CScnPortalData : public CRenderMeshData
 {
+
+protected:
+	portalBox_t portaldata = portalBox_t(-1, -1);
+	bool selected = false;
+
 public:
 	IMeshBuffer *MeshBuffer;
-	portalSelect_t portaldata = portalSelect_t(-1,-1);
+	
 public:
 	CScnPortalData();
 
@@ -15,19 +20,28 @@ public:
 
 	void initMesh(CScnSolid* solid, u32 cellindx, s32 portalindx);
 
-	inline void select() {
-
-		RenderMesh->Materials[0]->changeShader("BuiltIn/Shader/Basic/VertexColor.xml");
-
+	inline bool toggleSelect() {
+		return selected ? deselect() : select();
 	}
 
-	inline void deselect() {
+	inline bool select() {
+		RenderMesh->Materials[0]->changeShader("BuiltIn/Shader/Basic/VertexColor.xml");
+		return (selected = true);
+	}
 
+	inline bool deselect() {
 		if (!str_equals("BuiltIn/Shader/Basic/VertexColorAlpha.xml", RenderMesh->Materials[0]->getShaderPath())) {
 			RenderMesh->Materials[0]->changeShader("BuiltIn/Shader/Basic/VertexColorAlpha.xml");
+			return (selected = false);
 		}
-
+		return selected;
 	}
 
+	inline portalBox_t getPortalData() {
+		return portaldata;
+	}
 
+	inline bool getSelected() {
+		return selected;
+	}
 };

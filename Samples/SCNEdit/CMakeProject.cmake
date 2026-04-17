@@ -1,5 +1,5 @@
 
 file(GLOB_RECURSE additional_source
-	./Header/**.h)
+	./include/**.h)
 	
 list (APPEND application_source ${additional_source})

@@ -64,8 +64,8 @@ endif()
 set(template_path ${SKYLICHT_ENGINE_PROJECT_DIR}/Main)
 
 file(GLOB_RECURSE application_source 
-	./Source/**.cpp 
-	./Source/**.c 
+	./src/**.cpp 
+	./src/**.c 
 	)
 
 # Custom additional sources
